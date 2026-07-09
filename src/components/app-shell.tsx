@@ -2,13 +2,14 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { Home, ListChecks, Sparkles, Flame, CalendarDays } from "lucide-react";
 import type { ReactNode } from "react";
 
-const tabs = [
+type Tab = { to: string; label: string; icon: typeof Home; center?: boolean };
+const tabs: Tab[] = [
   { to: "/", label: "Today", icon: Home },
   { to: "/tasks", label: "Tasks", icon: ListChecks },
   { to: "/ai", label: "Origin", icon: Sparkles, center: true },
   { to: "/habits", label: "Habits", icon: Flame },
   { to: "/calendar", label: "Plan", icon: CalendarDays },
-] as const;
+];
 
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
