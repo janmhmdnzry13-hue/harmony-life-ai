@@ -84,6 +84,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:description", content: "A calm, AI-powered home for your day: tasks, habits, calendar, mood, and thinking — in one place." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Origin — Your life operating system" },
+      { name: "twitter:description", content: "A calm, AI-powered home for your day: tasks, habits, calendar, mood, and thinking — in one place." },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/ebef2e36-4a88-4047-b440-f26d06f86819" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/ebef2e36-4a88-4047-b440-f26d06f86819" },
     ],
     links: [
       {
