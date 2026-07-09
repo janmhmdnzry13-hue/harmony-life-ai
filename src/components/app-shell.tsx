@@ -26,7 +26,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               const Icon = t.icon;
               if (t.center) {
                 return (
-                  <Link key={t.to} to={t.to} className="flex flex-col items-center gap-1 -mt-6">
+                  <Link key={t.to} to={t.to as never} className="flex flex-col items-center gap-1 -mt-6">
                     <div className="size-12 bg-ink text-paper border border-ink flex items-center justify-center">
                       <Icon className="size-5" strokeWidth={1.8} />
                     </div>
