@@ -37,7 +37,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 );
               }
               return (
-                <Link key={t.to} to={t.to} className="flex flex-col items-center gap-1 py-1 px-2">
+                <Link key={t.to} to={t.to as never} className="flex flex-col items-center gap-1 py-1 px-2">
                   <Icon
                     className={`size-5 ${active ? "text-ink" : "text-ink/30"}`}
                     strokeWidth={1.8}
