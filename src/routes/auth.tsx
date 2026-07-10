@@ -20,10 +20,12 @@ function AuthPage() {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
+    setErrorMsg(null);
     try {
       if (mode === "signup") {
         const { error } = await supabase.auth.signUp({
@@ -42,7 +44,9 @@ function AuthPage() {
       }
       navigate({ to: "/" });
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Something went wrong");
+      const msg = err instanceof Error ? err.message : "Something went wrong";
+      setErrorMsg(msg);
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
@@ -54,7 +58,9 @@ function AuthPage() {
       redirect_uri: window.location.origin,
     });
     if (res.error) {
-      toast.error(res.error.message ?? "Google sign-in failed");
+      const msg = res.error.message ?? "Google sign-in failed";
+      setErrorMsg(msg);
+      toast.error(msg);
       setLoading(false);
       return;
     }
@@ -107,6 +113,16 @@ function AuthPage() {
             onChange={(e) => setPassword(e.target.value)}
             className="w-full bg-surface border border-ink/10 px-4 py-3.5 text-sm focus:outline-none focus:border-ink/40"
           />
+          {errorMsg && (
+            <div className="border border-ink/20 bg-ink/5 px-4 py-3 text-xs text-ink/80">
+              {errorMsg}
+            </div>
+          )}
+          {mode === "signup" && (
+            <p className="text-[11px] text-ink/50 leading-relaxed">
+              Use at least 8 characters with a mix of letters, numbers, and symbols. Common or breached passwords are rejected.
+            </p>
+          )}
           <button
             type="submit"
             disabled={loading}
