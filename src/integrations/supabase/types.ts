@@ -38,6 +38,30 @@ export type Database = {
         }
         Relationships: []
       }
+      brain_dumps: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          processed: boolean
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          processed?: boolean
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          processed?: boolean
+          user_id?: string
+        }
+        Relationships: []
+      }
       budgets: {
         Row: {
           amount: number
@@ -103,6 +127,53 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      goals: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          progress: number
+          project_id: string | null
+          status: string
+          target_date: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          progress?: number
+          project_id?: string | null
+          status?: string
+          target_date?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          progress?: number
+          project_id?: string | null
+          status?: string
+          target_date?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "goals_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       habit_logs: {
         Row: {
@@ -172,6 +243,105 @@ export type Database = {
         }
         Relationships: []
       }
+      journal_entries: {
+        Row: {
+          content: string
+          created_at: string
+          entry_date: string
+          gratitude: string | null
+          id: string
+          mood: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content?: string
+          created_at?: string
+          entry_date?: string
+          gratitude?: string | null
+          id?: string
+          mood?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          entry_date?: string
+          gratitude?: string | null
+          id?: string
+          mood?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      notes: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          pinned: boolean
+          tags: string[]
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content?: string
+          created_at?: string
+          id?: string
+          pinned?: boolean
+          tags?: string[]
+          title?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          pinned?: boolean
+          tags?: string[]
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          body: string | null
+          created_at: string
+          id: string
+          kind: string
+          link: string | null
+          read_at: string | null
+          title: string
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          kind?: string
+          link?: string | null
+          read_at?: string | null
+          title: string
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          kind?: string
+          link?: string | null
+          read_at?: string | null
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -202,15 +372,53 @@ export type Database = {
         }
         Relationships: []
       }
+      projects: {
+        Row: {
+          color: string
+          created_at: string
+          description: string | null
+          due_date: string | null
+          id: string
+          name: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          color?: string
+          created_at?: string
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          name: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          name?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       tasks: {
         Row: {
           completed: boolean
           completed_at: string | null
           created_at: string
           due_date: string | null
+          goal_id: string | null
           id: string
           notes: string | null
           priority: string
+          project_id: string | null
           tag: string | null
           title: string
           updated_at: string
@@ -221,9 +429,11 @@ export type Database = {
           completed_at?: string | null
           created_at?: string
           due_date?: string | null
+          goal_id?: string | null
           id?: string
           notes?: string | null
           priority?: string
+          project_id?: string | null
           tag?: string | null
           title: string
           updated_at?: string
@@ -234,15 +444,32 @@ export type Database = {
           completed_at?: string | null
           created_at?: string
           due_date?: string | null
+          goal_id?: string | null
           id?: string
           notes?: string | null
           priority?: string
+          project_id?: string | null
           tag?: string | null
           title?: string
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "tasks_goal_id_fkey"
+            columns: ["goal_id"]
+            isOneToOne: false
+            referencedRelation: "goals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tasks_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       transactions: {
         Row: {
@@ -276,6 +503,36 @@ export type Database = {
           note?: string | null
           occurred_on?: string
           type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_settings: {
+        Row: {
+          created_at: string
+          daily_summary_time: string
+          notification_prefs: Json
+          theme: string
+          timezone: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          daily_summary_time?: string
+          notification_prefs?: Json
+          theme?: string
+          timezone?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          daily_summary_time?: string
+          notification_prefs?: Json
+          theme?: string
+          timezone?: string
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
