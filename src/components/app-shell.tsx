@@ -4,6 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { Home, ListChecks, Sparkles, Flame, Wallet, User } from "lucide-react";
 import type { ReactNode } from "react";
 import { getProfile } from "@/lib/profile.functions";
+import { NotificationsBell } from "@/components/notifications-bell";
 
 type Tab = { to: string; label: string; icon: typeof Home; center?: boolean };
 const tabs: Tab[] = [
@@ -38,15 +39,18 @@ export function AppShell({ children }: { children: ReactNode }) {
               Origin
             </span>
           </div>
-          <Link
-            to="/account"
-            aria-label="Account"
-            className={`size-9 border flex items-center justify-center text-[11px] font-medium tracking-wide transition-colors ${
-              onAccount ? "bg-ink text-paper border-ink" : "border-ink/20 text-ink/70 hover:border-ink hover:text-ink"
-            }`}
-          >
-            {initials.length > 0 ? initials : <User className="size-4" />}
-          </Link>
+          <div className="flex items-center gap-2">
+            <NotificationsBell />
+            <Link
+              to="/account"
+              aria-label="Account"
+              className={`size-9 border flex items-center justify-center text-[11px] font-medium tracking-wide transition-colors ${
+                onAccount ? "bg-ink text-paper border-ink" : "border-ink/20 text-ink/70 hover:border-ink hover:text-ink"
+              }`}
+            >
+              {initials.length > 0 ? initials : <User className="size-4" />}
+            </Link>
+          </div>
         </header>
 
         <main className="flex-1 pb-28">{children}</main>
