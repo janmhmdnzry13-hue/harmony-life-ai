@@ -1,6 +1,9 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Home, ListChecks, Sparkles, Flame, Wallet } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { Home, ListChecks, Sparkles, Flame, Wallet, User } from "lucide-react";
 import type { ReactNode } from "react";
+import { getProfile } from "@/lib/profile.functions";
 
 type Tab = { to: string; label: string; icon: typeof Home; center?: boolean };
 const tabs: Tab[] = [
@@ -13,10 +16,39 @@ const tabs: Tab[] = [
 
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const profileFn = useServerFn(getProfile);
+  const profile = useQuery({ queryKey: ["profile"], queryFn: () => profileFn() });
+
+  const initials = (profile.data?.display_name || "◦")
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((s) => s[0]?.toUpperCase())
+    .join("") || "◦";
+
+  const onAccount = pathname === "/account";
 
   return (
     <div className="min-h-screen bg-paper text-ink flex justify-center">
       <div className="w-full max-w-[480px] min-h-screen flex flex-col relative">
+        <header className="sticky top-0 z-30 bg-paper/95 backdrop-blur border-b border-ink/5 px-5 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="size-1.5 bg-accent rounded-full" />
+            <span className="text-[10px] uppercase tracking-[0.2em] text-ink/50 font-medium">
+              Origin
+            </span>
+          </div>
+          <Link
+            to="/account"
+            aria-label="Account"
+            className={`size-9 border flex items-center justify-center text-[11px] font-medium tracking-wide transition-colors ${
+              onAccount ? "bg-ink text-paper border-ink" : "border-ink/20 text-ink/70 hover:border-ink hover:text-ink"
+            }`}
+          >
+            {initials.length > 0 ? initials : <User className="size-4" />}
+          </Link>
+        </header>
+
         <main className="flex-1 pb-28">{children}</main>
 
         <nav className="fixed bottom-0 inset-x-0 z-40 flex justify-center pointer-events-none">
