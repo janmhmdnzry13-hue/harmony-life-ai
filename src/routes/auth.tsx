@@ -23,8 +23,14 @@ function AuthPage() {
     supabase.auth.getUser().then(({ data }) => {
       if (active && data.user) navigate({ to: "/" });
     });
+
+    const { data: subscription } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_IN" && session) navigate({ to: "/" });
+    });
+
     return () => {
       active = false;
+      subscription.subscription.unsubscribe();
     };
   }, [navigate]);
 
