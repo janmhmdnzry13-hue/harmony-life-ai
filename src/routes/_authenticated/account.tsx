@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 import { getProfile, updateName } from "@/lib/profile.functions";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, LogOut, Mail, User as UserIcon, Calendar } from "lucide-react";
+import { ArrowLeft, LogOut, Mail, User as UserIcon, Calendar, Settings as SettingsIcon } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 
@@ -143,10 +143,21 @@ function AccountPage() {
         <Row icon={<UserIcon className="size-4" />} label="User ID" value={userId.slice(0, 8) + "…"} mono />
       </div>
 
+      <Link
+        to="/settings"
+        className="mt-6 w-full flex items-center justify-between border border-ink/15 px-4 py-3.5 text-sm hover:border-ink/40"
+      >
+        <span className="flex items-center gap-2">
+          <SettingsIcon className="size-4" />
+          Settings
+        </span>
+        <span className="text-xs uppercase tracking-widest text-ink/40">Open</span>
+      </Link>
+
       <button
         onClick={signOut}
         disabled={signingOut}
-        className="mt-8 w-full flex items-center justify-center gap-2 border border-ink py-3.5 text-sm font-medium tracking-wide hover:bg-ink hover:text-paper transition-colors disabled:opacity-50"
+        className="mt-3 w-full flex items-center justify-center gap-2 border border-ink py-3.5 text-sm font-medium tracking-wide hover:bg-ink hover:text-paper transition-colors disabled:opacity-50"
       >
         <LogOut className="size-4" />
         {signingOut ? "Signing out…" : "Sign out"}
