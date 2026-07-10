@@ -1,15 +1,10 @@
 import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/auth")({
-  ssr: false,
-  beforeLoad: async () => {
-    const { data } = await supabase.auth.getUser();
-    if (data.user) throw redirect({ to: "/" });
-  },
   component: AuthPage,
 });
 
@@ -21,14 +16,26 @@ function AuthPage() {
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [noticeMsg, setNoticeMsg] = useState<string | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    supabase.auth.getUser().then(({ data }) => {
+      if (active && data.user) navigate({ to: "/" });
+    });
+    return () => {
+      active = false;
+    };
+  }, [navigate]);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     setErrorMsg(null);
+    setNoticeMsg(null);
     try {
       if (mode === "signup") {
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
@@ -37,14 +44,29 @@ function AuthPage() {
           },
         });
         if (error) throw error;
+
+        if (!data.session) {
+          const message =
+            "Check your email to confirm the account, then sign in. If this email uses Google, continue with Google instead.";
+          setNoticeMsg(message);
+          setMode("signin");
+          setPassword("");
+          toast.success("Confirmation email sent.");
+          return;
+        }
+
         toast.success("Account created. Welcome.");
       } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
+        if (!data.session) {
+          throw new Error("Please confirm your email before signing in.");
+        }
       }
       navigate({ to: "/" });
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Something went wrong";
+      const raw = err instanceof Error ? err.message : "Something went wrong";
+      const msg = friendlyAuthMessage(raw, mode);
       setErrorMsg(msg);
       toast.error(msg);
     } finally {
@@ -54,18 +76,27 @@ function AuthPage() {
 
   async function onGoogle() {
     setLoading(true);
-    const res = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
-    });
-    if (res.error) {
-      const msg = res.error.message ?? "Google sign-in failed";
+    setErrorMsg(null);
+    setNoticeMsg(null);
+    try {
+      const res = await lovable.auth.signInWithOAuth("google", {
+        redirect_uri: window.location.origin,
+      });
+      if (res.error) {
+        const msg = res.error.message ?? "Google sign-in failed";
+        setErrorMsg(msg);
+        toast.error(msg);
+        return;
+      }
+      if (res.redirected) return;
+      navigate({ to: "/" });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Google sign-in failed";
       setErrorMsg(msg);
       toast.error(msg);
+    } finally {
       setLoading(false);
-      return;
     }
-    if (res.redirected) return;
-    navigate({ to: "/" });
   }
 
   return (
@@ -118,6 +149,11 @@ function AuthPage() {
               {errorMsg}
             </div>
           )}
+          {noticeMsg && (
+            <div className="border border-accent/30 bg-accent/10 px-4 py-3 text-xs text-ink/80">
+              {noticeMsg}
+            </div>
+          )}
           {mode === "signup" && (
             <p className="text-[11px] text-ink/50 leading-relaxed">
               Use at least 8 characters with a mix of letters, numbers, and symbols. Common or breached passwords are rejected.
@@ -148,7 +184,11 @@ function AuthPage() {
 
         <button
           type="button"
-          onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
+          onClick={() => {
+            setMode(mode === "signin" ? "signup" : "signin");
+            setErrorMsg(null);
+            setNoticeMsg(null);
+          }}
           className="mt-8 text-xs text-ink/60 hover:text-ink"
         >
           {mode === "signin"
@@ -158,4 +198,21 @@ function AuthPage() {
       </div>
     </div>
   );
+}
+
+function friendlyAuthMessage(message: string, mode: "signin" | "signup") {
+  const lower = message.toLowerCase();
+  if (lower.includes("invalid login credentials")) {
+    return "That email and password do not match. If you signed up with Google, use Continue with Google. If you just created an account, confirm your email first.";
+  }
+  if (lower.includes("email not confirmed") || lower.includes("confirm your email")) {
+    return "Please confirm your email first, then sign in.";
+  }
+  if (lower.includes("weak_password") || lower.includes("weak") || lower.includes("pwned")) {
+    return "Choose a stronger, unique password. Common or leaked passwords are rejected.";
+  }
+  if (mode === "signup" && lower.includes("already")) {
+    return "This email may already have an account. Sign in, reset the password, or continue with Google.";
+  }
+  return message;
 }
