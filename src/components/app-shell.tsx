@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Home, ListChecks, Sparkles, Flame, CalendarDays } from "lucide-react";
+import { Home, ListChecks, Sparkles, Flame, Wallet } from "lucide-react";
 import type { ReactNode } from "react";
 
 type Tab = { to: string; label: string; icon: typeof Home; center?: boolean };
@@ -8,7 +8,7 @@ const tabs: Tab[] = [
   { to: "/tasks", label: "Tasks", icon: ListChecks },
   { to: "/ai", label: "Origin", icon: Sparkles, center: true },
   { to: "/habits", label: "Habits", icon: Flame },
-  { to: "/calendar", label: "Plan", icon: CalendarDays },
+  { to: "/finance", label: "Money", icon: Wallet },
 ];
 
 export function AppShell({ children }: { children: ReactNode }) {
