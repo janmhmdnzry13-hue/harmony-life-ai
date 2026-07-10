@@ -18,6 +18,17 @@ export const Route = createFileRoute("/_authenticated/finance")({
   component: FinancePage,
 });
 
+type TxInput = {
+  type: "income" | "expense";
+  amount: number;
+  currency: string;
+  category: string;
+  note: string | null;
+  occurred_on: string;
+};
+type BudgetInput = { category: string; amount: number; currency: string; month: string };
+
+
 const CATEGORIES = [
   "food",
   "transport",
@@ -70,7 +81,7 @@ function FinancePage() {
   }, [transactions, month]);
 
   const createTx = useMutation({
-    mutationFn: (v: Parameters<typeof upTx>[0]["data"]) => upTx({ data: v }),
+    mutationFn: (v: TxInput) => upTx({ data: v }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["finance"] });
       setTxOpen(false);
@@ -82,7 +93,7 @@ function FinancePage() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["finance"] }),
   });
   const saveBudget = useMutation({
-    mutationFn: (v: Parameters<typeof upBud>[0]["data"]) => upBud({ data: v }),
+    mutationFn: (v: BudgetInput) => upBud({ data: v }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["finance"] });
       setBudOpen(false);
