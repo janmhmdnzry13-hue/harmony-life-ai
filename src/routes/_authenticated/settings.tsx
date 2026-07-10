@@ -11,6 +11,14 @@ export const Route = createFileRoute("/_authenticated/settings")({
 });
 
 type Theme = "light" | "dark" | "system";
+type PrefKey = "daily_summary" | "habit_streaks" | "task_due";
+type Prefs = Record<PrefKey, boolean>;
+type SettingsPatch = {
+  theme?: Theme;
+  timezone?: string;
+  notification_prefs?: Prefs;
+  daily_summary_time?: string;
+};
 
 function SettingsPage() {
   const qc = useQueryClient();
@@ -21,7 +29,7 @@ function SettingsPage() {
   const settings = useQuery({ queryKey: ["settings"], queryFn: () => getFn() });
 
   const save = useMutation({
-    mutationFn: (patch: Parameters<typeof setFn>[0]["data"]) => setFn({ data: patch }),
+    mutationFn: (patch: SettingsPatch) => setFn({ data: patch }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["settings"] });
       toast.success("Saved");
@@ -29,19 +37,23 @@ function SettingsPage() {
     onError: (e) => toast.error(e instanceof Error ? e.message : "Save failed"),
   });
 
-  const prefs = settings.data?.notification_prefs ?? {
-    daily_summary: true,
-    habit_streaks: true,
-    task_due: true,
-  };
+  const rawPrefs = settings.data?.notification_prefs;
+  const prefs: Prefs =
+    rawPrefs && typeof rawPrefs === "object" && !Array.isArray(rawPrefs)
+      ? {
+          daily_summary: (rawPrefs as Record<string, unknown>).daily_summary !== false,
+          habit_streaks: (rawPrefs as Record<string, unknown>).habit_streaks !== false,
+          task_due: (rawPrefs as Record<string, unknown>).task_due !== false,
+        }
+      : { daily_summary: true, habit_streaks: true, task_due: true };
 
   const pickTheme = (t: Theme) => {
     setTheme(t);
     save.mutate({ theme: t });
   };
 
-  const togglePref = (key: "daily_summary" | "habit_streaks" | "task_due") => {
-    const next = { ...prefs, [key]: !prefs[key] };
+  const togglePref = (key: PrefKey) => {
+    const next: Prefs = { ...prefs, [key]: !prefs[key] };
     save.mutate({ notification_prefs: next });
   };
 
