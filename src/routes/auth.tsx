@@ -30,13 +30,14 @@ function AuthPage() {
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
+    const normalizedEmail = email.trim().toLowerCase();
     setLoading(true);
     setErrorMsg(null);
     setNoticeMsg(null);
     try {
       if (mode === "signup") {
         const { data, error } = await supabase.auth.signUp({
-          email,
+          email: normalizedEmail,
           password,
           options: {
             emailRedirectTo: window.location.origin,
@@ -47,7 +48,7 @@ function AuthPage() {
 
         if (!data.session) {
           const message =
-            "Check your email to confirm the account, then sign in. If this email uses Google, continue with Google instead.";
+            "Check your email to confirm the account, then sign in. If this email already uses Google, continue with Google or reset the password.";
           setNoticeMsg(message);
           setMode("signin");
           setPassword("");
@@ -57,7 +58,10 @@ function AuthPage() {
 
         toast.success("Account created. Welcome.");
       } else {
-        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: normalizedEmail,
+          password,
+        });
         if (error) throw error;
         if (!data.session) {
           throw new Error("Please confirm your email before signing in.");
@@ -88,10 +92,42 @@ function AuthPage() {
         toast.error(msg);
         return;
       }
-      if (res.redirected) return;
+      if (res.redirected) {
+        setLoading(false);
+        return;
+      }
       navigate({ to: "/" });
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Google sign-in failed";
+      setErrorMsg(msg);
+      toast.error(msg);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function onForgotPassword() {
+    const normalizedEmail = email.trim().toLowerCase();
+    if (!normalizedEmail) {
+      const msg = "Enter your email first, then request a reset link.";
+      setErrorMsg(msg);
+      toast.error(msg);
+      return;
+    }
+
+    setLoading(true);
+    setErrorMsg(null);
+    setNoticeMsg(null);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(normalizedEmail, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      if (error) throw error;
+      const msg = "Password reset link sent. Check your email.";
+      setNoticeMsg(msg);
+      toast.success(msg);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Could not send reset link.";
       setErrorMsg(msg);
       toast.error(msg);
     } finally {
@@ -167,6 +203,17 @@ function AuthPage() {
             {loading ? "…" : mode === "signin" ? "Sign in" : "Create account"}
           </button>
         </form>
+
+        {mode === "signin" && (
+          <button
+            type="button"
+            onClick={onForgotPassword}
+            disabled={loading}
+            className="mt-3 text-xs text-ink/50 hover:text-ink disabled:opacity-50"
+          >
+            Forgot password?
+          </button>
+        )}
 
         <div className="my-5 flex items-center gap-3">
           <div className="h-px flex-1 bg-ink/10" />
