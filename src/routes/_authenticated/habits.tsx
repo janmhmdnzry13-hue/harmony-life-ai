@@ -77,7 +77,14 @@ function HabitsPage() {
             <div key={h.id} className="p-4 border border-ink/10 bg-surface group">
               <div className="flex justify-between items-start mb-3">
                 <div className="flex-1 min-w-0">
-                  <h4 className="font-serif text-lg">{h.name}</h4>
+                  <h4 className="font-serif text-lg">
+                    {h.name}
+                    {h.expires_on && (
+                      <span className="ml-2 text-[10px] uppercase tracking-widest text-ink/40 font-sans">
+                        today only
+                      </span>
+                    )}
+                  </h4>
                   {h.description && (
                     <p className="text-[10px] uppercase tracking-widest text-ink/40 mt-0.5">
                       {h.description}
@@ -88,7 +95,8 @@ function HabitsPage() {
                   <div className="font-serif italic text-xl text-accent">{streak}d</div>
                   <button
                     onClick={() => del.mutate(h.id)}
-                    className="opacity-0 group-hover:opacity-100 p-1 text-ink/40"
+                    className="p-1 text-ink/40 hover:text-destructive"
+                    aria-label="Delete habit"
                   >
                     <Trash2 className="size-4" />
                   </button>
