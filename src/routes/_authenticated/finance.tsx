@@ -274,9 +274,9 @@ function FinancePage() {
                 }`}
               >
                 {t.type === "income" ? (
-                  <ArrowUpRight className="size-4" />
+                  <ArrowDownLeft className="size-4" />
                 ) : (
-                  <ArrowDownRight className="size-4" />
+                  <ArrowUpRight className="size-4" />
                 )}
               </div>
               <div className="flex-1 min-w-0">
