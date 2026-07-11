@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState, useMemo } from "react";
 import { format, parseISO } from "date-fns";
-import { Plus, Sparkles, Trash2, ArrowUpRight, ArrowDownRight, Loader2 } from "lucide-react";
+import { Plus, Sparkles, Trash2, ArrowDownLeft, ArrowUpRight, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import {
   listFinance,
@@ -146,13 +146,13 @@ function FinancePage() {
         <div className="grid grid-cols-2 divide-x divide-ink/10">
           <div className="p-4">
             <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-widest text-ink/40 mb-1">
-              <ArrowUpRight className="size-3" /> Income
+              <ArrowDownLeft className="size-3" /> Income
             </div>
             <p className="font-serif text-xl">{formatMoney(totals.income, currency)}</p>
           </div>
           <div className="p-4">
             <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-widest text-ink/40 mb-1">
-              <ArrowDownRight className="size-3" /> Spent
+              <ArrowUpRight className="size-3" /> Spent
             </div>
             <p className="font-serif text-xl">{formatMoney(totals.expense, currency)}</p>
           </div>
@@ -274,9 +274,9 @@ function FinancePage() {
                 }`}
               >
                 {t.type === "income" ? (
-                  <ArrowUpRight className="size-4" />
+                  <ArrowDownLeft className="size-4" />
                 ) : (
-                  <ArrowDownRight className="size-4" />
+                  <ArrowUpRight className="size-4" />
                 )}
               </div>
               <div className="flex-1 min-w-0">
