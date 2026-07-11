@@ -172,8 +172,16 @@ function TasksPage() {
                 className="bg-surface border border-ink/10 px-3 py-3 text-sm focus:outline-none focus:border-ink/40"
               />
             </div>
+            <label className="flex items-center gap-2 mb-4 text-xs uppercase tracking-widest cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={justToday}
+                onChange={(e) => setJustToday(e.target.checked)}
+                className="size-4 accent-ink"
+              />
+              Just for today (auto-delete tomorrow)
+            </label>
             <button
-              disabled={!title.trim() || create.isPending}
               onClick={() => create.mutate()}
               className="w-full bg-ink text-paper py-3 text-sm font-medium disabled:opacity-40"
             >
