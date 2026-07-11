@@ -93,11 +93,13 @@ function TasksPage() {
                 {t.tag ? `${t.tag} · ` : ""}
                 {t.priority}
                 {t.due_date ? ` · ${format(parseISO(t.due_date), "MMM d")}` : ""}
+                {t.expires_on ? " · today only" : ""}
               </p>
             </div>
             <button
               onClick={() => del.mutate(t.id)}
-              className="opacity-0 group-hover:opacity-100 p-1 text-ink/40"
+              className="p-1 text-ink/40 hover:text-destructive"
+              aria-label="Delete"
             >
               <Trash2 className="size-4" />
             </button>
