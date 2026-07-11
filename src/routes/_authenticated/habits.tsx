@@ -153,6 +153,15 @@ function HabitsPage() {
               onChange={(e) => setDescription(e.target.value)}
               className="w-full bg-surface border border-ink/10 px-3 py-3 text-sm mb-4 focus:outline-none focus:border-ink/40"
             />
+            <label className="flex items-center gap-2 mb-4 text-xs uppercase tracking-widest cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={justToday}
+                onChange={(e) => setJustToday(e.target.checked)}
+                className="size-4 accent-ink"
+              />
+              Just for today (auto-delete tomorrow)
+            </label>
             <button
               disabled={!name.trim() || create.isPending}
               onClick={() => create.mutate()}
