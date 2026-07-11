@@ -22,15 +22,17 @@ function HabitsPage() {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
+  const [justToday, setJustToday] = useState(false);
 
   const create = useMutation({
     mutationFn: () =>
-      createFn({ data: { name, description: description || null, target_per_day: 1 } }),
+      createFn({ data: { name, description: description || null, target_per_day: 1, just_for_today: justToday } }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["habits"] });
       setOpen(false);
       setName("");
       setDescription("");
+      setJustToday(false);
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
   });
