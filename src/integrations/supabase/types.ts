@@ -216,6 +216,7 @@ export type Database = {
           color: string
           created_at: string
           description: string | null
+          expires_on: string | null
           id: string
           name: string
           target_per_day: number
@@ -226,6 +227,7 @@ export type Database = {
           color?: string
           created_at?: string
           description?: string | null
+          expires_on?: string | null
           id?: string
           name: string
           target_per_day?: number
@@ -236,6 +238,7 @@ export type Database = {
           color?: string
           created_at?: string
           description?: string | null
+          expires_on?: string | null
           id?: string
           name?: string
           target_per_day?: number
@@ -414,6 +417,7 @@ export type Database = {
           completed_at: string | null
           created_at: string
           due_date: string | null
+          expires_on: string | null
           goal_id: string | null
           id: string
           notes: string | null
@@ -429,6 +433,7 @@ export type Database = {
           completed_at?: string | null
           created_at?: string
           due_date?: string | null
+          expires_on?: string | null
           goal_id?: string | null
           id?: string
           notes?: string | null
@@ -444,6 +449,7 @@ export type Database = {
           completed_at?: string | null
           created_at?: string
           due_date?: string | null
+          expires_on?: string | null
           goal_id?: string | null
           id?: string
           notes?: string | null
