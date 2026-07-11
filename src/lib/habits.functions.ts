@@ -2,9 +2,16 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 
+function todayStr() {
+  return new Date().toISOString().slice(0, 10);
+}
+
 export const listHabits = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
+    // Purge one-day habits from prior days
+    await context.supabase.from("habits").delete().lt("expires_on", todayStr());
+
     const [{ data: habits, error: e1 }, { data: logs, error: e2 }] = await Promise.all([
       context.supabase.from("habits").select("*").eq("archived", false).order("created_at"),
       context.supabase
@@ -24,10 +31,16 @@ export const createHabit = createServerFn({ method: "POST" })
       name: z.string().min(1).max(80),
       description: z.string().max(200).optional().nullable(),
       target_per_day: z.number().int().min(1).max(20).default(1),
+      just_for_today: z.boolean().optional().default(false),
     }).parse(v),
   )
   .handler(async ({ data, context }) => {
-    const { error } = await context.supabase.from("habits").insert({ ...data, user_id: context.userId });
+    const { just_for_today, ...rest } = data;
+    const { error } = await context.supabase.from("habits").insert({
+      ...rest,
+      user_id: context.userId,
+      expires_on: just_for_today ? todayStr() : null,
+    });
     if (error) throw new Error(error.message);
     return { ok: true };
   });
