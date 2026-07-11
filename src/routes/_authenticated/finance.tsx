@@ -269,8 +269,8 @@ function FinancePage() {
               <div
                 className={`size-8 border flex items-center justify-center ${
                   t.type === "income"
-                    ? "border-accent/40 text-accent"
-                    : "border-ink/20 text-ink/70"
+                    ? "border-foreground/40 text-foreground"
+                    : "border-destructive/40 text-destructive"
                 }`}
               >
                 {t.type === "income" ? (
