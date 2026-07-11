@@ -146,13 +146,13 @@ function FinancePage() {
         <div className="grid grid-cols-2 divide-x divide-ink/10">
           <div className="p-4">
             <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-widest text-ink/40 mb-1">
-              <ArrowDownLeft className="size-3" /> Income
+              <ArrowDownLeft className="size-3 text-foreground" /> Income
             </div>
             <p className="font-serif text-xl text-foreground">{formatMoney(totals.income, currency)}</p>
           </div>
           <div className="p-4">
             <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-widest text-ink/40 mb-1">
-              <ArrowUpRight className="size-3" /> Spent
+              <ArrowUpRight className="size-3 text-destructive" /> Spent
             </div>
             <p className="font-serif text-xl text-destructive">{formatMoney(totals.expense, currency)}</p>
           </div>
@@ -269,8 +269,8 @@ function FinancePage() {
               <div
                 className={`size-8 border flex items-center justify-center ${
                   t.type === "income"
-                    ? "border-accent/40 text-accent"
-                    : "border-ink/20 text-ink/70"
+                    ? "border-foreground/40 text-foreground"
+                    : "border-destructive/40 text-destructive"
                 }`}
               >
                 {t.type === "income" ? (
