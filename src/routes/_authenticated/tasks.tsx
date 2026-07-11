@@ -26,6 +26,7 @@ function TasksPage() {
   const [priority, setPriority] = useState<"low" | "medium" | "high">("medium");
   const [tag, setTag] = useState("");
   const [dueDate, setDueDate] = useState("");
+  const [justToday, setJustToday] = useState(false);
 
   const create = useMutation({
     mutationFn: () =>
@@ -35,6 +36,7 @@ function TasksPage() {
           priority,
           tag: tag || null,
           due_date: dueDate || null,
+          just_for_today: justToday,
         },
       }),
     onSuccess: () => {
@@ -44,6 +46,7 @@ function TasksPage() {
       setTag("");
       setDueDate("");
       setPriority("medium");
+      setJustToday(false);
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
   });
@@ -90,11 +93,13 @@ function TasksPage() {
                 {t.tag ? `${t.tag} · ` : ""}
                 {t.priority}
                 {t.due_date ? ` · ${format(parseISO(t.due_date), "MMM d")}` : ""}
+                {t.expires_on ? " · today only" : ""}
               </p>
             </div>
             <button
               onClick={() => del.mutate(t.id)}
-              className="opacity-0 group-hover:opacity-100 p-1 text-ink/40"
+              className="p-1 text-ink/40 hover:text-destructive"
+              aria-label="Delete"
             >
               <Trash2 className="size-4" />
             </button>
@@ -167,6 +172,15 @@ function TasksPage() {
                 className="bg-surface border border-ink/10 px-3 py-3 text-sm focus:outline-none focus:border-ink/40"
               />
             </div>
+            <label className="flex items-center gap-2 mb-4 text-xs uppercase tracking-widest cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={justToday}
+                onChange={(e) => setJustToday(e.target.checked)}
+                className="size-4 accent-ink"
+              />
+              Just for today (auto-delete tomorrow)
+            </label>
             <button
               disabled={!title.trim() || create.isPending}
               onClick={() => create.mutate()}

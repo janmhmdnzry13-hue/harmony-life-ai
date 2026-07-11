@@ -22,15 +22,17 @@ function HabitsPage() {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
+  const [justToday, setJustToday] = useState(false);
 
   const create = useMutation({
     mutationFn: () =>
-      createFn({ data: { name, description: description || null, target_per_day: 1 } }),
+      createFn({ data: { name, description: description || null, target_per_day: 1, just_for_today: justToday } }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["habits"] });
       setOpen(false);
       setName("");
       setDescription("");
+      setJustToday(false);
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
   });
@@ -75,7 +77,14 @@ function HabitsPage() {
             <div key={h.id} className="p-4 border border-ink/10 bg-surface group">
               <div className="flex justify-between items-start mb-3">
                 <div className="flex-1 min-w-0">
-                  <h4 className="font-serif text-lg">{h.name}</h4>
+                  <h4 className="font-serif text-lg">
+                    {h.name}
+                    {h.expires_on && (
+                      <span className="ml-2 text-[10px] uppercase tracking-widest text-ink/40 font-sans">
+                        today only
+                      </span>
+                    )}
+                  </h4>
                   {h.description && (
                     <p className="text-[10px] uppercase tracking-widest text-ink/40 mt-0.5">
                       {h.description}
@@ -86,7 +95,8 @@ function HabitsPage() {
                   <div className="font-serif italic text-xl text-accent">{streak}d</div>
                   <button
                     onClick={() => del.mutate(h.id)}
-                    className="opacity-0 group-hover:opacity-100 p-1 text-ink/40"
+                    className="p-1 text-ink/40 hover:text-destructive"
+                    aria-label="Delete habit"
                   >
                     <Trash2 className="size-4" />
                   </button>
@@ -143,6 +153,15 @@ function HabitsPage() {
               onChange={(e) => setDescription(e.target.value)}
               className="w-full bg-surface border border-ink/10 px-3 py-3 text-sm mb-4 focus:outline-none focus:border-ink/40"
             />
+            <label className="flex items-center gap-2 mb-4 text-xs uppercase tracking-widest cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={justToday}
+                onChange={(e) => setJustToday(e.target.checked)}
+                className="size-4 accent-ink"
+              />
+              Just for today (auto-delete tomorrow)
+            </label>
             <button
               disabled={!name.trim() || create.isPending}
               onClick={() => create.mutate()}
