@@ -26,6 +26,7 @@ function TasksPage() {
   const [priority, setPriority] = useState<"low" | "medium" | "high">("medium");
   const [tag, setTag] = useState("");
   const [dueDate, setDueDate] = useState("");
+  const [justToday, setJustToday] = useState(false);
 
   const create = useMutation({
     mutationFn: () =>
@@ -35,6 +36,7 @@ function TasksPage() {
           priority,
           tag: tag || null,
           due_date: dueDate || null,
+          just_for_today: justToday,
         },
       }),
     onSuccess: () => {
@@ -44,6 +46,7 @@ function TasksPage() {
       setTag("");
       setDueDate("");
       setPriority("medium");
+      setJustToday(false);
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
   });
