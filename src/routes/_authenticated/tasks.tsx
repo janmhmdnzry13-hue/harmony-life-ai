@@ -182,6 +182,7 @@ function TasksPage() {
               Just for today (auto-delete tomorrow)
             </label>
             <button
+              disabled={!title.trim() || create.isPending}
               onClick={() => create.mutate()}
               className="w-full bg-ink text-paper py-3 text-sm font-medium disabled:opacity-40"
             >
