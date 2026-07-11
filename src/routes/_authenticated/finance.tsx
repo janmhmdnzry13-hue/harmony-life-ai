@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState, useMemo } from "react";
 import { format, parseISO } from "date-fns";
-import { Plus, Sparkles, Trash2, ArrowUpRight, ArrowDownRight, Loader2 } from "lucide-react";
+import { Plus, Sparkles, Trash2, ArrowDownLeft, ArrowUpRight, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import {
   listFinance,
