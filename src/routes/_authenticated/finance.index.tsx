@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState, useMemo } from "react";
 import { format, parseISO } from "date-fns";
-import { Plus, Sparkles, Trash2, ArrowDownLeft, ArrowUpRight, Loader2 } from "lucide-react";
+import { Plus, Sparkles, Trash2, ArrowDownLeft, ArrowUpRight, Loader2, Receipt, PiggyBank } from "lucide-react";
 import { toast } from "sonner";
 import {
   listFinance,
@@ -13,6 +13,8 @@ import {
   deleteBudget,
   analyzeSpending,
 } from "@/lib/finance.functions";
+import { listBills, upsertBill, deleteBill } from "@/lib/bills.functions";
+import { listGoals, upsertGoal, contributeGoal, deleteGoal } from "@/lib/savings.functions";
 
 export const Route = createFileRoute("/_authenticated/finance/")({
   component: FinancePage,
