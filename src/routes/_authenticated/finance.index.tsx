@@ -52,7 +52,17 @@ function FinancePage() {
   const delBud = useServerFn(deleteBudget);
   const analyzeFn = useServerFn(analyzeSpending);
 
+  const listBillsFn = useServerFn(listBills);
+  const upBillFn = useServerFn(upsertBill);
+  const delBillFn = useServerFn(deleteBill);
+  const listGoalsFn = useServerFn(listGoals);
+  const upGoalFn = useServerFn(upsertGoal);
+  const contribFn = useServerFn(contributeGoal);
+  const delGoalFn = useServerFn(deleteGoal);
+
   const q = useQuery({ queryKey: ["finance"], queryFn: () => listFn() });
+  const billsQ = useQuery({ queryKey: ["bills"], queryFn: () => listBillsFn() });
+  const goalsQ = useQuery({ queryKey: ["goals"], queryFn: () => listGoalsFn() });
   const analyze = useMutation({
     mutationFn: () => analyzeFn(),
     onError: (e) => toast.error(e instanceof Error ? e.message : "Analysis failed"),
@@ -60,6 +70,8 @@ function FinancePage() {
 
   const [txOpen, setTxOpen] = useState(false);
   const [budOpen, setBudOpen] = useState(false);
+  const [billOpen, setBillOpen] = useState(false);
+  const [goalOpen, setGoalOpen] = useState(false);
 
   const transactions = q.data?.transactions ?? [];
   const budgets = q.data?.budgets ?? [];
