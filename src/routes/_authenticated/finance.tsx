@@ -1,13 +1,13 @@
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
 
-const TABS = [
+const TABS: Array<{ to: string; label: string; exact?: boolean }> = [
   { to: "/finance", label: "Money", exact: true },
   { to: "/finance/networth", label: "Wealth" },
   { to: "/finance/invest", label: "Invest" },
   { to: "/finance/trade", label: "Trade" },
   { to: "/finance/market", label: "Market" },
   { to: "/finance/coach", label: "Coach" },
-] as const;
+];
 
 export const Route = createFileRoute("/_authenticated/finance")({
   component: FinanceLayout,
