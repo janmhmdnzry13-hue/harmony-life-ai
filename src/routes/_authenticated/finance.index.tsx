@@ -406,6 +406,23 @@ function FinancePage() {
           pending={saveBudget.isPending}
           currency={currency}
         />
+      {billOpen && (
+        <Sheet onClose={() => setBillOpen(false)} title="New bill / subscription">
+          <BillForm
+            currency={currency}
+            pending={createBill.isPending}
+            onSubmit={(v) => createBill.mutate(v)}
+          />
+        </Sheet>
+      )}
+      {goalOpen && (
+        <Sheet onClose={() => setGoalOpen(false)} title="New savings goal">
+          <GoalForm
+            currency={currency}
+            pending={createGoal.isPending}
+            onSubmit={(v) => createGoal.mutate(v)}
+          />
+        </Sheet>
       )}
     </div>
   );
