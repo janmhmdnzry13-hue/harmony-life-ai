@@ -615,3 +615,49 @@ function formatMoney(n: number, currency: string) {
     return `${currency} ${Math.round(n)}`;
   }
 }
+
+type BillInput = { name: string; amount: number; currency: string; cycle: "weekly"|"monthly"|"quarterly"|"yearly"; category: "bill"|"subscription"; next_due: string; is_active: boolean; notes: string | null };
+
+function BillForm({ currency, pending, onSubmit }: { currency: string; pending: boolean; onSubmit: (v: BillInput) => void }) {
+  const [name, setName] = useState("");
+  const [amount, setAmount] = useState("");
+  const [cycle, setCycle] = useState<BillInput["cycle"]>("monthly");
+  const [category, setCategory] = useState<BillInput["category"]>("subscription");
+  const [next, setNext] = useState(format(new Date(), "yyyy-MM-dd"));
+  return (
+    <>
+      <input autoFocus placeholder="Name (e.g. Netflix)" value={name} onChange={(e) => setName(e.target.value)} className="w-full bg-surface border border-ink/10 px-3 py-3 text-sm mb-3 focus:outline-none focus:border-ink/40" />
+      <div className="grid grid-cols-2 gap-2 mb-3">
+        <input inputMode="decimal" placeholder="Amount" value={amount} onChange={(e) => setAmount(e.target.value.replace(/[^0-9.]/g, ""))} className="bg-surface border border-ink/10 px-3 py-3 font-serif text-xl focus:outline-none focus:border-ink/40" />
+        <input type="date" value={next} onChange={(e) => setNext(e.target.value)} className="bg-surface border border-ink/10 px-3 py-3 text-sm focus:outline-none focus:border-ink/40" />
+      </div>
+      <div className="flex gap-1.5 mb-3">
+        {(["bill","subscription"] as const).map((c) => (
+          <button key={c} onClick={() => setCategory(c)} className={`px-2.5 py-1 text-xs capitalize border ${category === c ? "bg-ink text-paper border-ink" : "border-ink/15 text-ink/70"}`}>{c}</button>
+        ))}
+      </div>
+      <div className="flex gap-1.5 mb-4">
+        {(["weekly","monthly","quarterly","yearly"] as const).map((c) => (
+          <button key={c} onClick={() => setCycle(c)} className={`px-2.5 py-1 text-xs capitalize border ${cycle === c ? "bg-ink text-paper border-ink" : "border-ink/15 text-ink/70"}`}>{c}</button>
+        ))}
+      </div>
+      <button disabled={!name || !amount || pending} onClick={() => onSubmit({ name, amount: Number(amount), currency, cycle, category, next_due: next, is_active: true, notes: null })} className="w-full bg-ink text-paper py-3 text-sm font-medium disabled:opacity-40">Save</button>
+    </>
+  );
+}
+
+type GoalInput = { name: string; target_amount: number; current_amount: number; currency: string; deadline: string | null; category: string };
+
+function GoalForm({ currency, pending, onSubmit }: { currency: string; pending: boolean; onSubmit: (v: GoalInput) => void }) {
+  const [name, setName] = useState("");
+  const [target, setTarget] = useState("");
+  const [deadline, setDeadline] = useState("");
+  return (
+    <>
+      <input autoFocus placeholder="Goal name" value={name} onChange={(e) => setName(e.target.value)} className="w-full bg-surface border border-ink/10 px-3 py-3 text-sm mb-3 focus:outline-none focus:border-ink/40" />
+      <input inputMode="decimal" placeholder="Target amount" value={target} onChange={(e) => setTarget(e.target.value.replace(/[^0-9.]/g, ""))} className="w-full bg-surface border border-ink/10 px-3 py-3 font-serif text-xl mb-3 focus:outline-none focus:border-ink/40" />
+      <input type="date" value={deadline} onChange={(e) => setDeadline(e.target.value)} className="w-full bg-surface border border-ink/10 px-3 py-3 text-sm mb-4 focus:outline-none focus:border-ink/40" />
+      <button disabled={!name || !target || pending} onClick={() => onSubmit({ name, target_amount: Number(target), current_amount: 0, currency, deadline: deadline || null, category: "general" })} className="w-full bg-ink text-paper py-3 text-sm font-medium disabled:opacity-40">Save</button>
+    </>
+  );
+}
