@@ -73,6 +73,23 @@ function FinancePage() {
   const [billOpen, setBillOpen] = useState(false);
   const [goalOpen, setGoalOpen] = useState(false);
 
+  const createBill = useMutation({
+    mutationFn: (v: { name: string; amount: number; currency: string; cycle: "weekly"|"monthly"|"quarterly"|"yearly"; category: "bill"|"subscription"; next_due: string; is_active: boolean; notes: string | null }) => upBillFn({ data: v }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["bills"] }); setBillOpen(false); },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+  });
+  const rmBill = useMutation({ mutationFn: (id: string) => delBillFn({ data: { id } }), onSuccess: () => qc.invalidateQueries({ queryKey: ["bills"] }) });
+  const createGoal = useMutation({
+    mutationFn: (v: { name: string; target_amount: number; current_amount: number; currency: string; deadline: string | null; category: string }) => upGoalFn({ data: v }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["goals"] }); setGoalOpen(false); },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+  });
+  const contribGoal = useMutation({
+    mutationFn: (v: { id: string; amount: number }) => contribFn({ data: v }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["goals"] }),
+  });
+  const rmGoal = useMutation({ mutationFn: (id: string) => delGoalFn({ data: { id } }), onSuccess: () => qc.invalidateQueries({ queryKey: ["goals"] }) });
+
   const transactions = q.data?.transactions ?? [];
   const budgets = q.data?.budgets ?? [];
   const month = q.data?.month ?? format(new Date(), "yyyy-MM-01");
