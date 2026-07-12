@@ -284,6 +284,61 @@ function FinancePage() {
         </div>
       </section>
 
+      {/* Bills & Subscriptions */}
+      <section className="mb-8">
+        <div className="flex justify-between items-center mb-3">
+          <h3 className="text-[10px] font-medium uppercase tracking-[0.2em] text-ink/40">Bills & subscriptions</h3>
+          <button onClick={() => setBillOpen(true)} className="text-[10px] uppercase tracking-widest text-ink/60">+ Add</button>
+        </div>
+        <div className="divide-y divide-ink/10">
+          {(billsQ.data ?? []).length === 0 && <p className="text-sm text-ink/40 py-2">No bills tracked.</p>}
+          {(billsQ.data ?? []).map((b) => (
+            <div key={b.id} className="py-3 flex items-center gap-3 group">
+              <Receipt className="size-4 text-ink/40" />
+              <div className="flex-1 min-w-0">
+                <p className="text-sm truncate">{b.name}</p>
+                <p className="text-[10px] uppercase tracking-widest text-ink/40 mt-0.5">{b.category} · {b.cycle} · due {format(parseISO(b.next_due), "MMM d")}</p>
+              </div>
+              <span className="font-serif tabular-nums">{formatMoney(Number(b.amount), b.currency)}</span>
+              <button onClick={() => rmBill.mutate(b.id)} className="p-1 text-ink/40"><Trash2 className="size-3.5" /></button>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Savings goals */}
+      <section className="mb-8">
+        <div className="flex justify-between items-center mb-3">
+          <h3 className="text-[10px] font-medium uppercase tracking-[0.2em] text-ink/40">Savings goals</h3>
+          <button onClick={() => setGoalOpen(true)} className="text-[10px] uppercase tracking-widest text-ink/60">+ Add</button>
+        </div>
+        <div className="space-y-3">
+          {(goalsQ.data ?? []).length === 0 && <p className="text-sm text-ink/40 py-2">No goals yet.</p>}
+          {(goalsQ.data ?? []).map((g) => {
+            const pct = Number(g.target_amount) > 0 ? Math.min(100, Math.round((Number(g.current_amount) / Number(g.target_amount)) * 100)) : 0;
+            return (
+              <div key={g.id} className="p-4 border border-ink/10 group">
+                <div className="flex justify-between items-baseline mb-2">
+                  <div className="flex items-center gap-2">
+                    <PiggyBank className="size-3.5 text-ink/50" />
+                    <p className="text-sm font-medium">{g.name}</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-serif text-lg">{pct}%</span>
+                    <button onClick={() => { const v = window.prompt("Add contribution amount"); const n = Number(v); if (n > 0) contribGoal.mutate({ id: g.id, amount: n }); }} className="text-[10px] uppercase tracking-widest text-ink/60">+</button>
+                    <button onClick={() => rmGoal.mutate(g.id)} className="p-1 text-ink/40"><Trash2 className="size-3.5" /></button>
+                  </div>
+                </div>
+                <p className="text-[10px] uppercase tracking-widest text-ink/40 mb-1.5">{formatMoney(Number(g.current_amount), g.currency)} of {formatMoney(Number(g.target_amount), g.currency)}</p>
+                <div className="h-1.5 bg-ink/10"><div className="h-full bg-ink" style={{ width: `${pct}%` }} /></div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+
+
       {/* Recent */}
       <section>
         <h3 className="text-[10px] font-medium uppercase tracking-[0.2em] text-ink/40 mb-3">
