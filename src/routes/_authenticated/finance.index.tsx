@@ -406,6 +406,7 @@ function FinancePage() {
           pending={saveBudget.isPending}
           currency={currency}
         />
+      )}
       {billOpen && (
         <Sheet onClose={() => setBillOpen(false)} title="New bill / subscription">
           <BillForm
