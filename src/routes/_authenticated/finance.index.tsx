@@ -14,7 +14,7 @@ import {
   analyzeSpending,
 } from "@/lib/finance.functions";
 
-export const Route = createFileRoute("/_authenticated/finance")({
+export const Route = createFileRoute("/_authenticated/finance/")({
   component: FinancePage,
 });
 
