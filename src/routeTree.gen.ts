@@ -21,6 +21,12 @@ import { Route as AuthenticatedFinanceRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedCalendarRouteImport } from './routes/_authenticated/calendar'
 import { Route as AuthenticatedAiRouteImport } from './routes/_authenticated/ai'
 import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
+import { Route as AuthenticatedFinanceIndexRouteImport } from './routes/_authenticated/finance.index'
+import { Route as AuthenticatedFinanceTradeRouteImport } from './routes/_authenticated/finance.trade'
+import { Route as AuthenticatedFinanceNetworthRouteImport } from './routes/_authenticated/finance.networth'
+import { Route as AuthenticatedFinanceMarketRouteImport } from './routes/_authenticated/finance.market'
+import { Route as AuthenticatedFinanceInvestRouteImport } from './routes/_authenticated/finance.invest'
+import { Route as AuthenticatedFinanceCoachRouteImport } from './routes/_authenticated/finance.coach'
 
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
@@ -81,6 +87,42 @@ const AuthenticatedAccountRoute = AuthenticatedAccountRouteImport.update({
   path: '/account',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedFinanceIndexRoute =
+  AuthenticatedFinanceIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedFinanceRoute,
+  } as any)
+const AuthenticatedFinanceTradeRoute =
+  AuthenticatedFinanceTradeRouteImport.update({
+    id: '/trade',
+    path: '/trade',
+    getParentRoute: () => AuthenticatedFinanceRoute,
+  } as any)
+const AuthenticatedFinanceNetworthRoute =
+  AuthenticatedFinanceNetworthRouteImport.update({
+    id: '/networth',
+    path: '/networth',
+    getParentRoute: () => AuthenticatedFinanceRoute,
+  } as any)
+const AuthenticatedFinanceMarketRoute =
+  AuthenticatedFinanceMarketRouteImport.update({
+    id: '/market',
+    path: '/market',
+    getParentRoute: () => AuthenticatedFinanceRoute,
+  } as any)
+const AuthenticatedFinanceInvestRoute =
+  AuthenticatedFinanceInvestRouteImport.update({
+    id: '/invest',
+    path: '/invest',
+    getParentRoute: () => AuthenticatedFinanceRoute,
+  } as any)
+const AuthenticatedFinanceCoachRoute =
+  AuthenticatedFinanceCoachRouteImport.update({
+    id: '/coach',
+    path: '/coach',
+    getParentRoute: () => AuthenticatedFinanceRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
@@ -89,11 +131,17 @@ export interface FileRoutesByFullPath {
   '/account': typeof AuthenticatedAccountRoute
   '/ai': typeof AuthenticatedAiRoute
   '/calendar': typeof AuthenticatedCalendarRoute
-  '/finance': typeof AuthenticatedFinanceRoute
+  '/finance': typeof AuthenticatedFinanceRouteWithChildren
   '/habits': typeof AuthenticatedHabitsRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/tasks': typeof AuthenticatedTasksRoute
   '/api/chat': typeof ApiChatRoute
+  '/finance/coach': typeof AuthenticatedFinanceCoachRoute
+  '/finance/invest': typeof AuthenticatedFinanceInvestRoute
+  '/finance/market': typeof AuthenticatedFinanceMarketRoute
+  '/finance/networth': typeof AuthenticatedFinanceNetworthRoute
+  '/finance/trade': typeof AuthenticatedFinanceTradeRoute
+  '/finance/': typeof AuthenticatedFinanceIndexRoute
 }
 export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
@@ -101,12 +149,17 @@ export interface FileRoutesByTo {
   '/account': typeof AuthenticatedAccountRoute
   '/ai': typeof AuthenticatedAiRoute
   '/calendar': typeof AuthenticatedCalendarRoute
-  '/finance': typeof AuthenticatedFinanceRoute
   '/habits': typeof AuthenticatedHabitsRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/tasks': typeof AuthenticatedTasksRoute
   '/api/chat': typeof ApiChatRoute
   '/': typeof AuthenticatedIndexRoute
+  '/finance/coach': typeof AuthenticatedFinanceCoachRoute
+  '/finance/invest': typeof AuthenticatedFinanceInvestRoute
+  '/finance/market': typeof AuthenticatedFinanceMarketRoute
+  '/finance/networth': typeof AuthenticatedFinanceNetworthRoute
+  '/finance/trade': typeof AuthenticatedFinanceTradeRoute
+  '/finance': typeof AuthenticatedFinanceIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -116,12 +169,18 @@ export interface FileRoutesById {
   '/_authenticated/account': typeof AuthenticatedAccountRoute
   '/_authenticated/ai': typeof AuthenticatedAiRoute
   '/_authenticated/calendar': typeof AuthenticatedCalendarRoute
-  '/_authenticated/finance': typeof AuthenticatedFinanceRoute
+  '/_authenticated/finance': typeof AuthenticatedFinanceRouteWithChildren
   '/_authenticated/habits': typeof AuthenticatedHabitsRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/tasks': typeof AuthenticatedTasksRoute
   '/api/chat': typeof ApiChatRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
+  '/_authenticated/finance/coach': typeof AuthenticatedFinanceCoachRoute
+  '/_authenticated/finance/invest': typeof AuthenticatedFinanceInvestRoute
+  '/_authenticated/finance/market': typeof AuthenticatedFinanceMarketRoute
+  '/_authenticated/finance/networth': typeof AuthenticatedFinanceNetworthRoute
+  '/_authenticated/finance/trade': typeof AuthenticatedFinanceTradeRoute
+  '/_authenticated/finance/': typeof AuthenticatedFinanceIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -137,6 +196,12 @@ export interface FileRouteTypes {
     | '/settings'
     | '/tasks'
     | '/api/chat'
+    | '/finance/coach'
+    | '/finance/invest'
+    | '/finance/market'
+    | '/finance/networth'
+    | '/finance/trade'
+    | '/finance/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/auth'
@@ -144,12 +209,17 @@ export interface FileRouteTypes {
     | '/account'
     | '/ai'
     | '/calendar'
-    | '/finance'
     | '/habits'
     | '/settings'
     | '/tasks'
     | '/api/chat'
     | '/'
+    | '/finance/coach'
+    | '/finance/invest'
+    | '/finance/market'
+    | '/finance/networth'
+    | '/finance/trade'
+    | '/finance'
   id:
     | '__root__'
     | '/_authenticated'
@@ -164,6 +234,12 @@ export interface FileRouteTypes {
     | '/_authenticated/tasks'
     | '/api/chat'
     | '/_authenticated/'
+    | '/_authenticated/finance/coach'
+    | '/_authenticated/finance/invest'
+    | '/_authenticated/finance/market'
+    | '/_authenticated/finance/networth'
+    | '/_authenticated/finance/trade'
+    | '/_authenticated/finance/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -259,14 +335,77 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAccountRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/finance/': {
+      id: '/_authenticated/finance/'
+      path: '/'
+      fullPath: '/finance/'
+      preLoaderRoute: typeof AuthenticatedFinanceIndexRouteImport
+      parentRoute: typeof AuthenticatedFinanceRoute
+    }
+    '/_authenticated/finance/trade': {
+      id: '/_authenticated/finance/trade'
+      path: '/trade'
+      fullPath: '/finance/trade'
+      preLoaderRoute: typeof AuthenticatedFinanceTradeRouteImport
+      parentRoute: typeof AuthenticatedFinanceRoute
+    }
+    '/_authenticated/finance/networth': {
+      id: '/_authenticated/finance/networth'
+      path: '/networth'
+      fullPath: '/finance/networth'
+      preLoaderRoute: typeof AuthenticatedFinanceNetworthRouteImport
+      parentRoute: typeof AuthenticatedFinanceRoute
+    }
+    '/_authenticated/finance/market': {
+      id: '/_authenticated/finance/market'
+      path: '/market'
+      fullPath: '/finance/market'
+      preLoaderRoute: typeof AuthenticatedFinanceMarketRouteImport
+      parentRoute: typeof AuthenticatedFinanceRoute
+    }
+    '/_authenticated/finance/invest': {
+      id: '/_authenticated/finance/invest'
+      path: '/invest'
+      fullPath: '/finance/invest'
+      preLoaderRoute: typeof AuthenticatedFinanceInvestRouteImport
+      parentRoute: typeof AuthenticatedFinanceRoute
+    }
+    '/_authenticated/finance/coach': {
+      id: '/_authenticated/finance/coach'
+      path: '/coach'
+      fullPath: '/finance/coach'
+      preLoaderRoute: typeof AuthenticatedFinanceCoachRouteImport
+      parentRoute: typeof AuthenticatedFinanceRoute
+    }
   }
 }
+
+interface AuthenticatedFinanceRouteChildren {
+  AuthenticatedFinanceCoachRoute: typeof AuthenticatedFinanceCoachRoute
+  AuthenticatedFinanceInvestRoute: typeof AuthenticatedFinanceInvestRoute
+  AuthenticatedFinanceMarketRoute: typeof AuthenticatedFinanceMarketRoute
+  AuthenticatedFinanceNetworthRoute: typeof AuthenticatedFinanceNetworthRoute
+  AuthenticatedFinanceTradeRoute: typeof AuthenticatedFinanceTradeRoute
+  AuthenticatedFinanceIndexRoute: typeof AuthenticatedFinanceIndexRoute
+}
+
+const AuthenticatedFinanceRouteChildren: AuthenticatedFinanceRouteChildren = {
+  AuthenticatedFinanceCoachRoute: AuthenticatedFinanceCoachRoute,
+  AuthenticatedFinanceInvestRoute: AuthenticatedFinanceInvestRoute,
+  AuthenticatedFinanceMarketRoute: AuthenticatedFinanceMarketRoute,
+  AuthenticatedFinanceNetworthRoute: AuthenticatedFinanceNetworthRoute,
+  AuthenticatedFinanceTradeRoute: AuthenticatedFinanceTradeRoute,
+  AuthenticatedFinanceIndexRoute: AuthenticatedFinanceIndexRoute,
+}
+
+const AuthenticatedFinanceRouteWithChildren =
+  AuthenticatedFinanceRoute._addFileChildren(AuthenticatedFinanceRouteChildren)
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAccountRoute: typeof AuthenticatedAccountRoute
   AuthenticatedAiRoute: typeof AuthenticatedAiRoute
   AuthenticatedCalendarRoute: typeof AuthenticatedCalendarRoute
-  AuthenticatedFinanceRoute: typeof AuthenticatedFinanceRoute
+  AuthenticatedFinanceRoute: typeof AuthenticatedFinanceRouteWithChildren
   AuthenticatedHabitsRoute: typeof AuthenticatedHabitsRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedTasksRoute: typeof AuthenticatedTasksRoute
@@ -277,7 +416,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAccountRoute: AuthenticatedAccountRoute,
   AuthenticatedAiRoute: AuthenticatedAiRoute,
   AuthenticatedCalendarRoute: AuthenticatedCalendarRoute,
-  AuthenticatedFinanceRoute: AuthenticatedFinanceRoute,
+  AuthenticatedFinanceRoute: AuthenticatedFinanceRouteWithChildren,
   AuthenticatedHabitsRoute: AuthenticatedHabitsRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedTasksRoute: AuthenticatedTasksRoute,
@@ -296,13 +435,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

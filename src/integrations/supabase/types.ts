@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      accounts: {
+        Row: {
+          balance: number
+          created_at: string
+          currency: string
+          id: string
+          name: string
+          notes: string | null
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          balance?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          name: string
+          notes?: string | null
+          type?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          balance?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          name?: string
+          notes?: string | null
+          type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       ai_messages: {
         Row: {
           content: string
@@ -34,6 +70,51 @@ export type Database = {
           created_at?: string
           id?: string
           role?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      bills: {
+        Row: {
+          amount: number
+          category: string
+          created_at: string
+          currency: string
+          cycle: string
+          id: string
+          is_active: boolean
+          name: string
+          next_due: string
+          notes: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount?: number
+          category?: string
+          created_at?: string
+          currency?: string
+          cycle?: string
+          id?: string
+          is_active?: boolean
+          name: string
+          next_due: string
+          notes?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          category?: string
+          created_at?: string
+          currency?: string
+          cycle?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          next_due?: string
+          notes?: string | null
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
@@ -94,6 +175,53 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      dividends: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string
+          holding_id: string | null
+          id: string
+          note: string | null
+          paid_on: string
+          symbol: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          holding_id?: string | null
+          id?: string
+          note?: string | null
+          paid_on?: string
+          symbol: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          holding_id?: string | null
+          id?: string
+          note?: string | null
+          paid_on?: string
+          symbol?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dividends_holding_id_fkey"
+            columns: ["holding_id"]
+            isOneToOne: false
+            referencedRelation: "holdings"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       events: {
         Row: {
@@ -246,6 +374,65 @@ export type Database = {
         }
         Relationships: []
       }
+      holdings: {
+        Row: {
+          account_id: string | null
+          asset_type: string
+          avg_cost: number
+          created_at: string
+          currency: string
+          current_price: number | null
+          id: string
+          name: string | null
+          notes: string | null
+          price_updated_at: string | null
+          quantity: number
+          symbol: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          account_id?: string | null
+          asset_type?: string
+          avg_cost?: number
+          created_at?: string
+          currency?: string
+          current_price?: number | null
+          id?: string
+          name?: string | null
+          notes?: string | null
+          price_updated_at?: string | null
+          quantity?: number
+          symbol: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          account_id?: string | null
+          asset_type?: string
+          avg_cost?: number
+          created_at?: string
+          currency?: string
+          current_price?: number | null
+          id?: string
+          name?: string | null
+          notes?: string | null
+          price_updated_at?: string | null
+          quantity?: number
+          symbol?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "holdings_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       journal_entries: {
         Row: {
           content: string
@@ -345,6 +532,36 @@ export type Database = {
         }
         Relationships: []
       }
+      price_cache: {
+        Row: {
+          asset_type: string
+          currency: string
+          id: string
+          meta: Json | null
+          price: number
+          symbol: string
+          updated_at: string
+        }
+        Insert: {
+          asset_type: string
+          currency?: string
+          id?: string
+          meta?: Json | null
+          price: number
+          symbol: string
+          updated_at?: string
+        }
+        Update: {
+          asset_type?: string
+          currency?: string
+          id?: string
+          meta?: Json | null
+          price?: number
+          symbol?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -406,6 +623,45 @@ export type Database = {
           id?: string
           name?: string
           status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      savings_goals: {
+        Row: {
+          category: string
+          created_at: string
+          currency: string
+          current_amount: number
+          deadline: string | null
+          id: string
+          name: string
+          target_amount: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          currency?: string
+          current_amount?: number
+          deadline?: string | null
+          id?: string
+          name: string
+          target_amount?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          currency?: string
+          current_amount?: number
+          deadline?: string | null
+          id?: string
+          name?: string
+          target_amount?: number
           updated_at?: string
           user_id?: string
         }
@@ -476,6 +732,78 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      trades: {
+        Row: {
+          asset_type: string
+          closed_at: string | null
+          created_at: string
+          currency: string
+          entry_price: number
+          exit_price: number | null
+          id: string
+          mistakes: string[]
+          notes: string | null
+          opened_at: string
+          pnl: number | null
+          quantity: number
+          r_multiple: number | null
+          rating: number | null
+          setup: string | null
+          side: string
+          stop_price: number | null
+          symbol: string
+          target_price: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          asset_type?: string
+          closed_at?: string | null
+          created_at?: string
+          currency?: string
+          entry_price?: number
+          exit_price?: number | null
+          id?: string
+          mistakes?: string[]
+          notes?: string | null
+          opened_at?: string
+          pnl?: number | null
+          quantity?: number
+          r_multiple?: number | null
+          rating?: number | null
+          setup?: string | null
+          side?: string
+          stop_price?: number | null
+          symbol: string
+          target_price?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          asset_type?: string
+          closed_at?: string | null
+          created_at?: string
+          currency?: string
+          entry_price?: number
+          exit_price?: number | null
+          id?: string
+          mistakes?: string[]
+          notes?: string | null
+          opened_at?: string
+          pnl?: number | null
+          quantity?: number
+          r_multiple?: number | null
+          rating?: number | null
+          setup?: string | null
+          side?: string
+          stop_price?: number | null
+          symbol?: string
+          target_price?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       transactions: {
         Row: {
