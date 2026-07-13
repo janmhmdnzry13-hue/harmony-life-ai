@@ -26,6 +26,8 @@ import { Route as AuthenticatedWellnessIndexRouteImport } from './routes/_authen
 import { Route as AuthenticatedFinanceIndexRouteImport } from './routes/_authenticated/finance.index'
 import { Route as AuthenticatedWellnessRoutinesRouteImport } from './routes/_authenticated/wellness.routines'
 import { Route as AuthenticatedWellnessMindRouteImport } from './routes/_authenticated/wellness.mind'
+import { Route as AuthenticatedWellnessLearnRouteImport } from './routes/_authenticated/wellness.learn'
+import { Route as AuthenticatedWellnessCoachRouteImport } from './routes/_authenticated/wellness.coach'
 import { Route as AuthenticatedFinanceTradeRouteImport } from './routes/_authenticated/finance.trade'
 import { Route as AuthenticatedFinanceNetworthRouteImport } from './routes/_authenticated/finance.networth'
 import { Route as AuthenticatedFinanceMarketRouteImport } from './routes/_authenticated/finance.market'
@@ -120,6 +122,18 @@ const AuthenticatedWellnessMindRoute =
     path: '/mind',
     getParentRoute: () => AuthenticatedWellnessRoute,
   } as any)
+const AuthenticatedWellnessLearnRoute =
+  AuthenticatedWellnessLearnRouteImport.update({
+    id: '/learn',
+    path: '/learn',
+    getParentRoute: () => AuthenticatedWellnessRoute,
+  } as any)
+const AuthenticatedWellnessCoachRoute =
+  AuthenticatedWellnessCoachRouteImport.update({
+    id: '/coach',
+    path: '/coach',
+    getParentRoute: () => AuthenticatedWellnessRoute,
+  } as any)
 const AuthenticatedFinanceTradeRoute =
   AuthenticatedFinanceTradeRouteImport.update({
     id: '/trade',
@@ -169,6 +183,8 @@ export interface FileRoutesByFullPath {
   '/finance/market': typeof AuthenticatedFinanceMarketRoute
   '/finance/networth': typeof AuthenticatedFinanceNetworthRoute
   '/finance/trade': typeof AuthenticatedFinanceTradeRoute
+  '/wellness/coach': typeof AuthenticatedWellnessCoachRoute
+  '/wellness/learn': typeof AuthenticatedWellnessLearnRoute
   '/wellness/mind': typeof AuthenticatedWellnessMindRoute
   '/wellness/routines': typeof AuthenticatedWellnessRoutinesRoute
   '/finance/': typeof AuthenticatedFinanceIndexRoute
@@ -190,6 +206,8 @@ export interface FileRoutesByTo {
   '/finance/market': typeof AuthenticatedFinanceMarketRoute
   '/finance/networth': typeof AuthenticatedFinanceNetworthRoute
   '/finance/trade': typeof AuthenticatedFinanceTradeRoute
+  '/wellness/coach': typeof AuthenticatedWellnessCoachRoute
+  '/wellness/learn': typeof AuthenticatedWellnessLearnRoute
   '/wellness/mind': typeof AuthenticatedWellnessMindRoute
   '/wellness/routines': typeof AuthenticatedWellnessRoutinesRoute
   '/finance': typeof AuthenticatedFinanceIndexRoute
@@ -215,6 +233,8 @@ export interface FileRoutesById {
   '/_authenticated/finance/market': typeof AuthenticatedFinanceMarketRoute
   '/_authenticated/finance/networth': typeof AuthenticatedFinanceNetworthRoute
   '/_authenticated/finance/trade': typeof AuthenticatedFinanceTradeRoute
+  '/_authenticated/wellness/coach': typeof AuthenticatedWellnessCoachRoute
+  '/_authenticated/wellness/learn': typeof AuthenticatedWellnessLearnRoute
   '/_authenticated/wellness/mind': typeof AuthenticatedWellnessMindRoute
   '/_authenticated/wellness/routines': typeof AuthenticatedWellnessRoutinesRoute
   '/_authenticated/finance/': typeof AuthenticatedFinanceIndexRoute
@@ -240,6 +260,8 @@ export interface FileRouteTypes {
     | '/finance/market'
     | '/finance/networth'
     | '/finance/trade'
+    | '/wellness/coach'
+    | '/wellness/learn'
     | '/wellness/mind'
     | '/wellness/routines'
     | '/finance/'
@@ -261,6 +283,8 @@ export interface FileRouteTypes {
     | '/finance/market'
     | '/finance/networth'
     | '/finance/trade'
+    | '/wellness/coach'
+    | '/wellness/learn'
     | '/wellness/mind'
     | '/wellness/routines'
     | '/finance'
@@ -285,6 +309,8 @@ export interface FileRouteTypes {
     | '/_authenticated/finance/market'
     | '/_authenticated/finance/networth'
     | '/_authenticated/finance/trade'
+    | '/_authenticated/wellness/coach'
+    | '/_authenticated/wellness/learn'
     | '/_authenticated/wellness/mind'
     | '/_authenticated/wellness/routines'
     | '/_authenticated/finance/'
@@ -419,6 +445,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedWellnessMindRouteImport
       parentRoute: typeof AuthenticatedWellnessRoute
     }
+    '/_authenticated/wellness/learn': {
+      id: '/_authenticated/wellness/learn'
+      path: '/learn'
+      fullPath: '/wellness/learn'
+      preLoaderRoute: typeof AuthenticatedWellnessLearnRouteImport
+      parentRoute: typeof AuthenticatedWellnessRoute
+    }
+    '/_authenticated/wellness/coach': {
+      id: '/_authenticated/wellness/coach'
+      path: '/coach'
+      fullPath: '/wellness/coach'
+      preLoaderRoute: typeof AuthenticatedWellnessCoachRouteImport
+      parentRoute: typeof AuthenticatedWellnessRoute
+    }
     '/_authenticated/finance/trade': {
       id: '/_authenticated/finance/trade'
       path: '/trade'
@@ -479,12 +519,16 @@ const AuthenticatedFinanceRouteWithChildren =
   AuthenticatedFinanceRoute._addFileChildren(AuthenticatedFinanceRouteChildren)
 
 interface AuthenticatedWellnessRouteChildren {
+  AuthenticatedWellnessCoachRoute: typeof AuthenticatedWellnessCoachRoute
+  AuthenticatedWellnessLearnRoute: typeof AuthenticatedWellnessLearnRoute
   AuthenticatedWellnessMindRoute: typeof AuthenticatedWellnessMindRoute
   AuthenticatedWellnessRoutinesRoute: typeof AuthenticatedWellnessRoutinesRoute
   AuthenticatedWellnessIndexRoute: typeof AuthenticatedWellnessIndexRoute
 }
 
 const AuthenticatedWellnessRouteChildren: AuthenticatedWellnessRouteChildren = {
+  AuthenticatedWellnessCoachRoute: AuthenticatedWellnessCoachRoute,
+  AuthenticatedWellnessLearnRoute: AuthenticatedWellnessLearnRoute,
   AuthenticatedWellnessMindRoute: AuthenticatedWellnessMindRoute,
   AuthenticatedWellnessRoutinesRoute: AuthenticatedWellnessRoutinesRoute,
   AuthenticatedWellnessIndexRoute: AuthenticatedWellnessIndexRoute,
