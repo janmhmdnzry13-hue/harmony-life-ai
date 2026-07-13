@@ -1,7 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Home, ListChecks, Sparkles, Flame, Wallet, User } from "lucide-react";
+import { Home, Sparkles, Flame, Wallet, User, Heart } from "lucide-react";
 import type { ReactNode } from "react";
 import { getProfile } from "@/lib/profile.functions";
 import { NotificationsBell } from "@/components/notifications-bell";
@@ -9,7 +9,7 @@ import { NotificationsBell } from "@/components/notifications-bell";
 type Tab = { to: string; label: string; icon: typeof Home; center?: boolean };
 const tabs: Tab[] = [
   { to: "/", label: "Today", icon: Home },
-  { to: "/tasks", label: "Tasks", icon: ListChecks },
+  { to: "/wellness", label: "Wellness", icon: Heart },
   { to: "/ai", label: "Origin", icon: Sparkles, center: true },
   { to: "/habits", label: "Habits", icon: Flame },
   { to: "/finance", label: "Money", icon: Wallet },
