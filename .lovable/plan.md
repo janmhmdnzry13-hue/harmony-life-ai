@@ -1,93 +1,117 @@
 ## Scope
 
-Expand the existing Finance page into a full **Wealth OS** — personal finance, investments, trading journal, live market dashboard, and an AI Financial Coach — while keeping the app's editorial/minimal design system (ink/paper/serif, mobile-first).
+Add a **Wellness OS** alongside the existing Wealth OS, structured as four hubs plus an AI coach. Reuse the editorial ink/paper/serif design system and the same server-fn + RLS pattern already used by Finance.
 
-The current app already has: transactions, budgets, and an AI spending insight. Everything else is new.
+The existing `habits` table stays (we extend it, not replace it). Everything else is new.
 
 ## Navigation
 
-Restructure `/finance` into a hub with 5 sub-tabs (segmented control at top):
+Four new top-level hubs, each with sub-tabs (segmented control):
 
-1. **Money** — Income, Expenses, Budgets, Bills & Subscriptions, Cash Flow, Savings goals
-2. **Net Worth** — Accounts, Asset Allocation, Net Worth over time
-3. **Invest** — Stocks / Crypto / ETF / Gold / Real Estate holdings, P/L, Dividends
-4. **Trade** — Trading Journal, Trade History, Win Rate, Mistake tags, Position Size Calculator
-5. **Market** — Live crypto & stock prices, Fear & Greed, BTC Dominance, Altcoin Season, Economic Calendar (CPI, PPI, FOMC)
+1. **Health** `/health` → Sleep · Workouts · Nutrition · Water · Weight · Steps
+2. **Mind** `/mind` → Mood · Gratitude · Reflection · Stress · Emotion Analysis (AI)
+3. **Habits** `/habits` (upgrade existing) → Today · Streaks · Heatmap · Routines (Morning/Night)
+4. **Learn** `/learn` → Courses · Books · Reading · Flashcards · Notes · Knowledge Graph · Goals
+5. **Coach** `/coach` → Motivation · Habit suggestions · Burnout detection · Daily advice
 
-AI Coach lives as a floating insight card on each tab, plus a dedicated `/finance/coach` route that runs deeper analysis across all modules.
+Bottom nav updated: Home · Finance · Wellness · Habits · More.
 
-## Data Model (new tables)
+## Data model (new tables)
+
+All tables: `user_id` + RLS `auth.uid() = user_id`, GRANTs to authenticated + service_role, `updated_at` trigger.
 
 ```text
-bills             — recurring bills & subscriptions (name, amount, cycle, next_due, category, active)
-savings_goals     — name, target, current, deadline, category
-accounts          — name, type (cash/checking/savings/brokerage/crypto/real_estate/other), balance, currency
-holdings          — account_id, asset_type (stock/crypto/etf/gold/realestate), symbol, name,
-                    quantity, avg_cost, currency, notes
-price_cache       — symbol, asset_type, price, currency, updated_at (server-side price memo)
-dividends         — holding_id, amount, currency, paid_on, note
-trades            — symbol, side (long/short), entry, exit, quantity, stop, target,
-                    opened_at, closed_at, pnl, r_multiple, setup, mistakes[], notes, rating
+Health
+  sleep_logs        date, bedtime, wake_time, duration_min, quality (1-5), notes
+  workouts          date, type, duration_min, intensity, calories, notes
+  workout_exercises workout_id, name, sets, reps, weight, notes
+  nutrition_logs    date, meal (breakfast/lunch/dinner/snack), name, calories, protein, carbs, fat
+  water_logs        date, amount_ml
+  weight_logs       date, weight_kg, body_fat_pct?, notes
+  step_logs         date, steps, distance_km?
+
+Mind
+  mood_logs         logged_at, mood (1-5), energy (1-5), tags[], notes
+  gratitude_entries date, entries[] (3 items)
+  reflection_entries date, prompt, body
+  stress_logs       logged_at, level (1-10), triggers[], notes
+
+Habits (extend existing habits table)
+  routines          name, kind (morning/night), steps[], active
+  routine_logs      routine_id, date, completed_steps[]
+
+Learn
+  courses           title, provider, url, status (planned/active/done), progress_pct, notes
+  books             title, author, status (planned/reading/done), started_on, finished_on, rating, notes
+  reading_sessions  book_id, date, minutes, pages, notes
+  flashcard_decks   name, description
+  flashcards        deck_id, front, back, ease, due_on, reps
+  learn_notes       title, body, tags[], links[] (to other note ids)
+  learning_goals    title, target_date, progress_pct, notes
 ```
 
-All tables: `user_id` + RLS `auth.uid() = user_id`, GRANT to authenticated + service_role, `updated_at` trigger.
-
-`transactions` and `budgets` stay as-is (they already work).
+`emotion_analysis` reuses `mood_logs` + `reflection_entries` + AI, no new table.
 
 ## Server functions (new files)
 
-- `src/lib/bills.functions.ts` — CRUD + `upcomingBills` (next 30 days)
-- `src/lib/savings.functions.ts` — CRUD savings goals + contribute
-- `src/lib/networth.functions.ts` — CRUD accounts, aggregate net worth + allocation breakdown
-- `src/lib/holdings.functions.ts` — CRUD holdings, refresh prices, compute P/L, dividends
-- `src/lib/trading.functions.ts` — CRUD trades, stats (win rate, avg R, mistake frequency)
-- `src/lib/market.functions.ts` — server-side fetchers for public market data (see APIs below)
-- `src/lib/coach.functions.ts` — extends `analyzeSpending` into a multi-module coach
+- `src/lib/health/sleep.functions.ts`, `workouts.functions.ts`, `nutrition.functions.ts`, `water.functions.ts`, `weight.functions.ts`, `steps.functions.ts`
+- `src/lib/mind/mood.functions.ts`, `gratitude.functions.ts`, `reflection.functions.ts`, `stress.functions.ts`, `emotion.functions.ts` (AI)
+- `src/lib/habits/routines.functions.ts`, `heatmap.functions.ts` (aggregates existing habit_logs)
+- `src/lib/learn/courses.functions.ts`, `books.functions.ts`, `flashcards.functions.ts` (SM-2 lite scheduling), `learn-notes.functions.ts`, `learn-goals.functions.ts`
+- `src/lib/wellness-coach.functions.ts` — sibling to finance coach, scopes: motivation, habits, burnout, daily
 
-## Market data (server-side, cached)
+Each file follows the existing `createServerFn + requireSupabaseAuth + zod` pattern used by `tasks.functions.ts` / `coach.functions.ts`.
 
-Free public APIs, called from server functions and cached in `price_cache` (5–15 min TTL). Server-side only, so no CORS or key leaks. No user-facing API keys required for the defaults; if any provider requires a key later, request it via `add_secret`.
+## AI features
 
-- **Crypto prices & BTC dominance** — CoinGecko `/simple/price`, `/global`
-- **Fear & Greed (crypto)** — alternative.me `/fng`
-- **Altcoin Season Index** — computed server-side from CoinGecko top-50 30-day performance vs BTC (standard formula: % of top-50 that outperformed BTC over 90d)
-- **Stocks / ETFs / Gold** — Yahoo Finance public quote endpoint (`query1.finance.yahoo.com/v7/finance/quote`) — no key, server-side only
-- **Economic calendar (CPI, PPI, FOMC, Fed events)** — curated static JSON of upcoming US macro events shipped in `src/lib/econ-calendar.ts`, updated per release. (Free live econ-calendar APIs are unreliable / paywalled; a maintained JSON list is the pragmatic v1.)
+- **Emotion Analysis** — Gemini reads last 14d of mood + reflections, returns a short editorial paragraph + top 3 emotion tags.
+- **Wellness Coach** — mirrors `runCoach` in finance: aggregates sleep, workouts, mood, stress, habit streaks, then asks `google/gemini-2.5-flash` for a focused insight per scope.
+- **Burnout detection** — heuristic (sleep < 6h avg, stress ≥ 7 avg, mood ≤ 2, missed habits) + AI framing.
 
-## Position Size Calculator
+All via Lovable AI gateway — no user key needed.
 
-Pure client-side, no persistence: inputs (account size, risk %, entry, stop) → position size, risk $, R:R when target given.
-
-## AI Coach
-
-`coach.functions.ts` gathers monthly cash flow, net worth snapshot, portfolio allocation, and trading stats and asks `google/gemini-2.5-flash` for a single-paragraph insight per module (spending, investing, portfolio suggestion, budget optimization). Uses the same `createLovableAiGatewayProvider` pattern already in `finance.functions.ts`.
-
-## Route structure
+## Route files
 
 ```text
 src/routes/_authenticated/
-  finance.tsx              → redirects to /finance/money (or renders hub with tabs)
-  finance.money.tsx        → income/expenses/budgets/bills/subs/cashflow/savings
-  finance.networth.tsx     → accounts + allocation + timeline
-  finance.invest.tsx       → holdings across asset types + P/L + dividends
-  finance.trade.tsx        → journal + stats + position size calc
-  finance.market.tsx       → live prices + indices + econ calendar
-  finance.coach.tsx        → deep AI analysis across all modules
+  health.tsx (layout with tabs)
+  health.index.tsx  · health.workouts.tsx · health.nutrition.tsx
+  health.water.tsx · health.weight.tsx · health.steps.tsx
+  mind.tsx (layout)
+  mind.index.tsx (mood) · mind.gratitude.tsx · mind.reflection.tsx
+  mind.stress.tsx · mind.emotion.tsx
+  habits.tsx (upgrade to layout with tabs)
+  habits.index.tsx (today) · habits.streaks.tsx · habits.heatmap.tsx · habits.routines.tsx
+  learn.tsx (layout)
+  learn.index.tsx (courses) · learn.books.tsx · learn.flashcards.tsx
+  learn.notes.tsx · learn.graph.tsx · learn.goals.tsx
+  coach.tsx (wellness coach; finance coach stays at /finance/coach)
 ```
 
-Reuses existing app shell + design tokens.
+Mobile-first, matches existing editorial UI.
+
+## Knowledge graph
+
+Simple v1: `learn_notes.links` is a UUID[] of related note ids. Render as a force-directed SVG using a tiny in-house layout (no new deps). Click a node → open the note. No external graph libs.
+
+## Flashcards
+
+SM-2 lite: `ease` (default 2.5), `reps`, `due_on`. Review flow: show front → reveal → self-rate Again/Hard/Good/Easy → update `ease`, `reps`, `due_on`. Pure client interaction, server-fn to persist.
 
 ## Deliverables (in order)
 
-1. Migration: create all new tables with RLS + GRANTs + triggers.
-2. Server functions for each module.
-3. Route files with mobile-first UI matching the existing editorial style.
-4. Wire AI Coach card into each tab + dedicated coach route.
-5. Update nav to point Finance → hub.
+1. Migration: all new tables with RLS + GRANTs + triggers + `routines` seed helper.
+2. Server functions per module.
+3. Route files with sub-tabs and editorial UI.
+4. AI Emotion Analysis + Wellness Coach.
+5. Bottom nav update in `src/components/app-shell.tsx`.
 
 ## Out of scope (v1)
 
-- Bank account sync (Plaid) — manual entries only.
-- Broker API sync — manual holdings + refreshable prices via public APIs.
-- Real-time streaming — prices refresh on demand + cache TTL.
-- Multi-currency FX conversion — display each holding in its own currency; net worth aggregates per currency.
+- Wearable / HealthKit / Google Fit sync — manual entry only.
+- Food database — free-text meal + macros.
+- Image import for meals.
+- Multi-user sharing of notes/graphs.
+- Native step counter — manual daily entry.
+
+Ready to build on approval.
