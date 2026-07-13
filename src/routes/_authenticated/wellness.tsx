@@ -1,12 +1,12 @@
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
 
-const TABS = [
+const TABS: Array<{ to: string; label: string; exact?: boolean }> = [
   { to: "/wellness", label: "Health", exact: true },
   { to: "/wellness/mind", label: "Mind" },
   { to: "/wellness/routines", label: "Routines" },
   { to: "/wellness/learn", label: "Learn" },
   { to: "/wellness/coach", label: "Coach" },
-] as const;
+];
 
 export const Route = createFileRoute("/_authenticated/wellness")({
   component: WellnessLayout,
