@@ -1,7 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Home, Sparkles, Flame, Wallet, User, Heart } from "lucide-react";
+import { Home, Sparkles, Flame, Wallet, User, Heart, LayoutGrid } from "lucide-react";
 import type { ReactNode } from "react";
 import { getProfile } from "@/lib/profile.functions";
 import { NotificationsBell } from "@/components/notifications-bell";
@@ -11,8 +11,8 @@ const tabs: Tab[] = [
   { to: "/", label: "Today", icon: Home },
   { to: "/wellness", label: "Wellness", icon: Heart },
   { to: "/ai", label: "Origin", icon: Sparkles, center: true },
-  { to: "/habits", label: "Habits", icon: Flame },
   { to: "/finance", label: "Money", icon: Wallet },
+  { to: "/more", label: "More", icon: LayoutGrid },
 ];
 
 export function AppShell({ children }: { children: ReactNode }) {

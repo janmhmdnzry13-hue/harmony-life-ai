@@ -18,13 +18,16 @@ import { Route as AuthenticatedWellnessRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedTasksRouteImport } from './routes/_authenticated/tasks'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedProjectsRouteImport } from './routes/_authenticated/projects'
+import { Route as AuthenticatedPeopleRouteImport } from './routes/_authenticated/people'
 import { Route as AuthenticatedMoreRouteImport } from './routes/_authenticated/more'
 import { Route as AuthenticatedHabitsRouteImport } from './routes/_authenticated/habits'
 import { Route as AuthenticatedFinanceRouteImport } from './routes/_authenticated/finance'
+import { Route as AuthenticatedDocsRouteImport } from './routes/_authenticated/docs'
 import { Route as AuthenticatedCalendarRouteImport } from './routes/_authenticated/calendar'
 import { Route as AuthenticatedAiRouteImport } from './routes/_authenticated/ai'
 import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
 import { Route as AuthenticatedWellnessIndexRouteImport } from './routes/_authenticated/wellness.index'
+import { Route as AuthenticatedPeopleIndexRouteImport } from './routes/_authenticated/people.index'
 import { Route as AuthenticatedFinanceIndexRouteImport } from './routes/_authenticated/finance.index'
 import { Route as AuthenticatedCalendarIndexRouteImport } from './routes/_authenticated/calendar.index'
 import { Route as AuthenticatedWellnessRoutinesRouteImport } from './routes/_authenticated/wellness.routines'
@@ -32,6 +35,9 @@ import { Route as AuthenticatedWellnessMindRouteImport } from './routes/_authent
 import { Route as AuthenticatedWellnessLearnRouteImport } from './routes/_authenticated/wellness.learn'
 import { Route as AuthenticatedWellnessCoachRouteImport } from './routes/_authenticated/wellness.coach'
 import { Route as AuthenticatedProjectsIdRouteImport } from './routes/_authenticated/projects.$id'
+import { Route as AuthenticatedPeopleRemindersRouteImport } from './routes/_authenticated/people.reminders'
+import { Route as AuthenticatedPeopleGiftsRouteImport } from './routes/_authenticated/people.gifts'
+import { Route as AuthenticatedPeopleBirthdaysRouteImport } from './routes/_authenticated/people.birthdays'
 import { Route as AuthenticatedFinanceTradeRouteImport } from './routes/_authenticated/finance.trade'
 import { Route as AuthenticatedFinanceNetworthRouteImport } from './routes/_authenticated/finance.networth'
 import { Route as AuthenticatedFinanceMarketRouteImport } from './routes/_authenticated/finance.market'
@@ -85,6 +91,11 @@ const AuthenticatedProjectsRoute = AuthenticatedProjectsRouteImport.update({
   path: '/projects',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedPeopleRoute = AuthenticatedPeopleRouteImport.update({
+  id: '/people',
+  path: '/people',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedMoreRoute = AuthenticatedMoreRouteImport.update({
   id: '/more',
   path: '/more',
@@ -98,6 +109,11 @@ const AuthenticatedHabitsRoute = AuthenticatedHabitsRouteImport.update({
 const AuthenticatedFinanceRoute = AuthenticatedFinanceRouteImport.update({
   id: '/finance',
   path: '/finance',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedDocsRoute = AuthenticatedDocsRouteImport.update({
+  id: '/docs',
+  path: '/docs',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedCalendarRoute = AuthenticatedCalendarRouteImport.update({
@@ -120,6 +136,12 @@ const AuthenticatedWellnessIndexRoute =
     id: '/',
     path: '/',
     getParentRoute: () => AuthenticatedWellnessRoute,
+  } as any)
+const AuthenticatedPeopleIndexRoute =
+  AuthenticatedPeopleIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedPeopleRoute,
   } as any)
 const AuthenticatedFinanceIndexRoute =
   AuthenticatedFinanceIndexRouteImport.update({
@@ -162,6 +184,24 @@ const AuthenticatedProjectsIdRoute = AuthenticatedProjectsIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => AuthenticatedProjectsRoute,
 } as any)
+const AuthenticatedPeopleRemindersRoute =
+  AuthenticatedPeopleRemindersRouteImport.update({
+    id: '/reminders',
+    path: '/reminders',
+    getParentRoute: () => AuthenticatedPeopleRoute,
+  } as any)
+const AuthenticatedPeopleGiftsRoute =
+  AuthenticatedPeopleGiftsRouteImport.update({
+    id: '/gifts',
+    path: '/gifts',
+    getParentRoute: () => AuthenticatedPeopleRoute,
+  } as any)
+const AuthenticatedPeopleBirthdaysRoute =
+  AuthenticatedPeopleBirthdaysRouteImport.update({
+    id: '/birthdays',
+    path: '/birthdays',
+    getParentRoute: () => AuthenticatedPeopleRoute,
+  } as any)
 const AuthenticatedFinanceTradeRoute =
   AuthenticatedFinanceTradeRouteImport.update({
     id: '/trade',
@@ -218,9 +258,11 @@ export interface FileRoutesByFullPath {
   '/account': typeof AuthenticatedAccountRoute
   '/ai': typeof AuthenticatedAiRoute
   '/calendar': typeof AuthenticatedCalendarRouteWithChildren
+  '/docs': typeof AuthenticatedDocsRoute
   '/finance': typeof AuthenticatedFinanceRouteWithChildren
   '/habits': typeof AuthenticatedHabitsRoute
   '/more': typeof AuthenticatedMoreRoute
+  '/people': typeof AuthenticatedPeopleRouteWithChildren
   '/projects': typeof AuthenticatedProjectsRouteWithChildren
   '/settings': typeof AuthenticatedSettingsRoute
   '/tasks': typeof AuthenticatedTasksRoute
@@ -234,6 +276,9 @@ export interface FileRoutesByFullPath {
   '/finance/market': typeof AuthenticatedFinanceMarketRoute
   '/finance/networth': typeof AuthenticatedFinanceNetworthRoute
   '/finance/trade': typeof AuthenticatedFinanceTradeRoute
+  '/people/birthdays': typeof AuthenticatedPeopleBirthdaysRoute
+  '/people/gifts': typeof AuthenticatedPeopleGiftsRoute
+  '/people/reminders': typeof AuthenticatedPeopleRemindersRoute
   '/projects/$id': typeof AuthenticatedProjectsIdRoute
   '/wellness/coach': typeof AuthenticatedWellnessCoachRoute
   '/wellness/learn': typeof AuthenticatedWellnessLearnRoute
@@ -241,6 +286,7 @@ export interface FileRoutesByFullPath {
   '/wellness/routines': typeof AuthenticatedWellnessRoutinesRoute
   '/calendar/': typeof AuthenticatedCalendarIndexRoute
   '/finance/': typeof AuthenticatedFinanceIndexRoute
+  '/people/': typeof AuthenticatedPeopleIndexRoute
   '/wellness/': typeof AuthenticatedWellnessIndexRoute
 }
 export interface FileRoutesByTo {
@@ -248,6 +294,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/account': typeof AuthenticatedAccountRoute
   '/ai': typeof AuthenticatedAiRoute
+  '/docs': typeof AuthenticatedDocsRoute
   '/habits': typeof AuthenticatedHabitsRoute
   '/more': typeof AuthenticatedMoreRoute
   '/projects': typeof AuthenticatedProjectsRouteWithChildren
@@ -263,6 +310,9 @@ export interface FileRoutesByTo {
   '/finance/market': typeof AuthenticatedFinanceMarketRoute
   '/finance/networth': typeof AuthenticatedFinanceNetworthRoute
   '/finance/trade': typeof AuthenticatedFinanceTradeRoute
+  '/people/birthdays': typeof AuthenticatedPeopleBirthdaysRoute
+  '/people/gifts': typeof AuthenticatedPeopleGiftsRoute
+  '/people/reminders': typeof AuthenticatedPeopleRemindersRoute
   '/projects/$id': typeof AuthenticatedProjectsIdRoute
   '/wellness/coach': typeof AuthenticatedWellnessCoachRoute
   '/wellness/learn': typeof AuthenticatedWellnessLearnRoute
@@ -270,6 +320,7 @@ export interface FileRoutesByTo {
   '/wellness/routines': typeof AuthenticatedWellnessRoutinesRoute
   '/calendar': typeof AuthenticatedCalendarIndexRoute
   '/finance': typeof AuthenticatedFinanceIndexRoute
+  '/people': typeof AuthenticatedPeopleIndexRoute
   '/wellness': typeof AuthenticatedWellnessIndexRoute
 }
 export interface FileRoutesById {
@@ -280,9 +331,11 @@ export interface FileRoutesById {
   '/_authenticated/account': typeof AuthenticatedAccountRoute
   '/_authenticated/ai': typeof AuthenticatedAiRoute
   '/_authenticated/calendar': typeof AuthenticatedCalendarRouteWithChildren
+  '/_authenticated/docs': typeof AuthenticatedDocsRoute
   '/_authenticated/finance': typeof AuthenticatedFinanceRouteWithChildren
   '/_authenticated/habits': typeof AuthenticatedHabitsRoute
   '/_authenticated/more': typeof AuthenticatedMoreRoute
+  '/_authenticated/people': typeof AuthenticatedPeopleRouteWithChildren
   '/_authenticated/projects': typeof AuthenticatedProjectsRouteWithChildren
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/tasks': typeof AuthenticatedTasksRoute
@@ -297,6 +350,9 @@ export interface FileRoutesById {
   '/_authenticated/finance/market': typeof AuthenticatedFinanceMarketRoute
   '/_authenticated/finance/networth': typeof AuthenticatedFinanceNetworthRoute
   '/_authenticated/finance/trade': typeof AuthenticatedFinanceTradeRoute
+  '/_authenticated/people/birthdays': typeof AuthenticatedPeopleBirthdaysRoute
+  '/_authenticated/people/gifts': typeof AuthenticatedPeopleGiftsRoute
+  '/_authenticated/people/reminders': typeof AuthenticatedPeopleRemindersRoute
   '/_authenticated/projects/$id': typeof AuthenticatedProjectsIdRoute
   '/_authenticated/wellness/coach': typeof AuthenticatedWellnessCoachRoute
   '/_authenticated/wellness/learn': typeof AuthenticatedWellnessLearnRoute
@@ -304,6 +360,7 @@ export interface FileRoutesById {
   '/_authenticated/wellness/routines': typeof AuthenticatedWellnessRoutinesRoute
   '/_authenticated/calendar/': typeof AuthenticatedCalendarIndexRoute
   '/_authenticated/finance/': typeof AuthenticatedFinanceIndexRoute
+  '/_authenticated/people/': typeof AuthenticatedPeopleIndexRoute
   '/_authenticated/wellness/': typeof AuthenticatedWellnessIndexRoute
 }
 export interface FileRouteTypes {
@@ -315,9 +372,11 @@ export interface FileRouteTypes {
     | '/account'
     | '/ai'
     | '/calendar'
+    | '/docs'
     | '/finance'
     | '/habits'
     | '/more'
+    | '/people'
     | '/projects'
     | '/settings'
     | '/tasks'
@@ -331,6 +390,9 @@ export interface FileRouteTypes {
     | '/finance/market'
     | '/finance/networth'
     | '/finance/trade'
+    | '/people/birthdays'
+    | '/people/gifts'
+    | '/people/reminders'
     | '/projects/$id'
     | '/wellness/coach'
     | '/wellness/learn'
@@ -338,6 +400,7 @@ export interface FileRouteTypes {
     | '/wellness/routines'
     | '/calendar/'
     | '/finance/'
+    | '/people/'
     | '/wellness/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -345,6 +408,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/account'
     | '/ai'
+    | '/docs'
     | '/habits'
     | '/more'
     | '/projects'
@@ -360,6 +424,9 @@ export interface FileRouteTypes {
     | '/finance/market'
     | '/finance/networth'
     | '/finance/trade'
+    | '/people/birthdays'
+    | '/people/gifts'
+    | '/people/reminders'
     | '/projects/$id'
     | '/wellness/coach'
     | '/wellness/learn'
@@ -367,6 +434,7 @@ export interface FileRouteTypes {
     | '/wellness/routines'
     | '/calendar'
     | '/finance'
+    | '/people'
     | '/wellness'
   id:
     | '__root__'
@@ -376,9 +444,11 @@ export interface FileRouteTypes {
     | '/_authenticated/account'
     | '/_authenticated/ai'
     | '/_authenticated/calendar'
+    | '/_authenticated/docs'
     | '/_authenticated/finance'
     | '/_authenticated/habits'
     | '/_authenticated/more'
+    | '/_authenticated/people'
     | '/_authenticated/projects'
     | '/_authenticated/settings'
     | '/_authenticated/tasks'
@@ -393,6 +463,9 @@ export interface FileRouteTypes {
     | '/_authenticated/finance/market'
     | '/_authenticated/finance/networth'
     | '/_authenticated/finance/trade'
+    | '/_authenticated/people/birthdays'
+    | '/_authenticated/people/gifts'
+    | '/_authenticated/people/reminders'
     | '/_authenticated/projects/$id'
     | '/_authenticated/wellness/coach'
     | '/_authenticated/wellness/learn'
@@ -400,6 +473,7 @@ export interface FileRouteTypes {
     | '/_authenticated/wellness/routines'
     | '/_authenticated/calendar/'
     | '/_authenticated/finance/'
+    | '/_authenticated/people/'
     | '/_authenticated/wellness/'
   fileRoutesById: FileRoutesById
 }
@@ -475,6 +549,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProjectsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/people': {
+      id: '/_authenticated/people'
+      path: '/people'
+      fullPath: '/people'
+      preLoaderRoute: typeof AuthenticatedPeopleRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/more': {
       id: '/_authenticated/more'
       path: '/more'
@@ -494,6 +575,13 @@ declare module '@tanstack/react-router' {
       path: '/finance'
       fullPath: '/finance'
       preLoaderRoute: typeof AuthenticatedFinanceRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/docs': {
+      id: '/_authenticated/docs'
+      path: '/docs'
+      fullPath: '/docs'
+      preLoaderRoute: typeof AuthenticatedDocsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/calendar': {
@@ -523,6 +611,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/wellness/'
       preLoaderRoute: typeof AuthenticatedWellnessIndexRouteImport
       parentRoute: typeof AuthenticatedWellnessRoute
+    }
+    '/_authenticated/people/': {
+      id: '/_authenticated/people/'
+      path: '/'
+      fullPath: '/people/'
+      preLoaderRoute: typeof AuthenticatedPeopleIndexRouteImport
+      parentRoute: typeof AuthenticatedPeopleRoute
     }
     '/_authenticated/finance/': {
       id: '/_authenticated/finance/'
@@ -572,6 +667,27 @@ declare module '@tanstack/react-router' {
       fullPath: '/projects/$id'
       preLoaderRoute: typeof AuthenticatedProjectsIdRouteImport
       parentRoute: typeof AuthenticatedProjectsRoute
+    }
+    '/_authenticated/people/reminders': {
+      id: '/_authenticated/people/reminders'
+      path: '/reminders'
+      fullPath: '/people/reminders'
+      preLoaderRoute: typeof AuthenticatedPeopleRemindersRouteImport
+      parentRoute: typeof AuthenticatedPeopleRoute
+    }
+    '/_authenticated/people/gifts': {
+      id: '/_authenticated/people/gifts'
+      path: '/gifts'
+      fullPath: '/people/gifts'
+      preLoaderRoute: typeof AuthenticatedPeopleGiftsRouteImport
+      parentRoute: typeof AuthenticatedPeopleRoute
+    }
+    '/_authenticated/people/birthdays': {
+      id: '/_authenticated/people/birthdays'
+      path: '/birthdays'
+      fullPath: '/people/birthdays'
+      preLoaderRoute: typeof AuthenticatedPeopleBirthdaysRouteImport
+      parentRoute: typeof AuthenticatedPeopleRoute
     }
     '/_authenticated/finance/trade': {
       id: '/_authenticated/finance/trade'
@@ -672,6 +788,23 @@ const AuthenticatedFinanceRouteChildren: AuthenticatedFinanceRouteChildren = {
 const AuthenticatedFinanceRouteWithChildren =
   AuthenticatedFinanceRoute._addFileChildren(AuthenticatedFinanceRouteChildren)
 
+interface AuthenticatedPeopleRouteChildren {
+  AuthenticatedPeopleBirthdaysRoute: typeof AuthenticatedPeopleBirthdaysRoute
+  AuthenticatedPeopleGiftsRoute: typeof AuthenticatedPeopleGiftsRoute
+  AuthenticatedPeopleRemindersRoute: typeof AuthenticatedPeopleRemindersRoute
+  AuthenticatedPeopleIndexRoute: typeof AuthenticatedPeopleIndexRoute
+}
+
+const AuthenticatedPeopleRouteChildren: AuthenticatedPeopleRouteChildren = {
+  AuthenticatedPeopleBirthdaysRoute: AuthenticatedPeopleBirthdaysRoute,
+  AuthenticatedPeopleGiftsRoute: AuthenticatedPeopleGiftsRoute,
+  AuthenticatedPeopleRemindersRoute: AuthenticatedPeopleRemindersRoute,
+  AuthenticatedPeopleIndexRoute: AuthenticatedPeopleIndexRoute,
+}
+
+const AuthenticatedPeopleRouteWithChildren =
+  AuthenticatedPeopleRoute._addFileChildren(AuthenticatedPeopleRouteChildren)
+
 interface AuthenticatedProjectsRouteChildren {
   AuthenticatedProjectsIdRoute: typeof AuthenticatedProjectsIdRoute
 }
@@ -710,9 +843,11 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAccountRoute: typeof AuthenticatedAccountRoute
   AuthenticatedAiRoute: typeof AuthenticatedAiRoute
   AuthenticatedCalendarRoute: typeof AuthenticatedCalendarRouteWithChildren
+  AuthenticatedDocsRoute: typeof AuthenticatedDocsRoute
   AuthenticatedFinanceRoute: typeof AuthenticatedFinanceRouteWithChildren
   AuthenticatedHabitsRoute: typeof AuthenticatedHabitsRoute
   AuthenticatedMoreRoute: typeof AuthenticatedMoreRoute
+  AuthenticatedPeopleRoute: typeof AuthenticatedPeopleRouteWithChildren
   AuthenticatedProjectsRoute: typeof AuthenticatedProjectsRouteWithChildren
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedTasksRoute: typeof AuthenticatedTasksRoute
@@ -724,9 +859,11 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAccountRoute: AuthenticatedAccountRoute,
   AuthenticatedAiRoute: AuthenticatedAiRoute,
   AuthenticatedCalendarRoute: AuthenticatedCalendarRouteWithChildren,
+  AuthenticatedDocsRoute: AuthenticatedDocsRoute,
   AuthenticatedFinanceRoute: AuthenticatedFinanceRouteWithChildren,
   AuthenticatedHabitsRoute: AuthenticatedHabitsRoute,
   AuthenticatedMoreRoute: AuthenticatedMoreRoute,
+  AuthenticatedPeopleRoute: AuthenticatedPeopleRouteWithChildren,
   AuthenticatedProjectsRoute: AuthenticatedProjectsRouteWithChildren,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedTasksRoute: AuthenticatedTasksRoute,
