@@ -224,6 +224,89 @@ export type Database = {
         }
         Relationships: []
       }
+      communication_reminders: {
+        Row: {
+          cadence_days: number
+          contact_id: string
+          created_at: string
+          id: string
+          last_contacted_on: string | null
+          next_due_on: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          cadence_days?: number
+          contact_id: string
+          created_at?: string
+          id?: string
+          last_contacted_on?: string | null
+          next_due_on?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          cadence_days?: number
+          contact_id?: string
+          created_at?: string
+          id?: string
+          last_contacted_on?: string | null
+          next_due_on?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "communication_reminders_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      contacts: {
+        Row: {
+          avatar_url: string | null
+          birthday: string | null
+          created_at: string
+          email: string | null
+          id: string
+          name: string
+          notes: string | null
+          phone: string | null
+          relation: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          birthday?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          name: string
+          notes?: string | null
+          phone?: string | null
+          relation?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          birthday?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          name?: string
+          notes?: string | null
+          phone?: string | null
+          relation?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       courses: {
         Row: {
           created_at: string
@@ -309,6 +392,51 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      documents: {
+        Row: {
+          category: string
+          created_at: string
+          expires_on: string | null
+          file_path: string | null
+          id: string
+          mime: string | null
+          notes: string | null
+          ocr_text: string | null
+          size: number | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          expires_on?: string | null
+          file_path?: string | null
+          id?: string
+          mime?: string | null
+          notes?: string | null
+          ocr_text?: string | null
+          size?: number | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          expires_on?: string | null
+          file_path?: string | null
+          id?: string
+          mime?: string | null
+          notes?: string | null
+          ocr_text?: string | null
+          size?: number | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       events: {
         Row: {
@@ -416,6 +544,56 @@ export type Database = {
             columns: ["deck_id"]
             isOneToOne: false
             referencedRelation: "flashcard_decks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gift_ideas: {
+        Row: {
+          budget: number | null
+          contact_id: string | null
+          created_at: string
+          id: string
+          notes: string | null
+          occasion: string | null
+          status: string
+          title: string
+          updated_at: string
+          url: string | null
+          user_id: string
+        }
+        Insert: {
+          budget?: number | null
+          contact_id?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          occasion?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+          url?: string | null
+          user_id: string
+        }
+        Update: {
+          budget?: number | null
+          contact_id?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          occasion?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+          url?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gift_ideas_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
             referencedColumns: ["id"]
           },
         ]
@@ -723,6 +901,48 @@ export type Database = {
         }
         Relationships: []
       }
+      meetings: {
+        Row: {
+          agenda: string | null
+          attendees: string[] | null
+          created_at: string
+          ends_at: string | null
+          id: string
+          location: string | null
+          notes: string | null
+          starts_at: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          agenda?: string | null
+          attendees?: string[] | null
+          created_at?: string
+          ends_at?: string | null
+          id?: string
+          location?: string | null
+          notes?: string | null
+          starts_at: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          agenda?: string | null
+          attendees?: string[] | null
+          created_at?: string
+          ends_at?: string | null
+          id?: string
+          location?: string | null
+          notes?: string | null
+          starts_at?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       mood_logs: {
         Row: {
           created_at: string
@@ -864,6 +1084,44 @@ export type Database = {
         }
         Relationships: []
       }
+      packing_items: {
+        Row: {
+          created_at: string
+          id: string
+          label: string
+          packed: boolean
+          trip_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          label: string
+          packed?: boolean
+          trip_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          label?: string
+          packed?: boolean
+          trip_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "packing_items_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       price_cache: {
         Row: {
           asset_type: string
@@ -923,6 +1181,140 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      project_cards: {
+        Row: {
+          assignees: string[] | null
+          column_id: string | null
+          created_at: string
+          description: string | null
+          due_date: string | null
+          id: string
+          position: number
+          project_id: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          assignees?: string[] | null
+          column_id?: string | null
+          created_at?: string
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          position?: number
+          project_id: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          assignees?: string[] | null
+          column_id?: string | null
+          created_at?: string
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          position?: number
+          project_id?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_cards_column_id_fkey"
+            columns: ["column_id"]
+            isOneToOne: false
+            referencedRelation: "project_columns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_cards_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      project_columns: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          position: number
+          project_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          position?: number
+          project_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          position?: number
+          project_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_columns_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      project_deps: {
+        Row: {
+          card_id: string
+          created_at: string
+          depends_on_card_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          card_id: string
+          created_at?: string
+          depends_on_card_id: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          card_id?: string
+          created_at?: string
+          depends_on_card_id?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_deps_card_id_fkey"
+            columns: ["card_id"]
+            isOneToOne: false
+            referencedRelation: "project_cards"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_deps_depends_on_card_id_fkey"
+            columns: ["depends_on_card_id"]
+            isOneToOne: false
+            referencedRelation: "project_cards"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       projects: {
         Row: {
@@ -1026,6 +1418,45 @@ export type Database = {
           id?: string
           log_date?: string
           prompt?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      reviews: {
+        Row: {
+          body_md: string
+          created_at: string
+          highlights: string[] | null
+          id: string
+          kind: string
+          period_end: string
+          period_start: string
+          suggestions: string[] | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          body_md: string
+          created_at?: string
+          highlights?: string[] | null
+          id?: string
+          kind: string
+          period_end: string
+          period_start: string
+          suggestions?: string[] | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          body_md?: string
+          created_at?: string
+          highlights?: string[] | null
+          id?: string
+          kind?: string
+          period_end?: string
+          period_start?: string
+          suggestions?: string[] | null
           updated_at?: string
           user_id?: string
         }
@@ -1303,6 +1734,45 @@ export type Database = {
           },
         ]
       }
+      time_blocks: {
+        Row: {
+          category: string | null
+          created_at: string
+          date: string
+          end_time: string
+          id: string
+          notes: string | null
+          start_time: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          date: string
+          end_time: string
+          id?: string
+          notes?: string | null
+          start_time: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          date?: string
+          end_time?: string
+          id?: string
+          notes?: string | null
+          start_time?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       trades: {
         Row: {
           asset_type: string
@@ -1407,6 +1877,142 @@ export type Database = {
           note?: string | null
           occurred_on?: string
           type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      travel_journal: {
+        Row: {
+          body: string | null
+          created_at: string
+          entry_date: string
+          id: string
+          photos: string[] | null
+          title: string | null
+          trip_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          entry_date: string
+          id?: string
+          photos?: string[] | null
+          title?: string | null
+          trip_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          entry_date?: string
+          id?: string
+          photos?: string[] | null
+          title?: string | null
+          trip_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "travel_journal_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      trip_items: {
+        Row: {
+          cost: number | null
+          created_at: string
+          ends_at: string | null
+          id: string
+          kind: string
+          notes: string | null
+          starts_at: string | null
+          title: string
+          trip_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          cost?: number | null
+          created_at?: string
+          ends_at?: string | null
+          id?: string
+          kind?: string
+          notes?: string | null
+          starts_at?: string | null
+          title: string
+          trip_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          cost?: number | null
+          created_at?: string
+          ends_at?: string | null
+          id?: string
+          kind?: string
+          notes?: string | null
+          starts_at?: string | null
+          title?: string
+          trip_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trip_items_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      trips: {
+        Row: {
+          budget: number | null
+          cover_url: string | null
+          created_at: string
+          destination: string | null
+          ends_on: string | null
+          id: string
+          notes: string | null
+          starts_on: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          budget?: number | null
+          cover_url?: string | null
+          created_at?: string
+          destination?: string | null
+          ends_on?: string | null
+          id?: string
+          notes?: string | null
+          starts_on?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          budget?: number | null
+          cover_url?: string | null
+          created_at?: string
+          destination?: string | null
+          ends_on?: string | null
+          id?: string
+          notes?: string | null
+          starts_on?: string | null
+          title?: string
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
