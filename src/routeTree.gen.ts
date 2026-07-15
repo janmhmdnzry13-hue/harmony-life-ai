@@ -17,6 +17,7 @@ import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as AuthenticatedWellnessRouteImport } from './routes/_authenticated/wellness'
 import { Route as AuthenticatedTasksRouteImport } from './routes/_authenticated/tasks'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
+import { Route as AuthenticatedProjectsRouteImport } from './routes/_authenticated/projects'
 import { Route as AuthenticatedMoreRouteImport } from './routes/_authenticated/more'
 import { Route as AuthenticatedHabitsRouteImport } from './routes/_authenticated/habits'
 import { Route as AuthenticatedFinanceRouteImport } from './routes/_authenticated/finance'
@@ -30,6 +31,7 @@ import { Route as AuthenticatedWellnessRoutinesRouteImport } from './routes/_aut
 import { Route as AuthenticatedWellnessMindRouteImport } from './routes/_authenticated/wellness.mind'
 import { Route as AuthenticatedWellnessLearnRouteImport } from './routes/_authenticated/wellness.learn'
 import { Route as AuthenticatedWellnessCoachRouteImport } from './routes/_authenticated/wellness.coach'
+import { Route as AuthenticatedProjectsIdRouteImport } from './routes/_authenticated/projects.$id'
 import { Route as AuthenticatedFinanceTradeRouteImport } from './routes/_authenticated/finance.trade'
 import { Route as AuthenticatedFinanceNetworthRouteImport } from './routes/_authenticated/finance.networth'
 import { Route as AuthenticatedFinanceMarketRouteImport } from './routes/_authenticated/finance.market'
@@ -76,6 +78,11 @@ const AuthenticatedTasksRoute = AuthenticatedTasksRouteImport.update({
 const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedProjectsRoute = AuthenticatedProjectsRouteImport.update({
+  id: '/projects',
+  path: '/projects',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedMoreRoute = AuthenticatedMoreRouteImport.update({
@@ -150,6 +157,11 @@ const AuthenticatedWellnessCoachRoute =
     path: '/coach',
     getParentRoute: () => AuthenticatedWellnessRoute,
   } as any)
+const AuthenticatedProjectsIdRoute = AuthenticatedProjectsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AuthenticatedProjectsRoute,
+} as any)
 const AuthenticatedFinanceTradeRoute =
   AuthenticatedFinanceTradeRouteImport.update({
     id: '/trade',
@@ -209,6 +221,7 @@ export interface FileRoutesByFullPath {
   '/finance': typeof AuthenticatedFinanceRouteWithChildren
   '/habits': typeof AuthenticatedHabitsRoute
   '/more': typeof AuthenticatedMoreRoute
+  '/projects': typeof AuthenticatedProjectsRouteWithChildren
   '/settings': typeof AuthenticatedSettingsRoute
   '/tasks': typeof AuthenticatedTasksRoute
   '/wellness': typeof AuthenticatedWellnessRouteWithChildren
@@ -221,6 +234,7 @@ export interface FileRoutesByFullPath {
   '/finance/market': typeof AuthenticatedFinanceMarketRoute
   '/finance/networth': typeof AuthenticatedFinanceNetworthRoute
   '/finance/trade': typeof AuthenticatedFinanceTradeRoute
+  '/projects/$id': typeof AuthenticatedProjectsIdRoute
   '/wellness/coach': typeof AuthenticatedWellnessCoachRoute
   '/wellness/learn': typeof AuthenticatedWellnessLearnRoute
   '/wellness/mind': typeof AuthenticatedWellnessMindRoute
@@ -236,6 +250,7 @@ export interface FileRoutesByTo {
   '/ai': typeof AuthenticatedAiRoute
   '/habits': typeof AuthenticatedHabitsRoute
   '/more': typeof AuthenticatedMoreRoute
+  '/projects': typeof AuthenticatedProjectsRouteWithChildren
   '/settings': typeof AuthenticatedSettingsRoute
   '/tasks': typeof AuthenticatedTasksRoute
   '/api/chat': typeof ApiChatRoute
@@ -248,6 +263,7 @@ export interface FileRoutesByTo {
   '/finance/market': typeof AuthenticatedFinanceMarketRoute
   '/finance/networth': typeof AuthenticatedFinanceNetworthRoute
   '/finance/trade': typeof AuthenticatedFinanceTradeRoute
+  '/projects/$id': typeof AuthenticatedProjectsIdRoute
   '/wellness/coach': typeof AuthenticatedWellnessCoachRoute
   '/wellness/learn': typeof AuthenticatedWellnessLearnRoute
   '/wellness/mind': typeof AuthenticatedWellnessMindRoute
@@ -267,6 +283,7 @@ export interface FileRoutesById {
   '/_authenticated/finance': typeof AuthenticatedFinanceRouteWithChildren
   '/_authenticated/habits': typeof AuthenticatedHabitsRoute
   '/_authenticated/more': typeof AuthenticatedMoreRoute
+  '/_authenticated/projects': typeof AuthenticatedProjectsRouteWithChildren
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/tasks': typeof AuthenticatedTasksRoute
   '/_authenticated/wellness': typeof AuthenticatedWellnessRouteWithChildren
@@ -280,6 +297,7 @@ export interface FileRoutesById {
   '/_authenticated/finance/market': typeof AuthenticatedFinanceMarketRoute
   '/_authenticated/finance/networth': typeof AuthenticatedFinanceNetworthRoute
   '/_authenticated/finance/trade': typeof AuthenticatedFinanceTradeRoute
+  '/_authenticated/projects/$id': typeof AuthenticatedProjectsIdRoute
   '/_authenticated/wellness/coach': typeof AuthenticatedWellnessCoachRoute
   '/_authenticated/wellness/learn': typeof AuthenticatedWellnessLearnRoute
   '/_authenticated/wellness/mind': typeof AuthenticatedWellnessMindRoute
@@ -300,6 +318,7 @@ export interface FileRouteTypes {
     | '/finance'
     | '/habits'
     | '/more'
+    | '/projects'
     | '/settings'
     | '/tasks'
     | '/wellness'
@@ -312,6 +331,7 @@ export interface FileRouteTypes {
     | '/finance/market'
     | '/finance/networth'
     | '/finance/trade'
+    | '/projects/$id'
     | '/wellness/coach'
     | '/wellness/learn'
     | '/wellness/mind'
@@ -327,6 +347,7 @@ export interface FileRouteTypes {
     | '/ai'
     | '/habits'
     | '/more'
+    | '/projects'
     | '/settings'
     | '/tasks'
     | '/api/chat'
@@ -339,6 +360,7 @@ export interface FileRouteTypes {
     | '/finance/market'
     | '/finance/networth'
     | '/finance/trade'
+    | '/projects/$id'
     | '/wellness/coach'
     | '/wellness/learn'
     | '/wellness/mind'
@@ -357,6 +379,7 @@ export interface FileRouteTypes {
     | '/_authenticated/finance'
     | '/_authenticated/habits'
     | '/_authenticated/more'
+    | '/_authenticated/projects'
     | '/_authenticated/settings'
     | '/_authenticated/tasks'
     | '/_authenticated/wellness'
@@ -370,6 +393,7 @@ export interface FileRouteTypes {
     | '/_authenticated/finance/market'
     | '/_authenticated/finance/networth'
     | '/_authenticated/finance/trade'
+    | '/_authenticated/projects/$id'
     | '/_authenticated/wellness/coach'
     | '/_authenticated/wellness/learn'
     | '/_authenticated/wellness/mind'
@@ -442,6 +466,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof AuthenticatedSettingsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/projects': {
+      id: '/_authenticated/projects'
+      path: '/projects'
+      fullPath: '/projects'
+      preLoaderRoute: typeof AuthenticatedProjectsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/more': {
@@ -534,6 +565,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/wellness/coach'
       preLoaderRoute: typeof AuthenticatedWellnessCoachRouteImport
       parentRoute: typeof AuthenticatedWellnessRoute
+    }
+    '/_authenticated/projects/$id': {
+      id: '/_authenticated/projects/$id'
+      path: '/$id'
+      fullPath: '/projects/$id'
+      preLoaderRoute: typeof AuthenticatedProjectsIdRouteImport
+      parentRoute: typeof AuthenticatedProjectsRoute
     }
     '/_authenticated/finance/trade': {
       id: '/_authenticated/finance/trade'
@@ -634,6 +672,19 @@ const AuthenticatedFinanceRouteChildren: AuthenticatedFinanceRouteChildren = {
 const AuthenticatedFinanceRouteWithChildren =
   AuthenticatedFinanceRoute._addFileChildren(AuthenticatedFinanceRouteChildren)
 
+interface AuthenticatedProjectsRouteChildren {
+  AuthenticatedProjectsIdRoute: typeof AuthenticatedProjectsIdRoute
+}
+
+const AuthenticatedProjectsRouteChildren: AuthenticatedProjectsRouteChildren = {
+  AuthenticatedProjectsIdRoute: AuthenticatedProjectsIdRoute,
+}
+
+const AuthenticatedProjectsRouteWithChildren =
+  AuthenticatedProjectsRoute._addFileChildren(
+    AuthenticatedProjectsRouteChildren,
+  )
+
 interface AuthenticatedWellnessRouteChildren {
   AuthenticatedWellnessCoachRoute: typeof AuthenticatedWellnessCoachRoute
   AuthenticatedWellnessLearnRoute: typeof AuthenticatedWellnessLearnRoute
@@ -662,6 +713,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedFinanceRoute: typeof AuthenticatedFinanceRouteWithChildren
   AuthenticatedHabitsRoute: typeof AuthenticatedHabitsRoute
   AuthenticatedMoreRoute: typeof AuthenticatedMoreRoute
+  AuthenticatedProjectsRoute: typeof AuthenticatedProjectsRouteWithChildren
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedTasksRoute: typeof AuthenticatedTasksRoute
   AuthenticatedWellnessRoute: typeof AuthenticatedWellnessRouteWithChildren
@@ -675,6 +727,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedFinanceRoute: AuthenticatedFinanceRouteWithChildren,
   AuthenticatedHabitsRoute: AuthenticatedHabitsRoute,
   AuthenticatedMoreRoute: AuthenticatedMoreRoute,
+  AuthenticatedProjectsRoute: AuthenticatedProjectsRouteWithChildren,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedTasksRoute: AuthenticatedTasksRoute,
   AuthenticatedWellnessRoute: AuthenticatedWellnessRouteWithChildren,
