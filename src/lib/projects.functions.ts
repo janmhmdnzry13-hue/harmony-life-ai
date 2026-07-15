@@ -16,9 +16,9 @@ export const upsertProject = createServerFn({ method: "POST" })
     z.object({
       id: z.string().uuid().optional(),
       name: z.string().min(1).max(120),
-      description: z.string().max(1000).optional().nullable(),
-      status: z.string().max(40).optional().nullable(),
-      color: z.string().max(20).optional().nullable(),
+      description: z.string().max(1000).optional(),
+      status: z.string().max(40).optional(),
+      color: z.string().max(20).optional(),
     }).parse(v),
   )
   .handler(async ({ data, context }) => {
