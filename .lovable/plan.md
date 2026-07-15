@@ -1,117 +1,131 @@
 ## Scope
 
-Add a **Wellness OS** alongside the existing Wealth OS, structured as four hubs plus an AI coach. Reuse the editorial ink/paper/serif design system and the same server-fn + RLS pattern already used by Finance.
-
-The existing `habits` table stays (we extend it, not replace it). Everything else is new.
+Add a **Productivity & Relationships OS** alongside Wealth OS and Wellness OS. Five new hubs plus an AI productivity assistant, all following the existing editorial ink/paper/serif design and the `createServerFn + requireSupabaseAuth + zod` pattern.
 
 ## Navigation
 
-Four new top-level hubs, each with sub-tabs (segmented control):
+Bottom nav is full (5 slots). Add a **"More"** hub at `/more` that fans out into the new sections, and promote the most-used one (**Calendar**) by replacing the existing `/calendar` route with a richer version.
 
-1. **Health** `/health` → Sleep · Workouts · Nutrition · Water · Weight · Steps
-2. **Mind** `/mind` → Mood · Gratitude · Reflection · Stress · Emotion Analysis (AI)
-3. **Habits** `/habits` (upgrade existing) → Today · Streaks · Heatmap · Routines (Morning/Night)
-4. **Learn** `/learn` → Courses · Books · Reading · Flashcards · Notes · Knowledge Graph · Goals
-5. **Coach** `/coach` → Motivation · Habit suggestions · Burnout detection · Daily advice
+New top-level sections:
 
-Bottom nav updated: Home · Finance · Wellness · Habits · More.
+1. **Calendar** `/calendar` (upgrade) → Month · Week · Time Blocks · Meetings · Sync
+2. **Projects** `/projects` → Kanban · Timeline · Dependencies
+3. **Docs** `/docs` → Vault · Scanner · Categories (Passport / ID / Contract / Receipt)
+4. **People** `/people` → Contacts · Family · Friends · Birthdays · Gifts · Reminders
+5. **Travel** `/travel` → Trips · Packing · Budget · Journal
+6. **Assistant** `/assistant` → Weekly · Monthly · Reports · Suggestions
+
+`/more` lists these six as editorial cards. Bottom nav stays: Home · Wellness · Origin · Habits · Money (More is reached from the header, and Origin/AI already covers quick chat).
 
 ## Data model (new tables)
 
-All tables: `user_id` + RLS `auth.uid() = user_id`, GRANTs to authenticated + service_role, `updated_at` trigger.
+All: `user_id` + RLS `auth.uid() = user_id`, GRANTs to authenticated + service_role, `updated_at` trigger.
 
 ```text
-Health
-  sleep_logs        date, bedtime, wake_time, duration_min, quality (1-5), notes
-  workouts          date, type, duration_min, intensity, calories, notes
-  workout_exercises workout_id, name, sets, reps, weight, notes
-  nutrition_logs    date, meal (breakfast/lunch/dinner/snack), name, calories, protein, carbs, fat
-  water_logs        date, amount_ml
-  weight_logs       date, weight_kg, body_fat_pct?, notes
-  step_logs         date, steps, distance_km?
+Calendar
+  time_blocks         date, start_time, end_time, title, category, notes
+  meetings            starts_at, ends_at, title, attendees[], location, agenda, notes
+  calendar_sync       provider (google/outlook), connection_key_ref, last_sync_at, enabled
 
-Mind
-  mood_logs         logged_at, mood (1-5), energy (1-5), tags[], notes
-  gratitude_entries date, entries[] (3 items)
-  reflection_entries date, prompt, body
-  stress_logs       logged_at, level (1-10), triggers[], notes
+Projects
+  projects_v2         name, description, status, color, archived         (rename existing `projects` view or reuse; existing table stays)
+  project_columns     project_id, name, position
+  project_cards       project_id, column_id, title, description, position, due_date, assignees[]
+  project_deps        card_id, depends_on_card_id
+  project_members     project_id, user_id, role
 
-Habits (extend existing habits table)
-  routines          name, kind (morning/night), steps[], active
-  routine_logs      routine_id, date, completed_steps[]
+Documents
+  documents           title, category (passport/id/contract/receipt/other), file_path (storage), mime, size, expires_on, notes, ocr_text
+  (storage bucket: `documents`, private, RLS by user_id prefix)
 
-Learn
-  courses           title, provider, url, status (planned/active/done), progress_pct, notes
-  books             title, author, status (planned/reading/done), started_on, finished_on, rating, notes
-  reading_sessions  book_id, date, minutes, pages, notes
-  flashcard_decks   name, description
-  flashcards        deck_id, front, back, ease, due_on, reps
-  learn_notes       title, body, tags[], links[] (to other note ids)
-  learning_goals    title, target_date, progress_pct, notes
+People
+  contacts            name, relation (family/friend/colleague/other), email, phone, birthday, notes, avatar_url
+  gift_ideas          contact_id, title, occasion, budget, url, status (idea/bought/given), notes
+  communication_reminders  contact_id, cadence_days, last_contacted_on, next_due_on
+
+Travel
+  trips               title, destination, starts_on, ends_on, budget, notes, cover_url
+  trip_items          trip_id, kind (flight/hotel/activity/transport), title, starts_at, ends_at, cost, notes
+  packing_lists       trip_id, name
+  packing_items       list_id, label, packed
+  travel_journal      trip_id, entry_date, title, body, photos[]
+
+Assistant
+  reviews             kind (weekly/monthly), period_start, period_end, body_md, highlights[], suggestions[]
 ```
-
-`emotion_analysis` reuses `mood_logs` + `reflection_entries` + AI, no new table.
 
 ## Server functions (new files)
 
-- `src/lib/health/sleep.functions.ts`, `workouts.functions.ts`, `nutrition.functions.ts`, `water.functions.ts`, `weight.functions.ts`, `steps.functions.ts`
-- `src/lib/mind/mood.functions.ts`, `gratitude.functions.ts`, `reflection.functions.ts`, `stress.functions.ts`, `emotion.functions.ts` (AI)
-- `src/lib/habits/routines.functions.ts`, `heatmap.functions.ts` (aggregates existing habit_logs)
-- `src/lib/learn/courses.functions.ts`, `books.functions.ts`, `flashcards.functions.ts` (SM-2 lite scheduling), `learn-notes.functions.ts`, `learn-goals.functions.ts`
-- `src/lib/wellness-coach.functions.ts` — sibling to finance coach, scopes: motivation, habits, burnout, daily
+```text
+src/lib/calendar/time-blocks.functions.ts, meetings.functions.ts, sync.functions.ts
+src/lib/projects.functions.ts (kanban CRUD, deps, members)
+src/lib/documents.functions.ts (list/upsert/delete + signed URLs + OCR trigger)
+src/lib/people/contacts.functions.ts, gifts.functions.ts, reminders.functions.ts
+src/lib/travel.functions.ts (trips, items, packing, journal)
+src/lib/assistant.functions.ts (weekly/monthly review + suggestions via Gemini)
+```
 
-Each file follows the existing `createServerFn + requireSupabaseAuth + zod` pattern used by `tasks.functions.ts` / `coach.functions.ts`.
+Every file follows the existing pattern (`createServerFn + requireSupabaseAuth + zod`).
 
-## AI features
+## Calendar sync (Google + Outlook)
 
-- **Emotion Analysis** — Gemini reads last 14d of mood + reflections, returns a short editorial paragraph + top 3 emotion tags.
-- **Wellness Coach** — mirrors `runCoach` in finance: aggregates sleep, workouts, mood, stress, habit streaks, then asks `google/gemini-2.5-flash` for a focused insight per scope.
-- **Burnout detection** — heuristic (sleep < 6h avg, stress ≥ 7 avg, mood ≤ 2, missed habits) + AI framing.
+Uses **App User Connectors** — each end user connects their own account. Set up two clients (`google_calendar`, `microsoft_outlook`) via `connector_app_user--connect_client`, then per-user consent → store encrypted connection key in `app_user_connections` (shipped pattern). A server fn pulls the next 14 days of events on demand and merges them read-only into the calendar view; local `events` + `time_blocks` remain writable. No two-way write in v1.
 
-All via Lovable AI gateway — no user key needed.
+## Documents / OCR
+
+- Private Supabase Storage bucket `documents` with `user_id/...` prefix RLS.
+- Upload from the browser via signed upload URL.
+- OCR: server fn calls Lovable AI Gateway (`google/gemini-2.5-flash`) with the file as an image/PDF part; returns extracted text stored in `documents.ocr_text`. Searchable via ILIKE.
+- Expiry reminder: `documents.expires_on` powers a "Expiring soon" list on the vault page.
+
+## Relationships
+
+- Birthday reminders and communication cadence computed client-side from `contacts.birthday` and `communication_reminders.next_due_on`; surfaced on Home under a new "Coming up" card.
+- Gift planner is a simple board grouped by contact.
+
+## Travel
+
+- Trip detail page with itinerary (trip_items sorted by `starts_at`), packing checklist, running budget total, and a journal timeline.
+
+## AI Productivity Assistant
+
+- **Weekly Review**: aggregates last 7d of tasks, habits, calendar, mood, finance signals → Gemini prompt returns markdown review (wins / friction / next-week focus). Cached in `reviews`.
+- **Monthly Review**: same shape, 30d window.
+- **Smart Suggestions**: on-demand `google/gemini-2.5-flash` call returning 3 concrete next actions given current unfinished tasks + upcoming events.
+- All through Lovable AI Gateway — no user key.
 
 ## Route files
 
 ```text
 src/routes/_authenticated/
-  health.tsx (layout with tabs)
-  health.index.tsx  · health.workouts.tsx · health.nutrition.tsx
-  health.water.tsx · health.weight.tsx · health.steps.tsx
-  mind.tsx (layout)
-  mind.index.tsx (mood) · mind.gratitude.tsx · mind.reflection.tsx
-  mind.stress.tsx · mind.emotion.tsx
-  habits.tsx (upgrade to layout with tabs)
-  habits.index.tsx (today) · habits.streaks.tsx · habits.heatmap.tsx · habits.routines.tsx
-  learn.tsx (layout)
-  learn.index.tsx (courses) · learn.books.tsx · learn.flashcards.tsx
-  learn.notes.tsx · learn.graph.tsx · learn.goals.tsx
-  coach.tsx (wellness coach; finance coach stays at /finance/coach)
+  calendar.tsx (upgrade to layout with tabs)
+  calendar.index.tsx (month) · calendar.week.tsx · calendar.blocks.tsx · calendar.meetings.tsx · calendar.sync.tsx
+  projects.tsx (layout) · projects.index.tsx (list) · projects.$id.tsx (kanban) · projects.$id.timeline.tsx
+  docs.tsx (layout) · docs.index.tsx (vault) · docs.scan.tsx · docs.$id.tsx
+  people.tsx (layout) · people.index.tsx (contacts) · people.birthdays.tsx · people.gifts.tsx · people.reminders.tsx
+  travel.tsx (layout) · travel.index.tsx (trips) · travel.$id.tsx (detail)
+  assistant.tsx (layout) · assistant.index.tsx (dashboard) · assistant.weekly.tsx · assistant.monthly.tsx · assistant.suggestions.tsx
+  more.tsx (hub of the above)
 ```
 
-Mobile-first, matches existing editorial UI.
-
-## Knowledge graph
-
-Simple v1: `learn_notes.links` is a UUID[] of related note ids. Render as a force-directed SVG using a tiny in-house layout (no new deps). Click a node → open the note. No external graph libs.
-
-## Flashcards
-
-SM-2 lite: `ease` (default 2.5), `reps`, `due_on`. Review flow: show front → reveal → self-rate Again/Hard/Good/Easy → update `ease`, `reps`, `due_on`. Pure client interaction, server-fn to persist.
+Existing `/calendar` route becomes the new layout; its current month view moves to `calendar.index.tsx`.
 
 ## Deliverables (in order)
 
-1. Migration: all new tables with RLS + GRANTs + triggers + `routines` seed helper.
-2. Server functions per module.
-3. Route files with sub-tabs and editorial UI.
-4. AI Emotion Analysis + Wellness Coach.
-5. Bottom nav update in `src/components/app-shell.tsx`.
+1. Migration: all new tables + storage bucket + RLS + GRANTs + triggers.
+2. App User Connector clients for Google Calendar + Microsoft Outlook, with encrypted per-user key storage table.
+3. Server functions per module.
+4. Route files with sub-tabs and editorial UI.
+5. AI reviews + suggestions.
+6. `/more` hub + header entry point.
 
 ## Out of scope (v1)
 
-- Wearable / HealthKit / Google Fit sync — manual entry only.
-- Food database — free-text meal + macros.
-- Image import for meals.
-- Multi-user sharing of notes/graphs.
-- Native step counter — manual daily entry.
+- Two-way calendar write-back to Google/Outlook (read-only merge only).
+- Team collaboration for Projects across separate accounts (single-user; `project_members` table is ready but UI is solo).
+- Real-time OCR on-device — server-side via Gemini only.
+- File preview for non-PDF/image documents.
+- Native travel booking integrations.
+- Push notifications (in-app reminders only).
 
 Ready to build on approval.

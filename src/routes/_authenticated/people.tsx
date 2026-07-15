@@ -1,13 +1,13 @@
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
 
 const TABS = [
-  { to: "/calendar", label: "Month", exact: true },
-  { to: "/calendar/blocks", label: "Blocks" },
-  { to: "/calendar/meetings", label: "Meetings" },
-  { to: "/calendar/sync", label: "Sync" },
+  { to: "/people", label: "Contacts", exact: true },
+  { to: "/people/birthdays", label: "Birthdays" },
+  { to: "/people/gifts", label: "Gifts" },
+  { to: "/people/reminders", label: "Reach out" },
 ];
 
-export const Route = createFileRoute("/_authenticated/calendar")({
+export const Route = createFileRoute("/_authenticated/people")({
   component: Layout,
 });
 
