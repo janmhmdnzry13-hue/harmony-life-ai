@@ -25,6 +25,7 @@ import { Route as AuthenticatedAiRouteImport } from './routes/_authenticated/ai'
 import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
 import { Route as AuthenticatedWellnessIndexRouteImport } from './routes/_authenticated/wellness.index'
 import { Route as AuthenticatedFinanceIndexRouteImport } from './routes/_authenticated/finance.index'
+import { Route as AuthenticatedCalendarIndexRouteImport } from './routes/_authenticated/calendar.index'
 import { Route as AuthenticatedWellnessRoutinesRouteImport } from './routes/_authenticated/wellness.routines'
 import { Route as AuthenticatedWellnessMindRouteImport } from './routes/_authenticated/wellness.mind'
 import { Route as AuthenticatedWellnessLearnRouteImport } from './routes/_authenticated/wellness.learn'
@@ -34,6 +35,9 @@ import { Route as AuthenticatedFinanceNetworthRouteImport } from './routes/_auth
 import { Route as AuthenticatedFinanceMarketRouteImport } from './routes/_authenticated/finance.market'
 import { Route as AuthenticatedFinanceInvestRouteImport } from './routes/_authenticated/finance.invest'
 import { Route as AuthenticatedFinanceCoachRouteImport } from './routes/_authenticated/finance.coach'
+import { Route as AuthenticatedCalendarSyncRouteImport } from './routes/_authenticated/calendar.sync'
+import { Route as AuthenticatedCalendarMeetingsRouteImport } from './routes/_authenticated/calendar.meetings'
+import { Route as AuthenticatedCalendarBlocksRouteImport } from './routes/_authenticated/calendar.blocks'
 
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
@@ -116,6 +120,12 @@ const AuthenticatedFinanceIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedFinanceRoute,
   } as any)
+const AuthenticatedCalendarIndexRoute =
+  AuthenticatedCalendarIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedCalendarRoute,
+  } as any)
 const AuthenticatedWellnessRoutinesRoute =
   AuthenticatedWellnessRoutinesRouteImport.update({
     id: '/routines',
@@ -170,6 +180,24 @@ const AuthenticatedFinanceCoachRoute =
     path: '/coach',
     getParentRoute: () => AuthenticatedFinanceRoute,
   } as any)
+const AuthenticatedCalendarSyncRoute =
+  AuthenticatedCalendarSyncRouteImport.update({
+    id: '/sync',
+    path: '/sync',
+    getParentRoute: () => AuthenticatedCalendarRoute,
+  } as any)
+const AuthenticatedCalendarMeetingsRoute =
+  AuthenticatedCalendarMeetingsRouteImport.update({
+    id: '/meetings',
+    path: '/meetings',
+    getParentRoute: () => AuthenticatedCalendarRoute,
+  } as any)
+const AuthenticatedCalendarBlocksRoute =
+  AuthenticatedCalendarBlocksRouteImport.update({
+    id: '/blocks',
+    path: '/blocks',
+    getParentRoute: () => AuthenticatedCalendarRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
@@ -177,7 +205,7 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/account': typeof AuthenticatedAccountRoute
   '/ai': typeof AuthenticatedAiRoute
-  '/calendar': typeof AuthenticatedCalendarRoute
+  '/calendar': typeof AuthenticatedCalendarRouteWithChildren
   '/finance': typeof AuthenticatedFinanceRouteWithChildren
   '/habits': typeof AuthenticatedHabitsRoute
   '/more': typeof AuthenticatedMoreRoute
@@ -185,6 +213,9 @@ export interface FileRoutesByFullPath {
   '/tasks': typeof AuthenticatedTasksRoute
   '/wellness': typeof AuthenticatedWellnessRouteWithChildren
   '/api/chat': typeof ApiChatRoute
+  '/calendar/blocks': typeof AuthenticatedCalendarBlocksRoute
+  '/calendar/meetings': typeof AuthenticatedCalendarMeetingsRoute
+  '/calendar/sync': typeof AuthenticatedCalendarSyncRoute
   '/finance/coach': typeof AuthenticatedFinanceCoachRoute
   '/finance/invest': typeof AuthenticatedFinanceInvestRoute
   '/finance/market': typeof AuthenticatedFinanceMarketRoute
@@ -194,6 +225,7 @@ export interface FileRoutesByFullPath {
   '/wellness/learn': typeof AuthenticatedWellnessLearnRoute
   '/wellness/mind': typeof AuthenticatedWellnessMindRoute
   '/wellness/routines': typeof AuthenticatedWellnessRoutinesRoute
+  '/calendar/': typeof AuthenticatedCalendarIndexRoute
   '/finance/': typeof AuthenticatedFinanceIndexRoute
   '/wellness/': typeof AuthenticatedWellnessIndexRoute
 }
@@ -202,13 +234,15 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/account': typeof AuthenticatedAccountRoute
   '/ai': typeof AuthenticatedAiRoute
-  '/calendar': typeof AuthenticatedCalendarRoute
   '/habits': typeof AuthenticatedHabitsRoute
   '/more': typeof AuthenticatedMoreRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/tasks': typeof AuthenticatedTasksRoute
   '/api/chat': typeof ApiChatRoute
   '/': typeof AuthenticatedIndexRoute
+  '/calendar/blocks': typeof AuthenticatedCalendarBlocksRoute
+  '/calendar/meetings': typeof AuthenticatedCalendarMeetingsRoute
+  '/calendar/sync': typeof AuthenticatedCalendarSyncRoute
   '/finance/coach': typeof AuthenticatedFinanceCoachRoute
   '/finance/invest': typeof AuthenticatedFinanceInvestRoute
   '/finance/market': typeof AuthenticatedFinanceMarketRoute
@@ -218,6 +252,7 @@ export interface FileRoutesByTo {
   '/wellness/learn': typeof AuthenticatedWellnessLearnRoute
   '/wellness/mind': typeof AuthenticatedWellnessMindRoute
   '/wellness/routines': typeof AuthenticatedWellnessRoutinesRoute
+  '/calendar': typeof AuthenticatedCalendarIndexRoute
   '/finance': typeof AuthenticatedFinanceIndexRoute
   '/wellness': typeof AuthenticatedWellnessIndexRoute
 }
@@ -228,7 +263,7 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/account': typeof AuthenticatedAccountRoute
   '/_authenticated/ai': typeof AuthenticatedAiRoute
-  '/_authenticated/calendar': typeof AuthenticatedCalendarRoute
+  '/_authenticated/calendar': typeof AuthenticatedCalendarRouteWithChildren
   '/_authenticated/finance': typeof AuthenticatedFinanceRouteWithChildren
   '/_authenticated/habits': typeof AuthenticatedHabitsRoute
   '/_authenticated/more': typeof AuthenticatedMoreRoute
@@ -237,6 +272,9 @@ export interface FileRoutesById {
   '/_authenticated/wellness': typeof AuthenticatedWellnessRouteWithChildren
   '/api/chat': typeof ApiChatRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
+  '/_authenticated/calendar/blocks': typeof AuthenticatedCalendarBlocksRoute
+  '/_authenticated/calendar/meetings': typeof AuthenticatedCalendarMeetingsRoute
+  '/_authenticated/calendar/sync': typeof AuthenticatedCalendarSyncRoute
   '/_authenticated/finance/coach': typeof AuthenticatedFinanceCoachRoute
   '/_authenticated/finance/invest': typeof AuthenticatedFinanceInvestRoute
   '/_authenticated/finance/market': typeof AuthenticatedFinanceMarketRoute
@@ -246,6 +284,7 @@ export interface FileRoutesById {
   '/_authenticated/wellness/learn': typeof AuthenticatedWellnessLearnRoute
   '/_authenticated/wellness/mind': typeof AuthenticatedWellnessMindRoute
   '/_authenticated/wellness/routines': typeof AuthenticatedWellnessRoutinesRoute
+  '/_authenticated/calendar/': typeof AuthenticatedCalendarIndexRoute
   '/_authenticated/finance/': typeof AuthenticatedFinanceIndexRoute
   '/_authenticated/wellness/': typeof AuthenticatedWellnessIndexRoute
 }
@@ -265,6 +304,9 @@ export interface FileRouteTypes {
     | '/tasks'
     | '/wellness'
     | '/api/chat'
+    | '/calendar/blocks'
+    | '/calendar/meetings'
+    | '/calendar/sync'
     | '/finance/coach'
     | '/finance/invest'
     | '/finance/market'
@@ -274,6 +316,7 @@ export interface FileRouteTypes {
     | '/wellness/learn'
     | '/wellness/mind'
     | '/wellness/routines'
+    | '/calendar/'
     | '/finance/'
     | '/wellness/'
   fileRoutesByTo: FileRoutesByTo
@@ -282,13 +325,15 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/account'
     | '/ai'
-    | '/calendar'
     | '/habits'
     | '/more'
     | '/settings'
     | '/tasks'
     | '/api/chat'
     | '/'
+    | '/calendar/blocks'
+    | '/calendar/meetings'
+    | '/calendar/sync'
     | '/finance/coach'
     | '/finance/invest'
     | '/finance/market'
@@ -298,6 +343,7 @@ export interface FileRouteTypes {
     | '/wellness/learn'
     | '/wellness/mind'
     | '/wellness/routines'
+    | '/calendar'
     | '/finance'
     | '/wellness'
   id:
@@ -316,6 +362,9 @@ export interface FileRouteTypes {
     | '/_authenticated/wellness'
     | '/api/chat'
     | '/_authenticated/'
+    | '/_authenticated/calendar/blocks'
+    | '/_authenticated/calendar/meetings'
+    | '/_authenticated/calendar/sync'
     | '/_authenticated/finance/coach'
     | '/_authenticated/finance/invest'
     | '/_authenticated/finance/market'
@@ -325,6 +374,7 @@ export interface FileRouteTypes {
     | '/_authenticated/wellness/learn'
     | '/_authenticated/wellness/mind'
     | '/_authenticated/wellness/routines'
+    | '/_authenticated/calendar/'
     | '/_authenticated/finance/'
     | '/_authenticated/wellness/'
   fileRoutesById: FileRoutesById
@@ -450,6 +500,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedFinanceIndexRouteImport
       parentRoute: typeof AuthenticatedFinanceRoute
     }
+    '/_authenticated/calendar/': {
+      id: '/_authenticated/calendar/'
+      path: '/'
+      fullPath: '/calendar/'
+      preLoaderRoute: typeof AuthenticatedCalendarIndexRouteImport
+      parentRoute: typeof AuthenticatedCalendarRoute
+    }
     '/_authenticated/wellness/routines': {
       id: '/_authenticated/wellness/routines'
       path: '/routines'
@@ -513,8 +570,48 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedFinanceCoachRouteImport
       parentRoute: typeof AuthenticatedFinanceRoute
     }
+    '/_authenticated/calendar/sync': {
+      id: '/_authenticated/calendar/sync'
+      path: '/sync'
+      fullPath: '/calendar/sync'
+      preLoaderRoute: typeof AuthenticatedCalendarSyncRouteImport
+      parentRoute: typeof AuthenticatedCalendarRoute
+    }
+    '/_authenticated/calendar/meetings': {
+      id: '/_authenticated/calendar/meetings'
+      path: '/meetings'
+      fullPath: '/calendar/meetings'
+      preLoaderRoute: typeof AuthenticatedCalendarMeetingsRouteImport
+      parentRoute: typeof AuthenticatedCalendarRoute
+    }
+    '/_authenticated/calendar/blocks': {
+      id: '/_authenticated/calendar/blocks'
+      path: '/blocks'
+      fullPath: '/calendar/blocks'
+      preLoaderRoute: typeof AuthenticatedCalendarBlocksRouteImport
+      parentRoute: typeof AuthenticatedCalendarRoute
+    }
   }
 }
+
+interface AuthenticatedCalendarRouteChildren {
+  AuthenticatedCalendarBlocksRoute: typeof AuthenticatedCalendarBlocksRoute
+  AuthenticatedCalendarMeetingsRoute: typeof AuthenticatedCalendarMeetingsRoute
+  AuthenticatedCalendarSyncRoute: typeof AuthenticatedCalendarSyncRoute
+  AuthenticatedCalendarIndexRoute: typeof AuthenticatedCalendarIndexRoute
+}
+
+const AuthenticatedCalendarRouteChildren: AuthenticatedCalendarRouteChildren = {
+  AuthenticatedCalendarBlocksRoute: AuthenticatedCalendarBlocksRoute,
+  AuthenticatedCalendarMeetingsRoute: AuthenticatedCalendarMeetingsRoute,
+  AuthenticatedCalendarSyncRoute: AuthenticatedCalendarSyncRoute,
+  AuthenticatedCalendarIndexRoute: AuthenticatedCalendarIndexRoute,
+}
+
+const AuthenticatedCalendarRouteWithChildren =
+  AuthenticatedCalendarRoute._addFileChildren(
+    AuthenticatedCalendarRouteChildren,
+  )
 
 interface AuthenticatedFinanceRouteChildren {
   AuthenticatedFinanceCoachRoute: typeof AuthenticatedFinanceCoachRoute
@@ -561,7 +658,7 @@ const AuthenticatedWellnessRouteWithChildren =
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAccountRoute: typeof AuthenticatedAccountRoute
   AuthenticatedAiRoute: typeof AuthenticatedAiRoute
-  AuthenticatedCalendarRoute: typeof AuthenticatedCalendarRoute
+  AuthenticatedCalendarRoute: typeof AuthenticatedCalendarRouteWithChildren
   AuthenticatedFinanceRoute: typeof AuthenticatedFinanceRouteWithChildren
   AuthenticatedHabitsRoute: typeof AuthenticatedHabitsRoute
   AuthenticatedMoreRoute: typeof AuthenticatedMoreRoute
@@ -574,7 +671,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAccountRoute: AuthenticatedAccountRoute,
   AuthenticatedAiRoute: AuthenticatedAiRoute,
-  AuthenticatedCalendarRoute: AuthenticatedCalendarRoute,
+  AuthenticatedCalendarRoute: AuthenticatedCalendarRouteWithChildren,
   AuthenticatedFinanceRoute: AuthenticatedFinanceRouteWithChildren,
   AuthenticatedHabitsRoute: AuthenticatedHabitsRoute,
   AuthenticatedMoreRoute: AuthenticatedMoreRoute,
