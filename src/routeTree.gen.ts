@@ -17,6 +17,7 @@ import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as AuthenticatedWellnessRouteImport } from './routes/_authenticated/wellness'
 import { Route as AuthenticatedTasksRouteImport } from './routes/_authenticated/tasks'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
+import { Route as AuthenticatedMoreRouteImport } from './routes/_authenticated/more'
 import { Route as AuthenticatedHabitsRouteImport } from './routes/_authenticated/habits'
 import { Route as AuthenticatedFinanceRouteImport } from './routes/_authenticated/finance'
 import { Route as AuthenticatedCalendarRouteImport } from './routes/_authenticated/calendar'
@@ -71,6 +72,11 @@ const AuthenticatedTasksRoute = AuthenticatedTasksRouteImport.update({
 const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedMoreRoute = AuthenticatedMoreRouteImport.update({
+  id: '/more',
+  path: '/more',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedHabitsRoute = AuthenticatedHabitsRouteImport.update({
@@ -174,6 +180,7 @@ export interface FileRoutesByFullPath {
   '/calendar': typeof AuthenticatedCalendarRoute
   '/finance': typeof AuthenticatedFinanceRouteWithChildren
   '/habits': typeof AuthenticatedHabitsRoute
+  '/more': typeof AuthenticatedMoreRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/tasks': typeof AuthenticatedTasksRoute
   '/wellness': typeof AuthenticatedWellnessRouteWithChildren
@@ -197,6 +204,7 @@ export interface FileRoutesByTo {
   '/ai': typeof AuthenticatedAiRoute
   '/calendar': typeof AuthenticatedCalendarRoute
   '/habits': typeof AuthenticatedHabitsRoute
+  '/more': typeof AuthenticatedMoreRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/tasks': typeof AuthenticatedTasksRoute
   '/api/chat': typeof ApiChatRoute
@@ -223,6 +231,7 @@ export interface FileRoutesById {
   '/_authenticated/calendar': typeof AuthenticatedCalendarRoute
   '/_authenticated/finance': typeof AuthenticatedFinanceRouteWithChildren
   '/_authenticated/habits': typeof AuthenticatedHabitsRoute
+  '/_authenticated/more': typeof AuthenticatedMoreRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/tasks': typeof AuthenticatedTasksRoute
   '/_authenticated/wellness': typeof AuthenticatedWellnessRouteWithChildren
@@ -251,6 +260,7 @@ export interface FileRouteTypes {
     | '/calendar'
     | '/finance'
     | '/habits'
+    | '/more'
     | '/settings'
     | '/tasks'
     | '/wellness'
@@ -274,6 +284,7 @@ export interface FileRouteTypes {
     | '/ai'
     | '/calendar'
     | '/habits'
+    | '/more'
     | '/settings'
     | '/tasks'
     | '/api/chat'
@@ -299,6 +310,7 @@ export interface FileRouteTypes {
     | '/_authenticated/calendar'
     | '/_authenticated/finance'
     | '/_authenticated/habits'
+    | '/_authenticated/more'
     | '/_authenticated/settings'
     | '/_authenticated/tasks'
     | '/_authenticated/wellness'
@@ -380,6 +392,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof AuthenticatedSettingsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/more': {
+      id: '/_authenticated/more'
+      path: '/more'
+      fullPath: '/more'
+      preLoaderRoute: typeof AuthenticatedMoreRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/habits': {
@@ -545,6 +564,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedCalendarRoute: typeof AuthenticatedCalendarRoute
   AuthenticatedFinanceRoute: typeof AuthenticatedFinanceRouteWithChildren
   AuthenticatedHabitsRoute: typeof AuthenticatedHabitsRoute
+  AuthenticatedMoreRoute: typeof AuthenticatedMoreRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedTasksRoute: typeof AuthenticatedTasksRoute
   AuthenticatedWellnessRoute: typeof AuthenticatedWellnessRouteWithChildren
@@ -557,6 +577,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCalendarRoute: AuthenticatedCalendarRoute,
   AuthenticatedFinanceRoute: AuthenticatedFinanceRouteWithChildren,
   AuthenticatedHabitsRoute: AuthenticatedHabitsRoute,
+  AuthenticatedMoreRoute: AuthenticatedMoreRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedTasksRoute: AuthenticatedTasksRoute,
   AuthenticatedWellnessRoute: AuthenticatedWellnessRouteWithChildren,
