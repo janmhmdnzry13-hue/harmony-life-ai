@@ -50,6 +50,132 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_automations: {
+        Row: {
+          active: boolean
+          agent_key: string
+          created_at: string
+          description: string | null
+          id: string
+          last_result: string | null
+          last_run_at: string | null
+          name: string
+          schedule: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          active?: boolean
+          agent_key: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          last_result?: string | null
+          last_run_at?: string | null
+          name: string
+          schedule?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          active?: boolean
+          agent_key?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          last_result?: string | null
+          last_run_at?: string | null
+          name?: string
+          schedule?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      ai_insights: {
+        Row: {
+          action_label: string | null
+          action_link: string | null
+          body: string
+          confidence: number
+          created_at: string
+          dismissed: boolean
+          domain: string
+          id: string
+          kind: string
+          severity: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          action_label?: string | null
+          action_link?: string | null
+          body: string
+          confidence?: number
+          created_at?: string
+          dismissed?: boolean
+          domain?: string
+          id?: string
+          kind?: string
+          severity?: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          action_label?: string | null
+          action_link?: string | null
+          body?: string
+          confidence?: number
+          created_at?: string
+          dismissed?: boolean
+          domain?: string
+          id?: string
+          kind?: string
+          severity?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      ai_memories: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          importance: number
+          kind: string
+          last_used_at: string | null
+          source: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          importance?: number
+          kind?: string
+          last_used_at?: string | null
+          source?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          importance?: number
+          kind?: string
+          last_used_at?: string | null
+          source?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       ai_messages: {
         Row: {
           content: string
@@ -896,6 +1022,51 @@ export type Database = {
           progress_pct?: number
           target_date?: string | null
           title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      life_scores: {
+        Row: {
+          breakdown: Json
+          burnout_risk: number
+          created_at: string
+          finance_score: number
+          happiness_score: number
+          health_score: number
+          id: string
+          life_score: number
+          productivity_score: number
+          score_date: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          breakdown?: Json
+          burnout_risk?: number
+          created_at?: string
+          finance_score?: number
+          happiness_score?: number
+          health_score?: number
+          id?: string
+          life_score?: number
+          productivity_score?: number
+          score_date?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          breakdown?: Json
+          burnout_risk?: number
+          created_at?: string
+          finance_score?: number
+          happiness_score?: number
+          health_score?: number
+          id?: string
+          life_score?: number
+          productivity_score?: number
+          score_date?: string
           updated_at?: string
           user_id?: string
         }
