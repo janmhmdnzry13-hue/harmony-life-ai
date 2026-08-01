@@ -1,11 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Calendar, Kanban, FileLock, Users, Plane, Sparkles } from "lucide-react";
+import { Calendar, Kanban, FileLock, Users, Plane, Sparkles, Gauge } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/more")({
   component: MorePage,
 });
 
 const HUBS = [
+  { to: "/intel", label: "Intelligence", desc: "Life Score, predictions, agents, memory.", icon: Gauge },
   { to: "/calendar", label: "Calendar", desc: "Time blocks, meetings, sync.", icon: Calendar },
   { to: "/projects", label: "Projects", desc: "Kanban, timeline, dependencies.", icon: Kanban },
   { to: "/docs", label: "Documents", desc: "Secure vault, OCR scanner.", icon: FileLock },
@@ -13,6 +14,7 @@ const HUBS = [
   { to: "/travel", label: "Travel", desc: "Trips, packing, journal.", icon: Plane },
   { to: "/assistant", label: "Assistant", desc: "Weekly review & suggestions.", icon: Sparkles },
 ];
+
 
 function MorePage() {
   return (
