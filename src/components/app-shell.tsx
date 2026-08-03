@@ -1,91 +1,73 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
-import { useServerFn } from "@tanstack/react-start";
-import { Home, Sparkles, Wallet, User, Heart, LayoutGrid } from "lucide-react";
+import { House, CalendarCheck, Sparkles, ChartLine, User } from "lucide-react";
 import type { ReactNode } from "react";
-import { getProfile } from "@/lib/profile.functions";
 import { NotificationsBell } from "@/components/notifications-bell";
 
-type Tab = { to: string; label: string; icon: typeof Home; center?: boolean };
+type Tab = { to: string; label: string; icon: typeof House; center?: boolean };
+
 const tabs: Tab[] = [
-  { to: "/", label: "Today", icon: Home },
-  { to: "/wellness", label: "Wellness", icon: Heart },
+  { to: "/", label: "Home", icon: House },
+  { to: "/plan", label: "Plan", icon: CalendarCheck },
   { to: "/ai", label: "Origin", icon: Sparkles, center: true },
-  { to: "/finance", label: "Money", icon: Wallet },
-  { to: "/more", label: "More", icon: LayoutGrid },
+  { to: "/insights", label: "Insights", icon: ChartLine },
+  { to: "/account", label: "Profile", icon: User },
 ];
 
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const profileFn = useServerFn(getProfile);
-  const profile = useQuery({ queryKey: ["profile"], queryFn: () => profileFn() });
-
-  const initials = (profile.data?.display_name || "◦")
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((s) => s[0]?.toUpperCase())
-    .join("") || "◦";
-
-  const onAccount = pathname === "/account";
 
   return (
     <div className="min-h-screen bg-paper text-ink flex justify-center">
-      <div className="w-full max-w-[480px] min-h-screen flex flex-col relative">
-        <header className="sticky top-0 z-30 bg-paper/95 backdrop-blur border-b border-ink/5 px-5 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="size-1.5 bg-accent rounded-full" />
-            <span className="text-[10px] uppercase tracking-[0.2em] text-ink/50 font-medium">
-              Origin
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
-            <NotificationsBell />
-            <Link
-              to="/account"
-              aria-label="Account"
-              className={`size-9 border flex items-center justify-center text-[11px] font-medium tracking-wide transition-colors ${
-                onAccount ? "bg-ink text-paper border-ink" : "border-ink/20 text-ink/70 hover:border-ink hover:text-ink"
-              }`}
-            >
-              {initials.length > 0 ? initials : <User className="size-4" />}
-            </Link>
-          </div>
+      <div className="w-full max-w-[520px] min-h-screen flex flex-col relative">
+        <header className="sticky top-0 z-30 glass px-6 py-3.5 flex items-center justify-between border-x-0 border-t-0">
+          <Link to="/" className="flex items-center gap-2.5">
+            <span className="size-2 rounded-full bg-accent" />
+            <span className="font-serif text-[15px] tracking-tight">Origin</span>
+          </Link>
+          <NotificationsBell />
         </header>
 
-        <main className="flex-1 pb-28">{children}</main>
+        <main className="flex-1 pb-32">{children}</main>
 
         <nav className="fixed bottom-0 inset-x-0 z-40 flex justify-center pointer-events-none">
-          <div className="w-full max-w-[480px] pointer-events-auto bg-paper/95 backdrop-blur border-t border-ink/10 px-4 pt-3 pb-6 flex justify-between items-center">
-            {tabs.map((t) => {
-              const active = pathname === t.to || (t.to !== "/" && pathname.startsWith(t.to));
-              const Icon = t.icon;
-              if (t.center) {
-                return (
-                  <Link key={t.to} to={t.to as never} className="flex flex-col items-center gap-1 -mt-6">
-                    <div className="size-12 bg-ink text-paper border border-ink flex items-center justify-center">
+          <div className="w-full max-w-[520px] px-4 pb-5 pointer-events-auto">
+            <div className="card-lift rounded-2xl px-2.5 py-2 flex items-center justify-between">
+              {tabs.map((t) => {
+                const active =
+                  t.to === "/" ? pathname === "/" : pathname === t.to || pathname.startsWith(`${t.to}/`);
+                const Icon = t.icon;
+
+                if (t.center) {
+                  return (
+                    <Link
+                      key={t.to}
+                      to={t.to as never}
+                      aria-label={t.label}
+                      className="press mx-1 size-12 shrink-0 rounded-2xl bg-accent text-accent-foreground flex items-center justify-center"
+                      style={{ boxShadow: "var(--shadow-soft)" }}
+                    >
                       <Icon className="size-5" strokeWidth={1.8} />
-                    </div>
-                    <span className="text-[10px] uppercase tracking-widest font-medium text-ink/50">
+                    </Link>
+                  );
+                }
+
+                return (
+                  <Link
+                    key={t.to}
+                    to={t.to as never}
+                    aria-label={t.label}
+                    className={`press flex flex-1 flex-col items-center gap-1 rounded-xl py-2 ${
+                      active ? "text-ink" : "text-muted-foreground"
+                    }`}
+                  >
+                    <Icon className="size-[21px]" strokeWidth={active ? 2.1 : 1.7} />
+                    <span className={`text-[10px] tracking-wide ${active ? "font-semibold" : "font-medium"}`}>
                       {t.label}
                     </span>
                   </Link>
                 );
-              }
-              return (
-                <Link key={t.to} to={t.to as never} className="flex flex-col items-center gap-1 py-1 px-2">
-                  <Icon
-                    className={`size-5 ${active ? "text-ink" : "text-ink/30"}`}
-                    strokeWidth={1.8}
-                  />
-                  <span
-                    className={`text-[10px] uppercase tracking-widest font-medium ${active ? "text-ink" : "text-ink/40"}`}
-                  >
-                    {t.label}
-                  </span>
-                </Link>
-              );
-            })}
+              })}
+            </div>
           </div>
         </nav>
       </div>
