@@ -19,6 +19,7 @@ import { Route as AuthenticatedTravelRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedTasksRouteImport } from './routes/_authenticated/tasks'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedProjectsRouteImport } from './routes/_authenticated/projects'
+import { Route as AuthenticatedPlanRouteImport } from './routes/_authenticated/plan'
 import { Route as AuthenticatedPeopleRouteImport } from './routes/_authenticated/people'
 import { Route as AuthenticatedMoreRouteImport } from './routes/_authenticated/more'
 import { Route as AuthenticatedIntelRouteImport } from './routes/_authenticated/intel'
@@ -98,6 +99,11 @@ const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
 const AuthenticatedProjectsRoute = AuthenticatedProjectsRouteImport.update({
   id: '/projects',
   path: '/projects',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedPlanRoute = AuthenticatedPlanRouteImport.update({
+  id: '/plan',
+  path: '/plan',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedPeopleRoute = AuthenticatedPeopleRouteImport.update({
@@ -289,6 +295,7 @@ export interface FileRoutesByFullPath {
   '/intel': typeof AuthenticatedIntelRoute
   '/more': typeof AuthenticatedMoreRoute
   '/people': typeof AuthenticatedPeopleRouteWithChildren
+  '/plan': typeof AuthenticatedPlanRoute
   '/projects': typeof AuthenticatedProjectsRouteWithChildren
   '/settings': typeof AuthenticatedSettingsRoute
   '/tasks': typeof AuthenticatedTasksRoute
@@ -327,6 +334,7 @@ export interface FileRoutesByTo {
   '/habits': typeof AuthenticatedHabitsRoute
   '/intel': typeof AuthenticatedIntelRoute
   '/more': typeof AuthenticatedMoreRoute
+  '/plan': typeof AuthenticatedPlanRoute
   '/projects': typeof AuthenticatedProjectsRouteWithChildren
   '/settings': typeof AuthenticatedSettingsRoute
   '/tasks': typeof AuthenticatedTasksRoute
@@ -370,6 +378,7 @@ export interface FileRoutesById {
   '/_authenticated/intel': typeof AuthenticatedIntelRoute
   '/_authenticated/more': typeof AuthenticatedMoreRoute
   '/_authenticated/people': typeof AuthenticatedPeopleRouteWithChildren
+  '/_authenticated/plan': typeof AuthenticatedPlanRoute
   '/_authenticated/projects': typeof AuthenticatedProjectsRouteWithChildren
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/tasks': typeof AuthenticatedTasksRoute
@@ -415,6 +424,7 @@ export interface FileRouteTypes {
     | '/intel'
     | '/more'
     | '/people'
+    | '/plan'
     | '/projects'
     | '/settings'
     | '/tasks'
@@ -453,6 +463,7 @@ export interface FileRouteTypes {
     | '/habits'
     | '/intel'
     | '/more'
+    | '/plan'
     | '/projects'
     | '/settings'
     | '/tasks'
@@ -495,6 +506,7 @@ export interface FileRouteTypes {
     | '/_authenticated/intel'
     | '/_authenticated/more'
     | '/_authenticated/people'
+    | '/_authenticated/plan'
     | '/_authenticated/projects'
     | '/_authenticated/settings'
     | '/_authenticated/tasks'
@@ -602,6 +614,13 @@ declare module '@tanstack/react-router' {
       path: '/projects'
       fullPath: '/projects'
       preLoaderRoute: typeof AuthenticatedProjectsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/plan': {
+      id: '/_authenticated/plan'
+      path: '/plan'
+      fullPath: '/plan'
+      preLoaderRoute: typeof AuthenticatedPlanRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/people': {
@@ -937,6 +956,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedIntelRoute: typeof AuthenticatedIntelRoute
   AuthenticatedMoreRoute: typeof AuthenticatedMoreRoute
   AuthenticatedPeopleRoute: typeof AuthenticatedPeopleRouteWithChildren
+  AuthenticatedPlanRoute: typeof AuthenticatedPlanRoute
   AuthenticatedProjectsRoute: typeof AuthenticatedProjectsRouteWithChildren
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedTasksRoute: typeof AuthenticatedTasksRoute
@@ -956,6 +976,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedIntelRoute: AuthenticatedIntelRoute,
   AuthenticatedMoreRoute: AuthenticatedMoreRoute,
   AuthenticatedPeopleRoute: AuthenticatedPeopleRouteWithChildren,
+  AuthenticatedPlanRoute: AuthenticatedPlanRoute,
   AuthenticatedProjectsRoute: AuthenticatedProjectsRouteWithChildren,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedTasksRoute: AuthenticatedTasksRoute,
