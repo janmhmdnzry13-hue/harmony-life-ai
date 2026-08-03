@@ -19,9 +19,11 @@ import { Route as AuthenticatedTravelRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedTasksRouteImport } from './routes/_authenticated/tasks'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedProjectsRouteImport } from './routes/_authenticated/projects'
+import { Route as AuthenticatedPlanRouteImport } from './routes/_authenticated/plan'
 import { Route as AuthenticatedPeopleRouteImport } from './routes/_authenticated/people'
 import { Route as AuthenticatedMoreRouteImport } from './routes/_authenticated/more'
 import { Route as AuthenticatedIntelRouteImport } from './routes/_authenticated/intel'
+import { Route as AuthenticatedInsightsRouteImport } from './routes/_authenticated/insights'
 import { Route as AuthenticatedHabitsRouteImport } from './routes/_authenticated/habits'
 import { Route as AuthenticatedFinanceRouteImport } from './routes/_authenticated/finance'
 import { Route as AuthenticatedDocsRouteImport } from './routes/_authenticated/docs'
@@ -100,6 +102,11 @@ const AuthenticatedProjectsRoute = AuthenticatedProjectsRouteImport.update({
   path: '/projects',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedPlanRoute = AuthenticatedPlanRouteImport.update({
+  id: '/plan',
+  path: '/plan',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedPeopleRoute = AuthenticatedPeopleRouteImport.update({
   id: '/people',
   path: '/people',
@@ -113,6 +120,11 @@ const AuthenticatedMoreRoute = AuthenticatedMoreRouteImport.update({
 const AuthenticatedIntelRoute = AuthenticatedIntelRouteImport.update({
   id: '/intel',
   path: '/intel',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedInsightsRoute = AuthenticatedInsightsRouteImport.update({
+  id: '/insights',
+  path: '/insights',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedHabitsRoute = AuthenticatedHabitsRouteImport.update({
@@ -286,9 +298,11 @@ export interface FileRoutesByFullPath {
   '/docs': typeof AuthenticatedDocsRoute
   '/finance': typeof AuthenticatedFinanceRouteWithChildren
   '/habits': typeof AuthenticatedHabitsRoute
+  '/insights': typeof AuthenticatedInsightsRoute
   '/intel': typeof AuthenticatedIntelRoute
   '/more': typeof AuthenticatedMoreRoute
   '/people': typeof AuthenticatedPeopleRouteWithChildren
+  '/plan': typeof AuthenticatedPlanRoute
   '/projects': typeof AuthenticatedProjectsRouteWithChildren
   '/settings': typeof AuthenticatedSettingsRoute
   '/tasks': typeof AuthenticatedTasksRoute
@@ -325,8 +339,10 @@ export interface FileRoutesByTo {
   '/assistant': typeof AuthenticatedAssistantRoute
   '/docs': typeof AuthenticatedDocsRoute
   '/habits': typeof AuthenticatedHabitsRoute
+  '/insights': typeof AuthenticatedInsightsRoute
   '/intel': typeof AuthenticatedIntelRoute
   '/more': typeof AuthenticatedMoreRoute
+  '/plan': typeof AuthenticatedPlanRoute
   '/projects': typeof AuthenticatedProjectsRouteWithChildren
   '/settings': typeof AuthenticatedSettingsRoute
   '/tasks': typeof AuthenticatedTasksRoute
@@ -367,9 +383,11 @@ export interface FileRoutesById {
   '/_authenticated/docs': typeof AuthenticatedDocsRoute
   '/_authenticated/finance': typeof AuthenticatedFinanceRouteWithChildren
   '/_authenticated/habits': typeof AuthenticatedHabitsRoute
+  '/_authenticated/insights': typeof AuthenticatedInsightsRoute
   '/_authenticated/intel': typeof AuthenticatedIntelRoute
   '/_authenticated/more': typeof AuthenticatedMoreRoute
   '/_authenticated/people': typeof AuthenticatedPeopleRouteWithChildren
+  '/_authenticated/plan': typeof AuthenticatedPlanRoute
   '/_authenticated/projects': typeof AuthenticatedProjectsRouteWithChildren
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/tasks': typeof AuthenticatedTasksRoute
@@ -412,9 +430,11 @@ export interface FileRouteTypes {
     | '/docs'
     | '/finance'
     | '/habits'
+    | '/insights'
     | '/intel'
     | '/more'
     | '/people'
+    | '/plan'
     | '/projects'
     | '/settings'
     | '/tasks'
@@ -451,8 +471,10 @@ export interface FileRouteTypes {
     | '/assistant'
     | '/docs'
     | '/habits'
+    | '/insights'
     | '/intel'
     | '/more'
+    | '/plan'
     | '/projects'
     | '/settings'
     | '/tasks'
@@ -492,9 +514,11 @@ export interface FileRouteTypes {
     | '/_authenticated/docs'
     | '/_authenticated/finance'
     | '/_authenticated/habits'
+    | '/_authenticated/insights'
     | '/_authenticated/intel'
     | '/_authenticated/more'
     | '/_authenticated/people'
+    | '/_authenticated/plan'
     | '/_authenticated/projects'
     | '/_authenticated/settings'
     | '/_authenticated/tasks'
@@ -604,6 +628,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProjectsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/plan': {
+      id: '/_authenticated/plan'
+      path: '/plan'
+      fullPath: '/plan'
+      preLoaderRoute: typeof AuthenticatedPlanRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/people': {
       id: '/_authenticated/people'
       path: '/people'
@@ -623,6 +654,13 @@ declare module '@tanstack/react-router' {
       path: '/intel'
       fullPath: '/intel'
       preLoaderRoute: typeof AuthenticatedIntelRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/insights': {
+      id: '/_authenticated/insights'
+      path: '/insights'
+      fullPath: '/insights'
+      preLoaderRoute: typeof AuthenticatedInsightsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/habits': {
@@ -934,9 +972,11 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDocsRoute: typeof AuthenticatedDocsRoute
   AuthenticatedFinanceRoute: typeof AuthenticatedFinanceRouteWithChildren
   AuthenticatedHabitsRoute: typeof AuthenticatedHabitsRoute
+  AuthenticatedInsightsRoute: typeof AuthenticatedInsightsRoute
   AuthenticatedIntelRoute: typeof AuthenticatedIntelRoute
   AuthenticatedMoreRoute: typeof AuthenticatedMoreRoute
   AuthenticatedPeopleRoute: typeof AuthenticatedPeopleRouteWithChildren
+  AuthenticatedPlanRoute: typeof AuthenticatedPlanRoute
   AuthenticatedProjectsRoute: typeof AuthenticatedProjectsRouteWithChildren
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedTasksRoute: typeof AuthenticatedTasksRoute
@@ -953,9 +993,11 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDocsRoute: AuthenticatedDocsRoute,
   AuthenticatedFinanceRoute: AuthenticatedFinanceRouteWithChildren,
   AuthenticatedHabitsRoute: AuthenticatedHabitsRoute,
+  AuthenticatedInsightsRoute: AuthenticatedInsightsRoute,
   AuthenticatedIntelRoute: AuthenticatedIntelRoute,
   AuthenticatedMoreRoute: AuthenticatedMoreRoute,
   AuthenticatedPeopleRoute: AuthenticatedPeopleRouteWithChildren,
+  AuthenticatedPlanRoute: AuthenticatedPlanRoute,
   AuthenticatedProjectsRoute: AuthenticatedProjectsRouteWithChildren,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedTasksRoute: AuthenticatedTasksRoute,
