@@ -1,24 +1,29 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { getProfile, updateMood } from "@/lib/profile.functions";
+import { getProfile } from "@/lib/profile.functions";
 import { listTasks, toggleTask } from "@/lib/tasks.functions";
 import { listHabits, toggleHabitLog } from "@/lib/habits.functions";
 import { listEvents } from "@/lib/events.functions";
-import { supabase } from "@/integrations/supabase/client";
-import { format, isToday, parseISO } from "date-fns";
-import { ArrowRight, Sparkles, LogOut } from "lucide-react";
+import { listFinance } from "@/lib/finance.functions";
+import { listSleep } from "@/lib/health.functions";
+import { listInsights } from "@/lib/intelligence.functions";
+import { format, parseISO } from "date-fns";
+import { ArrowRight, Check, Clock, Heart, Sparkles, Wallet } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/")({
+  head: () => ({
+    meta: [
+      { title: "Today — Origin Life OS" },
+      { name: "description", content: "A calm daily view of your focus, habits, health and money." },
+      { property: "og:title", content: "Today — Origin Life OS" },
+      { property: "og:description", content: "A calm daily view of your focus, habits, health and money." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
   component: HomePage,
 });
-
-const MOODS = [
-  { key: "calm", label: "Calm" },
-  { key: "focused", label: "Focused" },
-  { key: "tired", label: "Tired" },
-  { key: "restless", label: "Restless" },
-];
 
 function HomePage() {
   const navigate = useNavigate();
@@ -27,7 +32,9 @@ function HomePage() {
   const tasksFn = useServerFn(listTasks);
   const habitsFn = useServerFn(listHabits);
   const eventsFn = useServerFn(listEvents);
-  const moodFn = useServerFn(updateMood);
+  const financeFn = useServerFn(listFinance);
+  const sleepFn = useServerFn(listSleep);
+  const insightsFn = useServerFn(listInsights);
   const toggleFn = useServerFn(toggleTask);
   const logHabitFn = useServerFn(toggleHabitLog);
 
@@ -35,11 +42,10 @@ function HomePage() {
   const tasks = useQuery({ queryKey: ["tasks"], queryFn: () => tasksFn() });
   const habitsQ = useQuery({ queryKey: ["habits"], queryFn: () => habitsFn() });
   const events = useQuery({ queryKey: ["events"], queryFn: () => eventsFn() });
+  const finance = useQuery({ queryKey: ["finance"], queryFn: () => financeFn() });
+  const sleep = useQuery({ queryKey: ["sleep"], queryFn: () => sleepFn() });
+  const insights = useQuery({ queryKey: ["insights"], queryFn: () => insightsFn() });
 
-  const setMood = useMutation({
-    mutationFn: (v: { mood?: string; energy_level?: number }) => moodFn({ data: v }),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["profile"] }),
-  });
   const toggle = useMutation({
     mutationFn: (v: { id: string; completed: boolean }) => toggleFn({ data: v }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["tasks"] }),
@@ -50,191 +56,209 @@ function HomePage() {
   });
 
   const today = format(new Date(), "yyyy-MM-dd");
-  const topTasks = (tasks.data ?? []).filter((t) => !t.completed).slice(0, 3);
+  const open = (tasks.data ?? []).filter((t) => !t.completed);
+  const focus = open.find((t) => t.priority === "high") ?? open[0];
+  const upcoming = open.filter((t) => t.id !== focus?.id).slice(0, 2);
   const nextEvent = (events.data ?? []).find((e) => new Date(e.starts_at) >= new Date());
-  const name = profile.data?.display_name ?? "friend";
-  const greeting = getGreeting();
 
-  async function signOut() {
-    await supabase.auth.signOut();
-    navigate({ to: "/auth" as never });
-  }
+  const habits = habitsQ.data?.habits ?? [];
+  const logs = habitsQ.data?.logs ?? [];
+  const doneToday = habits.filter((h) => logs.some((l) => l.habit_id === h.id && l.log_date === today));
+  const habitPct = habits.length ? Math.round((doneToday.length / habits.length) * 100) : 0;
+
+  const monthTx = finance.data?.transactions ?? [];
+  const monthKey = today.slice(0, 7);
+  const spent = monthTx
+    .filter((t) => t.type === "expense" && t.occurred_on.slice(0, 7) === monthKey)
+    .reduce((s, t) => s + Number(t.amount), 0);
+  const earned = monthTx
+    .filter((t) => t.type === "income" && t.occurred_on.slice(0, 7) === monthKey)
+    .reduce((s, t) => s + Number(t.amount), 0);
+
+  const lastSleep = (sleep.data ?? [])[0];
+  const sleepHrs = lastSleep?.duration_min ? (lastSleep.duration_min / 60).toFixed(1) : null;
+
+  const topInsight = (insights.data ?? [])[0];
+  const name = (profile.data?.display_name ?? "friend").split(" ")[0];
 
   return (
-    <div className="px-5 pt-12 pb-8">
-      <header className="mb-8 flex items-start justify-between">
-        <div>
-          <div className="flex justify-between items-center mb-1">
-            <span className="text-[10px] font-medium tracking-[0.2em] uppercase text-ink/50">
-              {format(new Date(), "EEEE · MMM d")}
-            </span>
-          </div>
-          <h1 className="font-serif text-4xl leading-[1.05] tracking-tight mb-4">
-            {greeting}, {name.split(" ")[0]}.
-          </h1>
-        </div>
-        <button onClick={signOut} className="p-2 text-ink/40 hover:text-ink" aria-label="Sign out">
-          <LogOut className="size-4" />
-        </button>
+    <div className="px-5 pt-8 pb-4 space-y-4">
+      {/* Greeting */}
+      <header className="px-1 pb-2 rise">
+        <p className="label-quiet">{format(new Date(), "EEEE, MMMM d")}</p>
+        <h1 className="mt-2 font-serif text-[34px] leading-[1.15] tracking-tight">
+          {getGreeting()}, {name}.
+        </h1>
       </header>
 
-      {/* Mood + energy */}
-      <section className="mb-6">
-        <p className="text-[10px] font-medium tracking-[0.2em] uppercase text-ink/40 mb-3">
-          How is today?
-        </p>
-        <div className="flex gap-2 flex-wrap">
-          {MOODS.map((m) => {
-            const active = profile.data?.mood === m.key;
-            return (
-              <button
-                key={m.key}
-                onClick={() => setMood.mutate({ mood: m.key })}
-                className={`px-3 py-1.5 text-sm border ${
-                  active ? "bg-ink text-paper border-ink" : "border-ink/15 text-ink/70"
-                }`}
-              >
-                {m.label}
-              </button>
-            );
-          })}
-        </div>
-        <div className="mt-4">
-          <p className="text-[10px] font-medium tracking-[0.2em] uppercase text-ink/40 mb-2">Energy</p>
-          <div className="flex gap-1.5">
-            {[0, 1, 2, 3, 4].map((n) => {
-              const active = (profile.data?.energy_level ?? -1) >= n;
-              return (
-                <button
-                  key={n}
-                  onClick={() => setMood.mutate({ energy_level: n })}
-                  className={`flex-1 h-1.5 ${active ? "bg-ink" : "bg-ink/10"}`}
-                  aria-label={`Energy ${n + 1}`}
-                />
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* Up next */}
-      {nextEvent && (
-        <section className="mb-6 p-4 border border-ink/10 bg-surface">
-          <div className="flex justify-between items-start mb-2">
-            <span className="text-[10px] font-medium uppercase tracking-widest text-ink/40">
-              Up next
-            </span>
-            <span className="text-[10px] font-medium px-2 py-0.5 bg-accent/15 text-accent uppercase tracking-widest">
-              {relativeTime(nextEvent.starts_at)}
-            </span>
-          </div>
-          <h2 className="font-serif text-xl mb-1">{nextEvent.title}</h2>
-          <p className="text-xs text-ink/60">
-            {format(parseISO(nextEvent.starts_at), "h:mm a")}
-            {nextEvent.location ? ` · ${nextEvent.location}` : ""}
-          </p>
-        </section>
-      )}
-
-      {/* AI card */}
-      <section className="mb-6 p-5 bg-ink text-paper">
-        <div className="flex items-center gap-2 mb-3">
-          <Sparkles className="size-3.5 text-accent" />
-          <span className="text-[10px] font-medium uppercase tracking-widest opacity-60">
-            Origin insight
-          </span>
-        </div>
-        <p className="font-serif italic text-lg leading-snug mb-4">
-          "{buildInsight(tasks.data ?? [], profile.data?.energy_level ?? null)}"
-        </p>
-        <button
-          onClick={() => navigate({ to: "/ai" as never })}
-          className="inline-flex items-center gap-2 text-xs bg-paper text-ink px-3 py-1.5 font-medium"
-        >
-          Talk to Origin <ArrowRight className="size-3.5" />
-        </button>
-      </section>
-
-      {/* Priorities */}
-      <section className="mb-8">
-        <div className="flex justify-between items-center mb-3">
-          <h3 className="text-[10px] font-medium uppercase tracking-[0.2em] text-ink/40">
-            Top priorities
-          </h3>
-          <button
-            onClick={() => navigate({ to: "/tasks" as never })}
-            className="text-[10px] uppercase tracking-widest text-ink/60"
-          >
-            All →
-          </button>
-        </div>
-        <div className="divide-y divide-ink/10">
-          {topTasks.length === 0 && (
-            <p className="text-sm text-ink/40 py-3">No open tasks. A quiet day.</p>
-          )}
-          {topTasks.map((t) => (
+      {/* Today's focus — the one primary action */}
+      <section className="card-soft p-6 rise">
+        <p className="label-quiet">Today's focus</p>
+        {focus ? (
+          <>
+            <h2 className="mt-3 font-serif text-2xl leading-snug">{focus.title}</h2>
+            {focus.tag && <p className="mt-1.5 text-sm text-muted-foreground">{focus.tag}</p>}
             <button
-              key={t.id}
-              onClick={() => toggle.mutate({ id: t.id, completed: !t.completed })}
-              className="w-full py-3 flex items-center gap-3 text-left"
+              onClick={() => toggle.mutate({ id: focus.id, completed: true })}
+              className="press mt-5 inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-accent-foreground"
             >
-              <span
-                className={`size-5 border ${t.completed ? "bg-ink border-ink" : "border-ink/30"}`}
-              />
-              <div className="flex-1">
-                <p className="text-sm">{t.title}</p>
-                {t.tag && (
-                  <p className="text-[10px] uppercase tracking-widest text-ink/40 mt-0.5">
-                    {t.tag} · {t.priority}
-                  </p>
-                )}
-              </div>
+              <Check className="size-4" strokeWidth={2.4} /> Mark complete
             </button>
-          ))}
+          </>
+        ) : (
+          <>
+            <h2 className="mt-3 font-serif text-2xl leading-snug">Nothing pressing.</h2>
+            <p className="mt-1.5 text-sm text-muted-foreground">A rare kind of clarity — use it well.</p>
+            <Link
+              to="/tasks"
+              className="press mt-5 inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-accent-foreground"
+            >
+              Add something <ArrowRight className="size-4" />
+            </Link>
+          </>
+        )}
+      </section>
+
+      {/* Up next — tasks + calendar in one calm timeline */}
+      <section className="card-soft p-6 rise">
+        <div className="flex items-center justify-between">
+          <p className="label-quiet">Up next</p>
+          <Link to="/plan" className="text-xs font-semibold text-accent">
+            Plan
+          </Link>
         </div>
+        <ul className="mt-4 space-y-4">
+          {nextEvent && (
+            <li className="flex items-start gap-3.5">
+              <span className="mt-0.5 grid size-9 shrink-0 place-items-center rounded-xl bg-surface">
+                <Clock className="size-4 text-muted-foreground" strokeWidth={1.8} />
+              </span>
+              <div className="min-w-0">
+                <p className="truncate text-[15px] font-medium">{nextEvent.title}</p>
+                <p className="mt-0.5 text-xs text-muted-foreground">
+                  {format(parseISO(nextEvent.starts_at), "h:mm a")}
+                  {nextEvent.location ? ` · ${nextEvent.location}` : ""}
+                </p>
+              </div>
+            </li>
+          )}
+          {upcoming.map((t) => (
+            <li key={t.id} className="flex items-start gap-3.5">
+              <button
+                onClick={() => toggle.mutate({ id: t.id, completed: true })}
+                aria-label={`Complete ${t.title}`}
+                className="press mt-0.5 size-9 shrink-0 rounded-xl border border-border bg-card"
+              />
+              <div className="min-w-0">
+                <p className="truncate text-[15px] font-medium">{t.title}</p>
+                {t.tag && <p className="mt-0.5 text-xs text-muted-foreground">{t.tag}</p>}
+              </div>
+            </li>
+          ))}
+          {!nextEvent && upcoming.length === 0 && (
+            <li className="text-sm text-muted-foreground">Your day is open.</li>
+          )}
+        </ul>
       </section>
 
       {/* Habits */}
-      <section className="mb-8">
-        <div className="flex justify-between items-center mb-3">
-          <h3 className="text-[10px] font-medium uppercase tracking-[0.2em] text-ink/40">
-            Habits today
-          </h3>
-          <button
-            onClick={() => navigate({ to: "/habits" as never })}
-            className="text-[10px] uppercase tracking-widest text-ink/60"
-          >
-            All →
-          </button>
+      <section className="card-soft p-6 rise">
+        <div className="flex items-center justify-between gap-4">
+          <div className="min-w-0">
+            <p className="label-quiet">Habits</p>
+            <p className="mt-2 font-serif text-2xl">
+              {doneToday.length}
+              <span className="text-muted-foreground text-lg"> / {habits.length || 0}</span>
+            </p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              {habits.length === 0 ? "Add a habit to start a streak." : "completed today"}
+            </p>
+          </div>
+          <Ring value={habitPct} />
         </div>
-        <div className="space-y-2">
-          {(habitsQ.data?.habits ?? []).slice(0, 4).map((h) => {
-            const done = (habitsQ.data?.logs ?? []).some(
-              (l) => l.habit_id === h.id && l.log_date === today,
-            );
-            return (
-              <button
-                key={h.id}
-                onClick={() => logHabit.mutate({ habit_id: h.id, log_date: today })}
-                className="w-full flex items-center gap-3 p-3 border border-ink/10 text-left"
-              >
-                <span className={`size-5 border ${done ? "bg-accent border-accent" : "border-ink/30"}`} />
-                <span className="text-sm flex-1">{h.name}</span>
-                <span className="text-[10px] uppercase tracking-widest text-ink/40">
-                  {done ? "Done" : "Tap"}
-                </span>
-              </button>
-            );
-          })}
-          {(habitsQ.data?.habits ?? []).length === 0 && (
-            <p className="text-sm text-ink/40">Add a habit to start a streak.</p>
-          )}
-        </div>
+        {habits.length > 0 && (
+          <div className="mt-5 flex flex-wrap gap-2">
+            {habits.slice(0, 5).map((h) => {
+              const done = doneToday.some((d) => d.id === h.id);
+              return (
+                <button
+                  key={h.id}
+                  onClick={() => logHabit.mutate({ habit_id: h.id, log_date: today })}
+                  className={`press rounded-full px-3.5 py-1.5 text-xs font-medium ${
+                    done
+                      ? "bg-accent text-accent-foreground"
+                      : "bg-surface text-muted-foreground"
+                  }`}
+                >
+                  {h.name}
+                </button>
+              );
+            })}
+          </div>
+        )}
       </section>
 
-      <p className="text-center font-serif italic text-sm text-ink/40 max-w-[30ch] mx-auto">
-        "Small consistent actions, over time, become a life."
-      </p>
+      {/* Health + Money summaries */}
+      <div className="grid grid-cols-2 gap-4">
+        <Link to="/wellness" className="press card-soft p-5 rise">
+          <Heart className="size-4 text-accent" strokeWidth={1.9} />
+          <p className="label-quiet mt-3">Health</p>
+          <p className="mt-1.5 font-serif text-2xl">{sleepHrs ? `${sleepHrs}h` : "—"}</p>
+          <p className="mt-0.5 text-xs text-muted-foreground">last night's sleep</p>
+        </Link>
+        <Link to="/finance" className="press card-soft p-5 rise">
+          <Wallet className="size-4 text-accent" strokeWidth={1.9} />
+          <p className="label-quiet mt-3">Money</p>
+          <p className="mt-1.5 font-serif text-2xl">
+            {earned - spent >= 0 ? "+" : "−"}
+            {Math.abs(Math.round(earned - spent)).toLocaleString()}
+          </p>
+          <p className="mt-0.5 text-xs text-muted-foreground">net this month</p>
+        </Link>
+      </div>
+
+      {/* AI recommendation */}
+      <section className="card-soft p-6 rise">
+        <div className="flex items-center gap-2">
+          <Sparkles className="size-3.5 text-accent" strokeWidth={2} />
+          <p className="label-quiet">Origin suggests</p>
+        </div>
+        <p className="mt-3 font-serif text-lg italic leading-snug">
+          {topInsight?.body ?? buildInsight(open.length, profile.data?.energy_level ?? null)}
+        </p>
+        <button
+          onClick={() => navigate({ to: "/ai" as never })}
+          className="press mt-5 inline-flex items-center gap-2 text-sm font-semibold text-accent"
+        >
+          Talk to Origin <ArrowRight className="size-4" />
+        </button>
+      </section>
+    </div>
+  );
+}
+
+function Ring({ value }: { value: number }) {
+  const size = 68;
+  const r = (size - 8) / 2;
+  const c = 2 * Math.PI * r;
+  return (
+    <div className="relative shrink-0" style={{ width: size, height: size }}>
+      <svg width={size} height={size} className="-rotate-90">
+        <circle cx={size / 2} cy={size / 2} r={r} fill="none" strokeWidth={6} className="stroke-surface" />
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={r}
+          fill="none"
+          strokeWidth={6}
+          strokeLinecap="round"
+          strokeDasharray={c}
+          strokeDashoffset={c - (Math.max(0, Math.min(100, value)) / 100) * c}
+          className="stroke-accent"
+          style={{ transition: "stroke-dashoffset 900ms cubic-bezier(0.22,1,0.36,1)" }}
+        />
+      </svg>
+      <span className="absolute inset-0 grid place-items-center font-serif text-sm">{value}%</span>
     </div>
   );
 }
@@ -247,21 +271,9 @@ function getGreeting() {
   return "Good evening";
 }
 
-function relativeTime(iso: string) {
-  const diff = (new Date(iso).getTime() - Date.now()) / 60000;
-  if (diff < 0) return "now";
-  if (diff < 60) return `in ${Math.round(diff)}m`;
-  const h = diff / 60;
-  if (h < 24) return `in ${Math.round(h)}h`;
-  return `in ${Math.round(h / 24)}d`;
-}
-
-function buildInsight(tasks: { completed: boolean; priority: string }[], energy: number | null) {
-  const open = tasks.filter((t) => !t.completed).length;
-  const highs = tasks.filter((t) => !t.completed && t.priority === "high").length;
-  if (highs > 0) return `You have ${highs} high-priority ${highs === 1 ? "task" : "tasks"} open. Start there while attention is fresh.`;
+function buildInsight(open: number, energy: number | null) {
   if (energy !== null && energy <= 1)
-    return "Your energy is low today. Consider one meaningful task and rest the rest.";
-  if (open === 0) return "Your list is clear. A rare kind of clarity — use it well.";
-  return `You have ${open} open ${open === 1 ? "task" : "tasks"} today. Let's move.`;
+    return "Your energy is low today. Choose one meaningful task and let the rest wait.";
+  if (open === 0) return "Nothing is pending. Rest is also progress.";
+  return `You have ${open} open ${open === 1 ? "task" : "tasks"}. Start with the smallest one.`;
 }
