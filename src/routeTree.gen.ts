@@ -23,6 +23,7 @@ import { Route as AuthenticatedPlanRouteImport } from './routes/_authenticated/p
 import { Route as AuthenticatedPeopleRouteImport } from './routes/_authenticated/people'
 import { Route as AuthenticatedMoreRouteImport } from './routes/_authenticated/more'
 import { Route as AuthenticatedIntelRouteImport } from './routes/_authenticated/intel'
+import { Route as AuthenticatedInsightsRouteImport } from './routes/_authenticated/insights'
 import { Route as AuthenticatedHabitsRouteImport } from './routes/_authenticated/habits'
 import { Route as AuthenticatedFinanceRouteImport } from './routes/_authenticated/finance'
 import { Route as AuthenticatedDocsRouteImport } from './routes/_authenticated/docs'
@@ -119,6 +120,11 @@ const AuthenticatedMoreRoute = AuthenticatedMoreRouteImport.update({
 const AuthenticatedIntelRoute = AuthenticatedIntelRouteImport.update({
   id: '/intel',
   path: '/intel',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedInsightsRoute = AuthenticatedInsightsRouteImport.update({
+  id: '/insights',
+  path: '/insights',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedHabitsRoute = AuthenticatedHabitsRouteImport.update({
@@ -292,6 +298,7 @@ export interface FileRoutesByFullPath {
   '/docs': typeof AuthenticatedDocsRoute
   '/finance': typeof AuthenticatedFinanceRouteWithChildren
   '/habits': typeof AuthenticatedHabitsRoute
+  '/insights': typeof AuthenticatedInsightsRoute
   '/intel': typeof AuthenticatedIntelRoute
   '/more': typeof AuthenticatedMoreRoute
   '/people': typeof AuthenticatedPeopleRouteWithChildren
@@ -332,6 +339,7 @@ export interface FileRoutesByTo {
   '/assistant': typeof AuthenticatedAssistantRoute
   '/docs': typeof AuthenticatedDocsRoute
   '/habits': typeof AuthenticatedHabitsRoute
+  '/insights': typeof AuthenticatedInsightsRoute
   '/intel': typeof AuthenticatedIntelRoute
   '/more': typeof AuthenticatedMoreRoute
   '/plan': typeof AuthenticatedPlanRoute
@@ -375,6 +383,7 @@ export interface FileRoutesById {
   '/_authenticated/docs': typeof AuthenticatedDocsRoute
   '/_authenticated/finance': typeof AuthenticatedFinanceRouteWithChildren
   '/_authenticated/habits': typeof AuthenticatedHabitsRoute
+  '/_authenticated/insights': typeof AuthenticatedInsightsRoute
   '/_authenticated/intel': typeof AuthenticatedIntelRoute
   '/_authenticated/more': typeof AuthenticatedMoreRoute
   '/_authenticated/people': typeof AuthenticatedPeopleRouteWithChildren
@@ -421,6 +430,7 @@ export interface FileRouteTypes {
     | '/docs'
     | '/finance'
     | '/habits'
+    | '/insights'
     | '/intel'
     | '/more'
     | '/people'
@@ -461,6 +471,7 @@ export interface FileRouteTypes {
     | '/assistant'
     | '/docs'
     | '/habits'
+    | '/insights'
     | '/intel'
     | '/more'
     | '/plan'
@@ -503,6 +514,7 @@ export interface FileRouteTypes {
     | '/_authenticated/docs'
     | '/_authenticated/finance'
     | '/_authenticated/habits'
+    | '/_authenticated/insights'
     | '/_authenticated/intel'
     | '/_authenticated/more'
     | '/_authenticated/people'
@@ -642,6 +654,13 @@ declare module '@tanstack/react-router' {
       path: '/intel'
       fullPath: '/intel'
       preLoaderRoute: typeof AuthenticatedIntelRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/insights': {
+      id: '/_authenticated/insights'
+      path: '/insights'
+      fullPath: '/insights'
+      preLoaderRoute: typeof AuthenticatedInsightsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/habits': {
@@ -953,6 +972,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDocsRoute: typeof AuthenticatedDocsRoute
   AuthenticatedFinanceRoute: typeof AuthenticatedFinanceRouteWithChildren
   AuthenticatedHabitsRoute: typeof AuthenticatedHabitsRoute
+  AuthenticatedInsightsRoute: typeof AuthenticatedInsightsRoute
   AuthenticatedIntelRoute: typeof AuthenticatedIntelRoute
   AuthenticatedMoreRoute: typeof AuthenticatedMoreRoute
   AuthenticatedPeopleRoute: typeof AuthenticatedPeopleRouteWithChildren
@@ -973,6 +993,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDocsRoute: AuthenticatedDocsRoute,
   AuthenticatedFinanceRoute: AuthenticatedFinanceRouteWithChildren,
   AuthenticatedHabitsRoute: AuthenticatedHabitsRoute,
+  AuthenticatedInsightsRoute: AuthenticatedInsightsRoute,
   AuthenticatedIntelRoute: AuthenticatedIntelRoute,
   AuthenticatedMoreRoute: AuthenticatedMoreRoute,
   AuthenticatedPeopleRoute: AuthenticatedPeopleRouteWithChildren,
