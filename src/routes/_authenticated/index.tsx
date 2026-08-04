@@ -210,8 +210,8 @@ function HomePage() {
               {doneToday.length}
               <span className="text-muted-foreground text-lg"> / {habits.length || 0}</span>
             </p>
-            <p className="mt-1 text-xs text-muted-foreground">
-              {habits.length === 0 ? "Add a habit to start a streak." : "completed today"}
+            <p className="mt-1 max-w-[26ch] text-xs leading-relaxed text-muted-foreground">
+              {habitEncouragement(doneToday.length, habits.length)}
             </p>
           </div>
           <Ring value={habitPct} />
@@ -223,11 +223,12 @@ function HomePage() {
               return (
                 <button
                   key={h.id}
-                  onClick={() => logHabit.mutate({ habit_id: h.id, log_date: today })}
-                  className={`press rounded-full px-3.5 py-1.5 text-xs font-medium ${
-                    done
-                      ? "bg-accent text-accent-foreground"
-                      : "bg-surface text-muted-foreground"
+                  onClick={() => {
+                    haptic("soft");
+                    logHabit.mutate({ habit_id: h.id, log_date: today, wasDone: done });
+                  }}
+                  className={`press rounded-full px-3.5 py-1.5 text-xs font-medium transition-colors ${
+                    done ? "bg-accent text-accent-foreground" : "bg-surface text-muted-foreground"
                   }`}
                 >
                   {h.name}
@@ -240,13 +241,15 @@ function HomePage() {
 
       {/* Health + Money summaries */}
       <div className="grid grid-cols-2 gap-4">
-        <Link to="/wellness" className="press card-soft p-5 rise">
+        <Link to="/wellness" onClick={() => haptic("tap")} className="press card-soft p-5 rise">
           <Heart className="size-4 text-accent" strokeWidth={1.9} />
           <p className="label-quiet mt-3">Health</p>
           <p className="mt-1.5 font-serif text-2xl">{sleepHrs ? `${sleepHrs}h` : "—"}</p>
-          <p className="mt-0.5 text-xs text-muted-foreground">last night's sleep</p>
+          <p className="mt-0.5 text-xs text-muted-foreground">
+            {sleepHrs ? "last night's rest" : "no sleep noted yet"}
+          </p>
         </Link>
-        <Link to="/finance" className="press card-soft p-5 rise">
+        <Link to="/finance" onClick={() => haptic("tap")} className="press card-soft p-5 rise">
           <Wallet className="size-4 text-accent" strokeWidth={1.9} />
           <p className="label-quiet mt-3">Money</p>
           <p className="mt-1.5 font-serif text-2xl">
@@ -257,25 +260,31 @@ function HomePage() {
         </Link>
       </div>
 
-      {/* AI recommendation */}
+      {/* AI recommendation — quiet, never dominant */}
       <section className="card-soft p-6 rise">
         <div className="flex items-center gap-2">
           <Sparkles className="size-3.5 text-accent" strokeWidth={2} />
-          <p className="label-quiet">Origin suggests</p>
+          <p className="label-quiet">A thought from Origin</p>
         </div>
         <p className="mt-3 font-serif text-lg italic leading-snug">
           {topInsight?.body ?? buildInsight(open.length, profile.data?.energy_level ?? null)}
         </p>
         <button
-          onClick={() => navigate({ to: "/ai" as never })}
+          onClick={() => {
+            haptic("tap");
+            navigate({ to: "/ai" as never });
+          }}
           className="press mt-5 inline-flex items-center gap-2 text-sm font-semibold text-accent"
         >
-          Talk to Origin <ArrowRight className="size-4" />
+          Talk it through <ArrowRight className="size-4" />
         </button>
       </section>
+        </>
+      )}
     </div>
   );
 }
+
 
 function Ring({ value }: { value: number }) {
   const size = 68;
