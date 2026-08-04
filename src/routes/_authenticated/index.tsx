@@ -94,16 +94,29 @@ function HomePage() {
   const topInsight = (insights.data ?? [])[0];
   const name = (profile.data?.display_name ?? "friend").split(" ")[0];
 
+  const loading = tasks.isLoading || habitsQ.isLoading;
+
   return (
     <div className="px-5 pt-8 pb-4 space-y-4">
       {/* Greeting */}
       <header className="px-1 pb-2 rise">
         <p className="label-quiet">{format(new Date(), "EEEE, MMMM d")}</p>
         <h1 className="mt-2 font-serif text-[34px] leading-[1.15] tracking-tight">
-          {getGreeting()}, {name}.
+          {greeting()}, {name}.
         </h1>
+        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+          {dayline(open.length, doneToday.length, habits.length)}
+        </p>
       </header>
 
+      {loading ? (
+        <div className="space-y-4">
+          <CardSkeleton lines={2} />
+          <CardSkeleton lines={3} />
+          <CardSkeleton lines={2} />
+        </div>
+      ) : (
+        <>
       {/* Today's focus — the one primary action */}
       <section className="card-soft p-6 rise">
         <p className="label-quiet">Today's focus</p>
@@ -112,16 +125,21 @@ function HomePage() {
             <h2 className="mt-3 font-serif text-2xl leading-snug">{focus.title}</h2>
             {focus.tag && <p className="mt-1.5 text-sm text-muted-foreground">{focus.tag}</p>}
             <button
-              onClick={() => toggle.mutate({ id: focus.id, completed: true })}
+              onClick={() => {
+                haptic("soft");
+                toggle.mutate({ id: focus.id, completed: true });
+              }}
               className="press mt-5 inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-accent-foreground"
             >
-              <Check className="size-4" strokeWidth={2.4} /> Mark complete
+              <Check className="size-4" strokeWidth={2.4} /> I've done this
             </button>
           </>
         ) : (
           <>
             <h2 className="mt-3 font-serif text-2xl leading-snug">Nothing pressing.</h2>
-            <p className="mt-1.5 text-sm text-muted-foreground">A rare kind of clarity — use it well.</p>
+            <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+              A rare kind of quiet. You're allowed to enjoy it.
+            </p>
             <Link
               to="/tasks"
               className="press mt-5 inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-accent-foreground"
@@ -131,6 +149,7 @@ function HomePage() {
           </>
         )}
       </section>
+
 
       {/* Up next — tasks + calendar in one calm timeline */}
       <section className="card-soft p-6 rise">
