@@ -91,7 +91,10 @@ function HomePage() {
   const lastSleep = (sleep.data ?? [])[0];
   const sleepHrs = lastSleep?.duration_min ? (lastSleep.duration_min / 60).toFixed(1) : null;
 
-  const topInsight = (insights.data ?? [])[0];
+  // Home shows a gentle, actionable nudge — never a cold statistical prediction.
+  const topInsight =
+    (insights.data ?? []).find((i) => i.kind === "recommendation") ?? undefined;
+
   const name = (profile.data?.display_name ?? "friend").split(" ")[0];
 
   const loading = tasks.isLoading || habitsQ.isLoading;
