@@ -10,6 +10,10 @@ import { listSleep } from "@/lib/health.functions";
 import { listInsights } from "@/lib/intelligence.functions";
 import { format, parseISO } from "date-fns";
 import { ArrowRight, Check, Clock, Heart, Sparkles, Wallet } from "lucide-react";
+import { greeting, dayline, habitEncouragement, haptic, praise } from "@/lib/feel";
+import { useCelebrate } from "@/components/celebration";
+import { CardSkeleton } from "@/components/soft";
+
 
 export const Route = createFileRoute("/_authenticated/")({
   head: () => ({
@@ -28,6 +32,7 @@ export const Route = createFileRoute("/_authenticated/")({
 function HomePage() {
   const navigate = useNavigate();
   const qc = useQueryClient();
+  const celebrate = useCelebrate();
   const profileFn = useServerFn(getProfile);
   const tasksFn = useServerFn(listTasks);
   const habitsFn = useServerFn(listHabits);
@@ -48,12 +53,20 @@ function HomePage() {
 
   const toggle = useMutation({
     mutationFn: (v: { id: string; completed: boolean }) => toggleFn({ data: v }),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["tasks"] }),
+    onSuccess: (_d, v) => {
+      qc.invalidateQueries({ queryKey: ["tasks"] });
+      if (v.completed) celebrate(praise.task());
+    },
   });
   const logHabit = useMutation({
-    mutationFn: (v: { habit_id: string; log_date: string }) => logHabitFn({ data: v }),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["habits"] }),
+    mutationFn: (v: { habit_id: string; log_date: string; wasDone: boolean }) =>
+      logHabitFn({ data: { habit_id: v.habit_id, log_date: v.log_date } }),
+    onSuccess: (_d, v) => {
+      qc.invalidateQueries({ queryKey: ["habits"] });
+      if (!v.wasDone) celebrate(praise.habit());
+    },
   });
+
 
   const today = format(new Date(), "yyyy-MM-dd");
   const open = (tasks.data ?? []).filter((t) => !t.completed);
@@ -78,8 +91,13 @@ function HomePage() {
   const lastSleep = (sleep.data ?? [])[0];
   const sleepHrs = lastSleep?.duration_min ? (lastSleep.duration_min / 60).toFixed(1) : null;
 
-  const topInsight = (insights.data ?? [])[0];
+  // Home shows a gentle, actionable nudge — never a cold statistical prediction.
+  const topInsight =
+    (insights.data ?? []).find((i) => i.kind === "recommendation") ?? undefined;
+
   const name = (profile.data?.display_name ?? "friend").split(" ")[0];
+
+  const loading = tasks.isLoading || habitsQ.isLoading;
 
   return (
     <div className="px-5 pt-8 pb-4 space-y-4">
@@ -87,10 +105,21 @@ function HomePage() {
       <header className="px-1 pb-2 rise">
         <p className="label-quiet">{format(new Date(), "EEEE, MMMM d")}</p>
         <h1 className="mt-2 font-serif text-[34px] leading-[1.15] tracking-tight">
-          {getGreeting()}, {name}.
+          {greeting()}, {name}.
         </h1>
+        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+          {dayline(open.length, doneToday.length, habits.length)}
+        </p>
       </header>
 
+      {loading ? (
+        <div className="space-y-4">
+          <CardSkeleton lines={2} />
+          <CardSkeleton lines={3} />
+          <CardSkeleton lines={2} />
+        </div>
+      ) : (
+        <>
       {/* Today's focus — the one primary action */}
       <section className="card-soft p-6 rise">
         <p className="label-quiet">Today's focus</p>
@@ -99,16 +128,21 @@ function HomePage() {
             <h2 className="mt-3 font-serif text-2xl leading-snug">{focus.title}</h2>
             {focus.tag && <p className="mt-1.5 text-sm text-muted-foreground">{focus.tag}</p>}
             <button
-              onClick={() => toggle.mutate({ id: focus.id, completed: true })}
+              onClick={() => {
+                haptic("soft");
+                toggle.mutate({ id: focus.id, completed: true });
+              }}
               className="press mt-5 inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-accent-foreground"
             >
-              <Check className="size-4" strokeWidth={2.4} /> Mark complete
+              <Check className="size-4" strokeWidth={2.4} /> I've done this
             </button>
           </>
         ) : (
           <>
             <h2 className="mt-3 font-serif text-2xl leading-snug">Nothing pressing.</h2>
-            <p className="mt-1.5 text-sm text-muted-foreground">A rare kind of clarity — use it well.</p>
+            <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+              A rare kind of quiet. You're allowed to enjoy it.
+            </p>
             <Link
               to="/tasks"
               className="press mt-5 inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-accent-foreground"
@@ -118,6 +152,7 @@ function HomePage() {
           </>
         )}
       </section>
+
 
       {/* Up next — tasks + calendar in one calm timeline */}
       <section className="card-soft p-6 rise">
@@ -145,10 +180,15 @@ function HomePage() {
           {upcoming.map((t) => (
             <li key={t.id} className="flex items-start gap-3.5">
               <button
-                onClick={() => toggle.mutate({ id: t.id, completed: true })}
+                onClick={() => {
+                  haptic("soft");
+                  toggle.mutate({ id: t.id, completed: true });
+                }}
                 aria-label={`Complete ${t.title}`}
-                className="press mt-0.5 size-9 shrink-0 rounded-xl border border-border bg-card"
-              />
+                className="press mt-0.5 grid size-9 shrink-0 place-items-center rounded-xl border border-border bg-card text-transparent active:text-accent"
+              >
+                <Check className="size-4" strokeWidth={2.4} />
+              </button>
               <div className="min-w-0">
                 <p className="truncate text-[15px] font-medium">{t.title}</p>
                 {t.tag && <p className="mt-0.5 text-xs text-muted-foreground">{t.tag}</p>}
@@ -156,8 +196,11 @@ function HomePage() {
             </li>
           ))}
           {!nextEvent && upcoming.length === 0 && (
-            <li className="text-sm text-muted-foreground">Your day is open.</li>
+            <li className="text-sm leading-relaxed text-muted-foreground">
+              Nothing scheduled. The day is yours to shape.
+            </li>
           )}
+
         </ul>
       </section>
 
@@ -170,8 +213,8 @@ function HomePage() {
               {doneToday.length}
               <span className="text-muted-foreground text-lg"> / {habits.length || 0}</span>
             </p>
-            <p className="mt-1 text-xs text-muted-foreground">
-              {habits.length === 0 ? "Add a habit to start a streak." : "completed today"}
+            <p className="mt-1 max-w-[26ch] text-xs leading-relaxed text-muted-foreground">
+              {habitEncouragement(doneToday.length, habits.length)}
             </p>
           </div>
           <Ring value={habitPct} />
@@ -183,11 +226,12 @@ function HomePage() {
               return (
                 <button
                   key={h.id}
-                  onClick={() => logHabit.mutate({ habit_id: h.id, log_date: today })}
-                  className={`press rounded-full px-3.5 py-1.5 text-xs font-medium ${
-                    done
-                      ? "bg-accent text-accent-foreground"
-                      : "bg-surface text-muted-foreground"
+                  onClick={() => {
+                    haptic("soft");
+                    logHabit.mutate({ habit_id: h.id, log_date: today, wasDone: done });
+                  }}
+                  className={`press rounded-full px-3.5 py-1.5 text-xs font-medium transition-colors ${
+                    done ? "bg-accent text-accent-foreground" : "bg-surface text-muted-foreground"
                   }`}
                 >
                   {h.name}
@@ -200,13 +244,15 @@ function HomePage() {
 
       {/* Health + Money summaries */}
       <div className="grid grid-cols-2 gap-4">
-        <Link to="/wellness" className="press card-soft p-5 rise">
+        <Link to="/wellness" onClick={() => haptic("tap")} className="press card-soft p-5 rise">
           <Heart className="size-4 text-accent" strokeWidth={1.9} />
           <p className="label-quiet mt-3">Health</p>
           <p className="mt-1.5 font-serif text-2xl">{sleepHrs ? `${sleepHrs}h` : "—"}</p>
-          <p className="mt-0.5 text-xs text-muted-foreground">last night's sleep</p>
+          <p className="mt-0.5 text-xs text-muted-foreground">
+            {sleepHrs ? "last night's rest" : "no sleep noted yet"}
+          </p>
         </Link>
-        <Link to="/finance" className="press card-soft p-5 rise">
+        <Link to="/finance" onClick={() => haptic("tap")} className="press card-soft p-5 rise">
           <Wallet className="size-4 text-accent" strokeWidth={1.9} />
           <p className="label-quiet mt-3">Money</p>
           <p className="mt-1.5 font-serif text-2xl">
@@ -217,25 +263,31 @@ function HomePage() {
         </Link>
       </div>
 
-      {/* AI recommendation */}
+      {/* AI recommendation — quiet, never dominant */}
       <section className="card-soft p-6 rise">
         <div className="flex items-center gap-2">
           <Sparkles className="size-3.5 text-accent" strokeWidth={2} />
-          <p className="label-quiet">Origin suggests</p>
+          <p className="label-quiet">A thought from Origin</p>
         </div>
         <p className="mt-3 font-serif text-lg italic leading-snug">
           {topInsight?.body ?? buildInsight(open.length, profile.data?.energy_level ?? null)}
         </p>
         <button
-          onClick={() => navigate({ to: "/ai" as never })}
+          onClick={() => {
+            haptic("tap");
+            navigate({ to: "/ai" as never });
+          }}
           className="press mt-5 inline-flex items-center gap-2 text-sm font-semibold text-accent"
         >
-          Talk to Origin <ArrowRight className="size-4" />
+          Talk it through <ArrowRight className="size-4" />
         </button>
       </section>
+        </>
+      )}
     </div>
   );
 }
+
 
 function Ring({ value }: { value: number }) {
   const size = 68;
@@ -263,17 +315,11 @@ function Ring({ value }: { value: number }) {
   );
 }
 
-function getGreeting() {
-  const h = new Date().getHours();
-  if (h < 5) return "Still up";
-  if (h < 12) return "Good morning";
-  if (h < 18) return "Good afternoon";
-  return "Good evening";
-}
-
 function buildInsight(open: number, energy: number | null) {
   if (energy !== null && energy <= 1)
-    return "Your energy is low today. Choose one meaningful task and let the rest wait.";
-  if (open === 0) return "Nothing is pending. Rest is also progress.";
-  return `You have ${open} open ${open === 1 ? "task" : "tasks"}. Start with the smallest one.`;
+    return "Your energy reads low today. Pick one thing that matters and let the rest wait — that's enough.";
+  if (open === 0) return "Nothing is pending. Rest counts as progress too.";
+  if (open === 1) return "One thing left. Start it before you think about it too long.";
+  return `You have ${open} open. Begin with the smallest one — momentum does the rest.`;
 }
+

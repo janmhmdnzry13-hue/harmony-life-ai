@@ -2,6 +2,9 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { House, CalendarCheck, Sparkles, ChartLine, User } from "lucide-react";
 import type { ReactNode } from "react";
 import { NotificationsBell } from "@/components/notifications-bell";
+import { CelebrationProvider } from "@/components/celebration";
+import { haptic } from "@/lib/feel";
+
 
 type Tab = { to: string; label: string; icon: typeof House; center?: boolean };
 
@@ -17,8 +20,10 @@ export function AppShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   return (
+    <CelebrationProvider>
     <div className="min-h-screen bg-paper text-ink flex justify-center">
       <div className="w-full max-w-[520px] min-h-screen flex flex-col relative">
+
         <header className="sticky top-0 z-30 glass px-6 py-3.5 flex items-center justify-between border-x-0 border-t-0">
           <Link to="/" className="flex items-center gap-2.5">
             <span className="size-2 rounded-full bg-accent" />
@@ -56,6 +61,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                     key={t.to}
                     to={t.to as never}
                     aria-label={t.label}
+                    onClick={() => haptic("tap")}
                     className={`press flex flex-1 flex-col items-center gap-1 rounded-xl py-2 ${
                       active ? "text-ink" : "text-muted-foreground"
                     }`}
@@ -72,5 +78,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         </nav>
       </div>
     </div>
+    </CelebrationProvider>
   );
+
 }
