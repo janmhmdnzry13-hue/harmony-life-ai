@@ -20,8 +20,10 @@ export function AppShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   return (
+    <CelebrationProvider>
     <div className="min-h-screen bg-paper text-ink flex justify-center">
       <div className="w-full max-w-[520px] min-h-screen flex flex-col relative">
+
         <header className="sticky top-0 z-30 glass px-6 py-3.5 flex items-center justify-between border-x-0 border-t-0">
           <Link to="/" className="flex items-center gap-2.5">
             <span className="size-2 rounded-full bg-accent" />
