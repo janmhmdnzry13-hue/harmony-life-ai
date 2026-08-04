@@ -177,10 +177,15 @@ function HomePage() {
           {upcoming.map((t) => (
             <li key={t.id} className="flex items-start gap-3.5">
               <button
-                onClick={() => toggle.mutate({ id: t.id, completed: true })}
+                onClick={() => {
+                  haptic("soft");
+                  toggle.mutate({ id: t.id, completed: true });
+                }}
                 aria-label={`Complete ${t.title}`}
-                className="press mt-0.5 size-9 shrink-0 rounded-xl border border-border bg-card"
-              />
+                className="press mt-0.5 grid size-9 shrink-0 place-items-center rounded-xl border border-border bg-card text-transparent active:text-accent"
+              >
+                <Check className="size-4" strokeWidth={2.4} />
+              </button>
               <div className="min-w-0">
                 <p className="truncate text-[15px] font-medium">{t.title}</p>
                 {t.tag && <p className="mt-0.5 text-xs text-muted-foreground">{t.tag}</p>}
@@ -188,8 +193,11 @@ function HomePage() {
             </li>
           ))}
           {!nextEvent && upcoming.length === 0 && (
-            <li className="text-sm text-muted-foreground">Your day is open.</li>
+            <li className="text-sm leading-relaxed text-muted-foreground">
+              Nothing scheduled. The day is yours to shape.
+            </li>
           )}
+
         </ul>
       </section>
 
