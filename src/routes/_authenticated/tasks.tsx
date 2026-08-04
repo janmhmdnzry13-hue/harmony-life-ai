@@ -4,17 +4,35 @@ import { useServerFn } from "@tanstack/react-start";
 import { listTasks, upsertTask, toggleTask, deleteTask } from "@/lib/tasks.functions";
 import { useState } from "react";
 import { format, parseISO } from "date-fns";
-import { Plus, Trash2 } from "lucide-react";
+import { Check, ListChecks, Plus, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
+import { haptic, praise } from "@/lib/feel";
+import { useCelebrate } from "@/components/celebration";
+import { CardSkeleton, EmptyState } from "@/components/soft";
 
 export const Route = createFileRoute("/_authenticated/tasks")({
+  head: () => ({
+    meta: [
+      { title: "Tasks — Origin Life OS" },
+      { name: "description", content: "A short, kind list of what needs doing today." },
+      { property: "og:title", content: "Tasks — Origin Life OS" },
+      { property: "og:description", content: "A short, kind list of what needs doing today." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
   component: TasksPage,
 });
 
-const PRIORITIES = ["low", "medium", "high"] as const;
+const PRIORITIES = [
+  { key: "low", label: "Whenever" },
+  { key: "medium", label: "Soon" },
+  { key: "high", label: "Today" },
+] as const;
 
 function TasksPage() {
   const qc = useQueryClient();
+  const celebrate = useCelebrate();
   const listFn = useServerFn(listTasks);
   const upsertFn = useServerFn(upsertTask);
   const toggleFn = useServerFn(toggleTask);
@@ -31,16 +49,11 @@ function TasksPage() {
   const create = useMutation({
     mutationFn: () =>
       upsertFn({
-        data: {
-          title,
-          priority,
-          tag: tag || null,
-          due_date: dueDate || null,
-          just_for_today: justToday,
-        },
+        data: { title, priority, tag: tag || null, due_date: dueDate || null, just_for_today: justToday },
       }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["tasks"] });
+      celebrate("Added. No rush on it.");
       setOpen(false);
       setTitle("");
       setTag("");
@@ -48,12 +61,17 @@ function TasksPage() {
       setPriority("medium");
       setJustToday(false);
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+    onError: () => toast.error("That didn't save. Mind trying once more?"),
   });
+
   const toggle = useMutation({
     mutationFn: (v: { id: string; completed: boolean }) => toggleFn({ data: v }),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["tasks"] }),
+    onSuccess: (_d, v) => {
+      qc.invalidateQueries({ queryKey: ["tasks"] });
+      if (v.completed) celebrate(praise.task());
+    },
   });
+
   const del = useMutation({
     mutationFn: (id: string) => delFn({ data: { id } }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["tasks"] }),
@@ -63,130 +81,191 @@ function TasksPage() {
   const done = (q.data ?? []).filter((t) => t.completed).slice(0, 20);
 
   return (
-    <div className="px-5 pt-12 pb-8">
-      <header className="mb-8 flex justify-between items-end">
+    <div className="px-5 pt-8 pb-4 space-y-4">
+      <header className="rise flex items-end justify-between px-1 pb-2">
         <div>
-          <h1 className="font-serif text-4xl leading-[1.05] tracking-tight mb-2">Tasks.</h1>
-          <p className="text-sm text-ink/60">
-            {openTasks.length} open · {done.length} done
+          <p className="label-quiet">Tasks</p>
+          <h1 className="mt-2 font-serif text-[34px] leading-tight tracking-tight">Your list.</h1>
+          <p className="mt-1.5 text-sm text-muted-foreground">
+            {openTasks.length === 0
+              ? "Clear for now."
+              : `${openTasks.length} open${done.length ? ` · ${done.length} done` : ""}`}
           </p>
         </div>
         <button
-          onClick={() => setOpen(true)}
-          className="size-11 bg-ink text-paper border border-ink flex items-center justify-center"
+          onClick={() => {
+            haptic("tap");
+            setOpen(true);
+          }}
+          aria-label="Add a task"
+          className="press grid size-12 place-items-center rounded-2xl bg-accent text-accent-foreground"
+          style={{ boxShadow: "var(--shadow-soft)" }}
         >
-          <Plus className="size-5" />
+          <Plus className="size-5" strokeWidth={2.2} />
         </button>
       </header>
 
-      <div className="divide-y divide-ink/10 mb-8">
-        {openTasks.map((t) => (
-          <div key={t.id} className="py-3 flex items-center gap-3 group">
-            <button
-              onClick={() => toggle.mutate({ id: t.id, completed: true })}
-              className="size-5 border border-ink/30 shrink-0"
-              aria-label="Complete"
-            />
-            <div className="flex-1 min-w-0">
-              <p className="text-sm truncate">{t.title}</p>
-              <p className="text-[10px] uppercase tracking-widest text-ink/40 mt-0.5">
-                {t.tag ? `${t.tag} · ` : ""}
-                {t.priority}
-                {t.due_date ? ` · ${format(parseISO(t.due_date), "MMM d")}` : ""}
-                {t.expires_on ? " · today only" : ""}
-              </p>
+      {q.isLoading ? (
+        <div className="space-y-4">
+          <CardSkeleton lines={3} />
+          <CardSkeleton lines={2} />
+        </div>
+      ) : openTasks.length === 0 ? (
+        <div className="card-soft">
+          <EmptyState
+            icon={<ListChecks className="size-5" strokeWidth={1.8} />}
+            title="Nothing waiting on you."
+            body="When something comes to mind, put it here and let your head rest."
+            action={
+              <button
+                onClick={() => setOpen(true)}
+                className="press rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-accent-foreground"
+              >
+                Add a task
+              </button>
+            }
+          />
+        </div>
+      ) : (
+        <section className="card-soft rise divide-y divide-border overflow-hidden">
+          {openTasks.map((t) => (
+            <div key={t.id} className="flex items-center gap-3.5 px-5 py-4">
+              <button
+                onClick={() => {
+                  haptic("soft");
+                  toggle.mutate({ id: t.id, completed: true });
+                }}
+                aria-label={`Complete ${t.title}`}
+                className="press grid size-9 shrink-0 place-items-center rounded-xl border border-border bg-card text-transparent transition-colors active:text-accent"
+              >
+                <Check className="size-4" strokeWidth={2.4} />
+              </button>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-[15px] font-medium leading-snug">{t.title}</p>
+                <p className="mt-0.5 truncate text-xs text-muted-foreground">
+                  {[
+                    t.tag,
+                    PRIORITIES.find((p) => p.key === t.priority)?.label,
+                    t.due_date ? format(parseISO(t.due_date), "MMM d") : null,
+                    t.expires_on ? "just for today" : null,
+                  ]
+                    .filter(Boolean)
+                    .join(" · ")}
+                </p>
+              </div>
+              <button
+                onClick={() => {
+                  haptic("warn");
+                  del.mutate(t.id);
+                }}
+                className="press p-1.5 text-muted-foreground"
+                aria-label="Remove task"
+              >
+                <Trash2 className="size-4" strokeWidth={1.8} />
+              </button>
             </div>
-            <button
-              onClick={() => del.mutate(t.id)}
-              className="p-1 text-ink/40 hover:text-destructive"
-              aria-label="Delete"
-            >
-              <Trash2 className="size-4" />
-            </button>
-          </div>
-        ))}
-        {openTasks.length === 0 && (
-          <p className="py-8 text-center text-sm text-ink/40 font-serif italic">
-            Nothing pending. Breathe.
-          </p>
-        )}
-      </div>
+          ))}
+        </section>
+      )}
 
       {done.length > 0 && (
-        <section>
-          <h3 className="text-[10px] font-medium uppercase tracking-[0.2em] text-ink/40 mb-3">
-            Completed
-          </h3>
-          <div className="divide-y divide-ink/5">
+        <section className="card-soft rise p-5">
+          <p className="label-quiet">Done recently</p>
+          <div className="mt-3 space-y-2.5">
             {done.map((t) => (
-              <div key={t.id} className="py-2.5 flex items-center gap-3 opacity-50">
-                <button
-                  onClick={() => toggle.mutate({ id: t.id, completed: false })}
-                  className="size-5 bg-ink border border-ink shrink-0"
-                />
-                <p className="text-sm line-through flex-1">{t.title}</p>
-              </div>
+              <button
+                key={t.id}
+                onClick={() => toggle.mutate({ id: t.id, completed: false })}
+                className="flex w-full items-center gap-3 text-left"
+              >
+                <span className="grid size-6 shrink-0 place-items-center rounded-lg bg-accent text-accent-foreground">
+                  <Check className="size-3.5" strokeWidth={2.6} />
+                </span>
+                <span className="truncate text-sm text-muted-foreground">{t.title}</span>
+              </button>
             ))}
           </div>
         </section>
       )}
 
       {open && (
-        <div className="fixed inset-0 z-50 bg-ink/40 flex items-end justify-center" onClick={() => setOpen(false)}>
+        <div
+          className="fixed inset-0 z-50 flex items-end justify-center bg-ink/30 backdrop-blur-sm"
+          onClick={() => setOpen(false)}
+        >
           <div
-            className="w-full max-w-[480px] bg-paper border-t border-ink/10 p-5 pb-10"
+            className="rise w-full max-w-[520px] rounded-t-3xl bg-card p-6 pb-10"
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 className="font-serif text-2xl mb-4">New task</h2>
+            <div className="flex items-start justify-between">
+              <div>
+                <h2 className="font-serif text-2xl">Add a task</h2>
+                <p className="mt-1 text-xs text-muted-foreground">Only the title matters. The rest is optional.</p>
+              </div>
+              <button onClick={() => setOpen(false)} aria-label="Close" className="press p-1 text-muted-foreground">
+                <X className="size-5" strokeWidth={1.8} />
+              </button>
+            </div>
+
             <input
               autoFocus
-              placeholder="What needs doing?"
+              placeholder="What's on your mind?"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full bg-surface border border-ink/10 px-3 py-3 text-sm mb-3 focus:outline-none focus:border-ink/40"
+              className="mt-5 w-full rounded-xl border border-border bg-surface px-4 py-3.5 text-[15px] outline-none focus:border-accent/50"
             />
-            <div className="flex gap-2 mb-3">
+
+            <div className="mt-3 flex gap-2">
               {PRIORITIES.map((p) => (
                 <button
-                  key={p}
-                  onClick={() => setPriority(p)}
-                  className={`flex-1 py-2 text-xs uppercase tracking-widest border ${
-                    priority === p ? "bg-ink text-paper border-ink" : "border-ink/15"
+                  key={p.key}
+                  onClick={() => {
+                    haptic("tap");
+                    setPriority(p.key);
+                  }}
+                  className={`press flex-1 rounded-xl py-2.5 text-xs font-semibold ${
+                    priority === p.key ? "bg-accent text-accent-foreground" : "bg-surface text-muted-foreground"
                   }`}
                 >
-                  {p}
+                  {p.label}
                 </button>
               ))}
             </div>
-            <div className="grid grid-cols-2 gap-2 mb-4">
+
+            <div className="mt-3 grid grid-cols-2 gap-2">
               <input
-                placeholder="Tag"
+                placeholder="Label (optional)"
                 value={tag}
                 onChange={(e) => setTag(e.target.value)}
-                className="bg-surface border border-ink/10 px-3 py-3 text-sm focus:outline-none focus:border-ink/40"
+                className="rounded-xl border border-border bg-surface px-4 py-3 text-sm outline-none focus:border-accent/50"
               />
               <input
                 type="date"
                 value={dueDate}
                 onChange={(e) => setDueDate(e.target.value)}
-                className="bg-surface border border-ink/10 px-3 py-3 text-sm focus:outline-none focus:border-ink/40"
+                className="rounded-xl border border-border bg-surface px-4 py-3 text-sm outline-none focus:border-accent/50"
               />
             </div>
-            <label className="flex items-center gap-2 mb-4 text-xs uppercase tracking-widest cursor-pointer select-none">
+
+            <label className="mt-4 flex cursor-pointer select-none items-center gap-2.5 text-sm">
               <input
                 type="checkbox"
                 checked={justToday}
                 onChange={(e) => setJustToday(e.target.checked)}
-                className="size-4 accent-ink"
+                className="size-4 accent-[var(--accent)]"
               />
-              Just for today (auto-delete tomorrow)
+              <span>
+                Just for today
+                <span className="text-muted-foreground"> — it clears itself tomorrow</span>
+              </span>
             </label>
+
             <button
               disabled={!title.trim() || create.isPending}
               onClick={() => create.mutate()}
-              className="w-full bg-ink text-paper py-3 text-sm font-medium disabled:opacity-40"
+              className="press mt-5 w-full rounded-full bg-accent py-3.5 text-sm font-semibold text-accent-foreground disabled:opacity-40"
             >
-              Add task
+              {create.isPending ? "Saving…" : "Add it"}
             </button>
           </div>
         </div>
