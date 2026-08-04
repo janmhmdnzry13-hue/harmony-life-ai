@@ -61,6 +61,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                     key={t.to}
                     to={t.to as never}
                     aria-label={t.label}
+                    onClick={() => haptic("tap")}
                     className={`press flex flex-1 flex-col items-center gap-1 rounded-xl py-2 ${
                       active ? "text-ink" : "text-muted-foreground"
                     }`}
@@ -77,5 +78,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         </nav>
       </div>
     </div>
+    </CelebrationProvider>
   );
+
 }
