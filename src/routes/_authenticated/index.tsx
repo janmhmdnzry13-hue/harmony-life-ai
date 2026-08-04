@@ -10,6 +10,10 @@ import { listSleep } from "@/lib/health.functions";
 import { listInsights } from "@/lib/intelligence.functions";
 import { format, parseISO } from "date-fns";
 import { ArrowRight, Check, Clock, Heart, Sparkles, Wallet } from "lucide-react";
+import { greeting, dayline, habitEncouragement, haptic, praise } from "@/lib/feel";
+import { useCelebrate } from "@/components/celebration";
+import { CardSkeleton } from "@/components/soft";
+
 
 export const Route = createFileRoute("/_authenticated/")({
   head: () => ({
