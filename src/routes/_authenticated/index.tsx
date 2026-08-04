@@ -312,17 +312,11 @@ function Ring({ value }: { value: number }) {
   );
 }
 
-function getGreeting() {
-  const h = new Date().getHours();
-  if (h < 5) return "Still up";
-  if (h < 12) return "Good morning";
-  if (h < 18) return "Good afternoon";
-  return "Good evening";
-}
-
 function buildInsight(open: number, energy: number | null) {
   if (energy !== null && energy <= 1)
-    return "Your energy is low today. Choose one meaningful task and let the rest wait.";
-  if (open === 0) return "Nothing is pending. Rest is also progress.";
-  return `You have ${open} open ${open === 1 ? "task" : "tasks"}. Start with the smallest one.`;
+    return "Your energy reads low today. Pick one thing that matters and let the rest wait — that's enough.";
+  if (open === 0) return "Nothing is pending. Rest counts as progress too.";
+  if (open === 1) return "One thing left. Start it before you think about it too long.";
+  return `You have ${open} open. Begin with the smallest one — momentum does the rest.`;
 }
+
