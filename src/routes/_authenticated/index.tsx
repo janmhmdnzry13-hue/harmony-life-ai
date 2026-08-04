@@ -32,6 +32,7 @@ export const Route = createFileRoute("/_authenticated/")({
 function HomePage() {
   const navigate = useNavigate();
   const qc = useQueryClient();
+  const celebrate = useCelebrate();
   const profileFn = useServerFn(getProfile);
   const tasksFn = useServerFn(listTasks);
   const habitsFn = useServerFn(listHabits);
@@ -52,12 +53,20 @@ function HomePage() {
 
   const toggle = useMutation({
     mutationFn: (v: { id: string; completed: boolean }) => toggleFn({ data: v }),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["tasks"] }),
+    onSuccess: (_d, v) => {
+      qc.invalidateQueries({ queryKey: ["tasks"] });
+      if (v.completed) celebrate(praise.task());
+    },
   });
   const logHabit = useMutation({
-    mutationFn: (v: { habit_id: string; log_date: string }) => logHabitFn({ data: v }),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["habits"] }),
+    mutationFn: (v: { habit_id: string; log_date: string; wasDone: boolean }) =>
+      logHabitFn({ data: { habit_id: v.habit_id, log_date: v.log_date } }),
+    onSuccess: (_d, v) => {
+      qc.invalidateQueries({ queryKey: ["habits"] });
+      if (!v.wasDone) celebrate(praise.habit());
+    },
   });
+
 
   const today = format(new Date(), "yyyy-MM-dd");
   const open = (tasks.data ?? []).filter((t) => !t.completed);
