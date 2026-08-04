@@ -2,6 +2,9 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { House, CalendarCheck, Sparkles, ChartLine, User } from "lucide-react";
 import type { ReactNode } from "react";
 import { NotificationsBell } from "@/components/notifications-bell";
+import { CelebrationProvider } from "@/components/celebration";
+import { haptic } from "@/lib/feel";
+
 
 type Tab = { to: string; label: string; icon: typeof House; center?: boolean };
 
