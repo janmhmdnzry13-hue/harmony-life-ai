@@ -299,9 +299,32 @@ function HomePage() {
               Talk it through <ArrowRight className="size-4" />
             </button>
           </section>
+
+          {/* Understand + capture — the quiet intelligence entry points */}
+          <div className="grid grid-cols-2 gap-4">
+            <Link
+              to="/understand"
+              onClick={() => haptic("tap")}
+              className="press card-soft rise p-5"
+            >
+              <p className="label-quiet">Understand</p>
+              <p className="mt-2 font-serif text-lg leading-snug">Why you're stuck</p>
+              <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
+                Friction, patterns, what's ahead
+              </p>
+            </Link>
+            <Link to="/capture" onClick={() => haptic("tap")} className="press card-soft rise p-5">
+              <p className="label-quiet">Capture</p>
+              <p className="mt-2 font-serif text-lg leading-snug">Say it, let it go</p>
+              <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
+                A thought becomes next steps
+              </p>
+            </Link>
+          </div>
         </>
       )}
     </div>
+
   );
 }
 

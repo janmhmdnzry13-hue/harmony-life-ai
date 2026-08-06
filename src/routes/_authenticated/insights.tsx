@@ -156,6 +156,19 @@ function InsightsPage() {
         </section>
       )}
 
+      {/* Understand — the deeper read */}
+      <Link
+        to="/understand"
+        onClick={() => haptic("tap")}
+        className="press card-soft rise block p-6"
+      >
+        <p className="label-quiet">Go deeper</p>
+        <p className="mt-2 font-serif text-2xl leading-snug">What's actually in the way</p>
+        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+          Friction, recurring patterns, where money leaks, and what happens if nothing changes.
+        </p>
+      </Link>
+
       {/* This month */}
       <section className="card-soft rise p-6">
         <p className="label-quiet">This month</p>
@@ -188,7 +201,7 @@ function InsightsPage() {
           { to: "/wellness", label: "Health", icon: Heart },
           { to: "/finance", label: "Money", icon: Wallet },
           { to: "/wellness/learn", label: "Learning", icon: BookOpen },
-          { to: "/intel", label: "Intelligence", icon: Gauge },
+          { to: "/understand", label: "Understand", icon: Gauge },
         ].map((c) => {
           const Icon = c.icon;
           return (

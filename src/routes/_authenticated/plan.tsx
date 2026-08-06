@@ -38,6 +38,8 @@ const TODAY = [
   { to: "/tasks", label: "Tasks", desc: "What needs doing today", icon: CheckCircle2 },
   { to: "/habits", label: "Habits", desc: "Streaks and daily rituals", icon: Repeat },
   { to: "/calendar", label: "Calendar", desc: "Events and time blocks", icon: CalendarDays },
+  { to: "/capture", label: "Capture a thought", desc: "Speak it — Origin makes it doable", icon: Sparkles },
+  { to: "/understand", label: "Understand", desc: "What's in the way, and what's ahead", icon: Brain },
 ];
 
 const GROUPS: { title: string; note: string; items: { to: string; label: string; icon: typeof Heart }[] }[] = [
