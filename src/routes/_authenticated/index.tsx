@@ -321,8 +321,10 @@ function HomePage() {
               </p>
             </Link>
           </div>
-
+        </>
+      )}
     </div>
+
   );
 }
 
