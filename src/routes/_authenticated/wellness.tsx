@@ -24,8 +24,8 @@ function WellnessLayout() {
               <Link
                 key={t.to}
                 to={t.to as never}
-                className={`shrink-0 px-3 py-1.5 text-[11px] uppercase tracking-widest font-medium border ${
-                  active ? "bg-ink text-paper border-ink" : "border-ink/10 text-ink/50"
+                className={`press shrink-0 rounded-full px-3.5 py-1.5 text-[11px] uppercase tracking-widest font-semibold border ${
+                  active ? "bg-accent text-accent-foreground border-accent" : "border-border text-muted-foreground"
                 }`}
               >
                 {t.label}

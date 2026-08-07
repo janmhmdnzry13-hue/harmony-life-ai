@@ -25,6 +25,15 @@
   --color-surface: var(--surface);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
+  --color-accent-soft: var(--accent-soft);
+  --color-sky: var(--sky);
+  --color-sky-soft: var(--sky-soft);
+  --color-leaf: var(--leaf);
+  --color-leaf-soft: var(--leaf-soft);
+  --color-amber: var(--amber);
+  --color-amber-soft: var(--amber-soft);
+  --color-positive: var(--positive);
+
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
   --color-border: var(--border);
@@ -53,38 +62,52 @@
 }
 
 :root {
-  --paper: #fafbfc;
+  --paper: #fbfbfd;
   --card: #ffffff;
-  --ink: #1b2432;
-  --surface: #eef2f7;
-  --accent: #3b82f6;
+  --ink: #16182b;
+  --surface: #f2f1fb;
+  --accent: #6d5efc;
   --accent-foreground: #ffffff;
-  --muted: #e8ecf1;
-  --muted-foreground: #6b7a8d;
-  --border: rgb(27 36 50 / 0.08);
-  --ring: rgb(59 130 246 / 0.35);
-  --destructive: #d9534a;
-  --positive: #2f9e6f;
+  --accent-soft: #eeeaff;
+  --sky: #3b82f6;
+  --sky-soft: #e7f0fe;
+  --leaf: #22a06b;
+  --leaf-soft: #e4f5ec;
+  --amber: #e08a1e;
+  --amber-soft: #fdf1de;
+  --muted: #eceaf6;
+  --muted-foreground: #6b6f8a;
+  --border: rgb(22 24 43 / 0.07);
+  --ring: rgb(109 94 252 / 0.35);
+  --destructive: #dc4c46;
+  --positive: #22a06b;
 
-  --shadow-soft: 0 1px 2px rgb(27 36 50 / 0.04), 0 8px 24px -12px rgb(27 36 50 / 0.1);
-  --shadow-lift: 0 2px 4px rgb(27 36 50 / 0.05), 0 18px 40px -18px rgb(27 36 50 / 0.16);
+  --shadow-soft: 0 1px 2px rgb(22 24 43 / 0.04), 0 10px 26px -14px rgb(22 24 43 / 0.12);
+  --shadow-lift: 0 2px 4px rgb(22 24 43 / 0.05), 0 20px 44px -20px rgb(22 24 43 / 0.18);
 
   --background: var(--paper);
   --foreground: var(--ink);
 }
 
 .dark {
-  --paper: #0e1218;
-  --card: #161c25;
-  --ink: #e9eef5;
-  --surface: #1b222d;
-  --accent: #6ea8fe;
-  --accent-foreground: #0e1218;
-  --muted: #212a36;
-  --muted-foreground: #9aa8ba;
-  --border: rgb(233 238 245 / 0.1);
-  --ring: rgb(110 168 254 / 0.4);
-  --positive: #56c596;
+  --paper: #0d0e17;
+  --card: #161824;
+  --ink: #ecebf5;
+  --surface: #1e2031;
+  --accent: #9a8cff;
+  --accent-foreground: #0d0e17;
+  --accent-soft: #24234a;
+  --sky: #7db0ff;
+  --sky-soft: #16233a;
+  --leaf: #57cd97;
+  --leaf-soft: #142a20;
+  --amber: #f0b45f;
+  --amber-soft: #2c2314;
+  --muted: #232538;
+  --muted-foreground: #9b9fbb;
+  --border: rgb(236 235 245 / 0.1);
+  --ring: rgb(154 140 255 / 0.4);
+  --positive: #57cd97;
 
   --shadow-soft: 0 1px 2px rgb(0 0 0 / 0.3), 0 10px 28px -14px rgb(0 0 0 / 0.6);
   --shadow-lift: 0 2px 6px rgb(0 0 0 / 0.35), 0 22px 46px -20px rgb(0 0 0 / 0.7);
@@ -207,4 +230,30 @@
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+
+/* --- Reference-inspired tiles: one card, one question ------------- */
+@utility tile {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+  padding: 1rem;
+}
+
+@utility chip-icon {
+  display: grid;
+  place-items: center;
+  border-radius: 0.75rem;
+  width: 2rem;
+  height: 2rem;
+}
+
+@keyframes float-orb {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+@utility orb {
+  animation: float-orb 4.5s ease-in-out infinite;
 }

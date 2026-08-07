@@ -130,17 +130,72 @@ function HomePage() {
   const name = (profile.data?.display_name ?? "friend").split(" ")[0];
   const loading = tasks.isLoading || habitsQ.isLoading;
 
+  const doneTasks = (tasks.data ?? []).filter((t) => t.completed).length;
+  const totalTasks = (tasks.data ?? []).length;
+
   return (
-    <div className="space-y-4 px-5 pb-4 pt-8">
-      <header className="rise px-1 pb-2">
+    <div className="space-y-4 px-5 pb-4 pt-7">
+      <header className="rise px-1 pb-1">
         <p className="label-quiet">{format(new Date(), "EEEE, MMMM d")}</p>
-        <h1 className="mt-2 font-serif text-[34px] leading-[1.15] tracking-tight">
+        <h1 className="mt-2 font-serif text-[32px] leading-[1.15] tracking-tight">
           {greeting()}, {name}.
         </h1>
         <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
           {dayline(open.length, doneToday.length, habits.length)}
         </p>
       </header>
+
+      {/* At a glance — four questions, four answers */}
+      <div className="grid grid-cols-2 gap-3">
+        <Tile
+          to="/insights"
+          label="Life score"
+          value={lifeScore ? String(lifeScore) : "—"}
+          note="across every area"
+          tone="accent"
+        />
+        <Tile
+          to="/tasks"
+          label="Tasks done"
+          value={`${doneTasks}/${totalTasks || 0}`}
+          note={open.length ? `${open.length} still open` : "all clear"}
+          tone="sky"
+        />
+        <Tile
+          to="/habits"
+          label="Habits"
+          value={`${habitPct}%`}
+          note={`${doneToday.length} of ${habits.length || 0} today`}
+          tone="leaf"
+        />
+        <Tile
+          to="/wellness"
+          label="Rest"
+          value={sleepHours ? `${sleepHours.toFixed(1)}h` : "—"}
+          note={stressNow !== null ? `stress ${Number(stressNow)}/10` : "last night"}
+          tone="amber"
+        />
+      </div>
+
+      {/* Quick actions — fewer clicks to the things done most */}
+      <div className="flex gap-2 overflow-x-auto no-scrollbar px-0.5 py-0.5">
+        {[
+          { to: "/capture", label: "Capture" },
+          { to: "/tasks", label: "Add task" },
+          { to: "/calendar", label: "Calendar" },
+          { to: "/finance", label: "Money" },
+          { to: "/rescue", label: "Rescue" },
+        ].map((a) => (
+          <Link
+            key={a.to}
+            to={a.to as never}
+            onClick={() => haptic("tap")}
+            className="press shrink-0 rounded-full border border-border bg-card px-3.5 py-2 text-xs font-semibold"
+          >
+            {a.label}
+          </Link>
+        ))}
+      </div>
 
       {loading ? (
         <div className="space-y-4">
@@ -150,6 +205,7 @@ function HomePage() {
         </div>
       ) : (
         <>
+
           {/* Today's focus — the single primary action on the screen */}
           <section className="card-soft rise p-6">
             <p className="label-quiet">Today's focus</p>
@@ -406,4 +462,37 @@ function buildInsight(open: number, energy: number | null) {
   if (open === 0) return "Nothing is pending. Rest counts as progress too.";
   if (open === 1) return "One thing left. Start it before you think about it too long.";
   return `You have ${open} open. Begin with the smallest one — momentum does the rest.`;
+}
+
+const TONES = {
+  accent: { bg: "bg-accent-soft", fg: "text-accent" },
+  sky: { bg: "bg-sky-soft", fg: "text-sky" },
+  leaf: { bg: "bg-leaf-soft", fg: "text-leaf" },
+  amber: { bg: "bg-amber-soft", fg: "text-amber" },
+} as const;
+
+function Tile({
+  to,
+  label,
+  value,
+  note,
+  tone,
+}: {
+  to: string;
+  label: string;
+  value: string;
+  note: string;
+  tone: keyof typeof TONES;
+}) {
+  const t = TONES[tone];
+  return (
+    <Link to={to as never} onClick={() => haptic("tap")} className="press tile rise flex flex-col gap-2">
+      <span className={`chip-icon ${t.bg}`}>
+        <span className={`size-2 rounded-full ${t.fg} bg-current`} />
+      </span>
+      <span className="text-[11px] font-semibold tracking-wide text-muted-foreground">{label}</span>
+      <span className="font-serif text-[26px] leading-none tracking-tight">{value}</span>
+      <span className="text-[11px] leading-snug text-muted-foreground">{note}</span>
+    </Link>
+  );
 }
