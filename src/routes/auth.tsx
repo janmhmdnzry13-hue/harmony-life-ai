@@ -204,7 +204,7 @@ function AuthPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-ink text-paper py-3.5 text-sm font-medium tracking-wide disabled:opacity-50"
+            className="press w-full rounded-xl bg-accent text-accent-foreground py-3.5 text-sm font-semibold tracking-wide disabled:opacity-50"
           >
             {loading ? "…" : mode === "signin" ? "Sign in" : "Create account"}
           </button>
