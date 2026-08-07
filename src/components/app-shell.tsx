@@ -58,7 +58,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                   to="/ai"
                   aria-label="Ask Origin"
                   onClick={() => haptic("soft")}
-                  className="press orb pointer-events-auto absolute bottom-[104px] right-5 grid size-13 size-[52px] place-items-center rounded-full bg-accent text-accent-foreground"
+                  className="press orb pointer-events-auto absolute bottom-[104px] right-5 grid size-[52px] place-items-center rounded-full bg-accent text-accent-foreground"
                   style={{ boxShadow: "var(--shadow-lift)" }}
                 >
                   <Sparkles className="size-[22px]" strokeWidth={1.9} />
