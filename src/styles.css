@@ -231,3 +231,29 @@
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }
+
+/* --- Reference-inspired tiles: one card, one question ------------- */
+@utility tile {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+  padding: 1rem;
+}
+
+@utility chip-icon {
+  display: grid;
+  place-items: center;
+  border-radius: 0.75rem;
+  width: 2rem;
+  height: 2rem;
+}
+
+@keyframes float-orb {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+@utility orb {
+  animation: float-orb 4.5s ease-in-out infinite;
+}
