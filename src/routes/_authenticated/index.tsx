@@ -463,3 +463,36 @@ function buildInsight(open: number, energy: number | null) {
   if (open === 1) return "One thing left. Start it before you think about it too long.";
   return `You have ${open} open. Begin with the smallest one — momentum does the rest.`;
 }
+
+const TONES = {
+  accent: { bg: "bg-accent-soft", fg: "text-accent" },
+  sky: { bg: "bg-sky-soft", fg: "text-sky" },
+  leaf: { bg: "bg-leaf-soft", fg: "text-leaf" },
+  amber: { bg: "bg-amber-soft", fg: "text-amber" },
+} as const;
+
+function Tile({
+  to,
+  label,
+  value,
+  note,
+  tone,
+}: {
+  to: string;
+  label: string;
+  value: string;
+  note: string;
+  tone: keyof typeof TONES;
+}) {
+  const t = TONES[tone];
+  return (
+    <Link to={to as never} onClick={() => haptic("tap")} className="press tile rise flex flex-col gap-2">
+      <span className={`chip-icon ${t.bg}`}>
+        <span className={`size-2 rounded-full ${t.fg} bg-current`} />
+      </span>
+      <span className="text-[11px] font-semibold tracking-wide text-muted-foreground">{label}</span>
+      <span className="font-serif text-[26px] leading-none tracking-tight">{value}</span>
+      <span className="text-[11px] leading-snug text-muted-foreground">{note}</span>
+    </Link>
+  );
+}
