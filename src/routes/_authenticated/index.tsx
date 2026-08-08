@@ -10,7 +10,7 @@ import { listSleep } from "@/lib/health.functions";
 import { listMood, listStress } from "@/lib/mind.functions";
 import { getScoreHistory, listInsights } from "@/lib/intelligence.functions";
 import { format, parseISO, isToday } from "date-fns";
-import { ArrowRight, Check, Clock, Sparkles } from "lucide-react";
+import { ArrowRight, Check, Clock, ListChecks, Mic, Repeat, Sparkles, UserRound } from "lucide-react";
 import { greeting, dayline, haptic, praise } from "@/lib/feel";
 import { useCelebrate } from "@/components/celebration";
 import { CardSkeleton } from "@/components/soft";
@@ -132,6 +132,38 @@ function HomePage() {
 
   const doneTasks = (tasks.data ?? []).filter((t) => t.completed).length;
   const totalTasks = (tasks.data ?? []).length;
+  const setupSteps = [
+    {
+      to: "/tasks",
+      label: "Add your first task",
+      detail: totalTasks ? `${totalTasks} task${totalTasks === 1 ? "" : "s"} added` : "Start with one small next step",
+      done: totalTasks > 0,
+      icon: ListChecks,
+    },
+    {
+      to: "/habits",
+      label: "Choose one habit",
+      detail: habits.length ? `${habits.length} habit${habits.length === 1 ? "" : "s"} tracking` : "Pick a ritual under ten minutes",
+      done: habits.length > 0,
+      icon: Repeat,
+    },
+    {
+      to: "/capture",
+      label: "Capture what is on your mind",
+      detail: "Turn loose thoughts into next steps",
+      done: totalTasks > 0,
+      icon: Mic,
+    },
+    {
+      to: "/account",
+      label: "Personalize your account",
+      detail: profile.data?.display_name ? `Welcome, ${name}` : "Add your name so Origin feels yours",
+      done: Boolean(profile.data?.display_name),
+      icon: UserRound,
+    },
+  ];
+  const setupComplete = setupSteps.every((step) => step.done);
+  const showFirstRunSetup = !loading && !setupComplete && totalTasks < 3 && habits.length < 3;
 
   return (
     <div className="space-y-4 px-5 pb-4 pt-7">
@@ -196,6 +228,49 @@ function HomePage() {
           </Link>
         ))}
       </div>
+
+      {showFirstRunSetup && (
+        <section className="card-soft rise p-6">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="label-quiet">First-time setup</p>
+              <h2 className="mt-2 font-serif text-2xl leading-snug">Make Origin useful in three minutes.</h2>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                Add just enough context for your Today view to feel personal. You can change everything later.
+              </p>
+            </div>
+            <span className="rounded-full bg-surface px-3 py-1 text-xs font-semibold text-muted-foreground">
+              {setupSteps.filter((step) => step.done).length}/{setupSteps.length}
+            </span>
+          </div>
+          <div className="mt-5 space-y-2.5">
+            {setupSteps.map((step) => {
+              const Icon = step.icon;
+              return (
+                <Link
+                  key={step.label}
+                  to={step.to as never}
+                  onClick={() => haptic("tap")}
+                  className="press flex items-center gap-3 rounded-2xl bg-surface px-4 py-3"
+                >
+                  <span
+                    className={`grid size-9 shrink-0 place-items-center rounded-xl ${
+                      step.done ? "bg-accent text-accent-foreground" : "bg-card text-accent"
+                    }`}
+                  >
+                    {step.done ? <Check className="size-4" strokeWidth={2.4} /> : <Icon className="size-4" strokeWidth={1.9} />}
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-sm font-semibold">{step.label}</span>
+                    <span className="block truncate text-xs text-muted-foreground">{step.detail}</span>
+                  </span>
+                  <ArrowRight className="size-4 text-muted-foreground" strokeWidth={1.8} />
+                </Link>
+              );
+            })}
+          </div>
+        </section>
+      )}
 
       {loading ? (
         <div className="space-y-4">

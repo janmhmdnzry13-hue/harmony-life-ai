@@ -104,8 +104,9 @@ function HabitsPage() {
         <div className="card-soft">
           <EmptyState
             icon={<Repeat className="size-5" strokeWidth={1.8} />}
-            title="Start with one."
-            body="Pick something small enough that a tired version of you would still do it."
+            title="Choose one ritual to begin."
+            body="A good first habit takes less than ten minutes and gives you an easy win every day."
+            tips={["Drink water after waking", "Walk outside for five minutes", "Write one sentence before bed"]}
             action={
               <button
                 onClick={() => setOpen(true)}
