@@ -1,15 +1,9 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { getProfile } from "@/lib/profile.functions";
-import { listTasks, toggleTask } from "@/lib/tasks.functions";
-import { listHabits, toggleHabitLog } from "@/lib/habits.functions";
-import { listEvents } from "@/lib/events.functions";
-import { listFinance } from "@/lib/finance.functions";
-import { listSleep } from "@/lib/health.functions";
-import { listMood, listStress } from "@/lib/mind.functions";
-import { getScoreHistory, listInsights } from "@/lib/intelligence.functions";
-import { format, parseISO, isToday } from "date-fns";
+import { toggleTask } from "@/lib/tasks.functions";
+import { getDashboardData } from "@/lib/dashboard.functions";
+import { format, parseISO } from "date-fns";
 import { ArrowRight, Check, Clock, ListChecks, Mic, Repeat, Sparkles, UserRound } from "lucide-react";
 import { greeting, dayline, haptic, praise } from "@/lib/feel";
 import { useCelebrate } from "@/components/celebration";
@@ -37,70 +31,45 @@ function HomePage() {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const celebrate = useCelebrate();
-  const profileFn = useServerFn(getProfile);
-  const tasksFn = useServerFn(listTasks);
-  const habitsFn = useServerFn(listHabits);
-  const eventsFn = useServerFn(listEvents);
-  const financeFn = useServerFn(listFinance);
-  const sleepFn = useServerFn(listSleep);
-  const moodFn = useServerFn(listMood);
-  const stressFn = useServerFn(listStress);
-  const insightsFn = useServerFn(listInsights);
-  const historyFn = useServerFn(getScoreHistory);
+  const dashboardFn = useServerFn(getDashboardData);
   const toggleFn = useServerFn(toggleTask);
-  const logHabitFn = useServerFn(toggleHabitLog);
 
-  const profile = useQuery({ queryKey: ["profile"], queryFn: () => profileFn() });
-  const tasks = useQuery({ queryKey: ["tasks"], queryFn: () => tasksFn() });
-  const habitsQ = useQuery({ queryKey: ["habits"], queryFn: () => habitsFn() });
-  const events = useQuery({ queryKey: ["events"], queryFn: () => eventsFn() });
-  const finance = useQuery({ queryKey: ["finance"], queryFn: () => financeFn() });
-  const sleep = useQuery({ queryKey: ["sleep"], queryFn: () => sleepFn() });
-  const mood = useQuery({ queryKey: ["mood"], queryFn: () => moodFn() });
-  const stress = useQuery({ queryKey: ["stress"], queryFn: () => stressFn() });
-  const insights = useQuery({ queryKey: ["insights"], queryFn: () => insightsFn() });
-  const history = useQuery({ queryKey: ["score-history"], queryFn: () => historyFn() });
+  const dashboard = useQuery({
+    queryKey: ["dashboard"],
+    queryFn: () => dashboardFn(),
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
+  });
 
   const toggle = useMutation({
     mutationFn: (v: { id: string; completed: boolean }) => toggleFn({ data: v }),
     onSuccess: (_d, v) => {
       qc.invalidateQueries({ queryKey: ["tasks"] });
+      qc.invalidateQueries({ queryKey: ["dashboard"] });
       if (v.completed) celebrate(praise.task());
     },
   });
-  const logHabit = useMutation({
-    mutationFn: (v: { habit_id: string; log_date: string; wasDone: boolean }) =>
-      logHabitFn({ data: { habit_id: v.habit_id, log_date: v.log_date } }),
-    onSuccess: (_d, v) => {
-      qc.invalidateQueries({ queryKey: ["habits"] });
-      if (!v.wasDone) celebrate(praise.habit());
-    },
-  });
 
-  const today = format(new Date(), "yyyy-MM-dd");
-  const open = (tasks.data ?? []).filter((t) => !t.completed);
-  const focus = open.find((t) => t.priority === "high") ?? open[0];
-  const nextAction = open.find((t) => t.id !== focus?.id);
-  const nextEvent = (events.data ?? []).find((e) => new Date(e.starts_at) >= new Date());
-  const eventsToday = (events.data ?? []).filter((e) => isToday(parseISO(e.starts_at))).length;
+  const data = dashboard.data;
+  const openCount = data?.tasks.openCount ?? 0;
+  const focus = data?.focusTask ?? null;
+  const nextAction = data?.nextAction ?? null;
+  const nextEvent = data?.upcomingEvents.find((e) => new Date(e.starts_at) >= new Date());
+  const eventsToday = data?.eventsTodayCount ?? 0;
 
-  const habits = habitsQ.data?.habits ?? [];
-  const logs = habitsQ.data?.logs ?? [];
-  const doneToday = habits.filter((h) => logs.some((l) => l.habit_id === h.id && l.log_date === today));
-  const habitPct = habits.length ? Math.round((doneToday.length / habits.length) * 100) : 0;
+  const habits = data?.habits.items ?? [];
+  const doneTodayCount = data?.habits.completedTodayCount ?? 0;
+  const habitPct = data?.habits.completionPercentage ?? 0;
 
-  const monthTx = finance.data?.transactions ?? [];
-  const monthKey = today.slice(0, 7);
-  const inMonth = monthTx.filter((t) => t.occurred_on.slice(0, 7) === monthKey);
-  const spent = inMonth.filter((t) => t.type === "expense").reduce((s, t) => s + Number(t.amount), 0);
-  const earned = inMonth.filter((t) => t.type === "income").reduce((s, t) => s + Number(t.amount), 0);
+  const spent = data?.financeSummary.spent ?? 0;
+  const earned = data?.financeSummary.earned ?? 0;
+  const inMonth = data?.financeSummary.monthTransactions ?? [];
 
-  const lastSleep = (sleep.data ?? [])[0];
-  const sleepHours = lastSleep?.duration_min ? lastSleep.duration_min / 60 : null;
-  const moodAvg = avg((mood.data ?? []).slice(0, 7).map((m) => Number(m.mood)));
-  const stressNow = (stress.data ?? [])[0]?.level ?? null;
+  const sleepHours = data?.sleepSummary.hours ?? null;
+  const moodAvg = data?.moodSummary.average ?? null;
+  const stressNow = data?.stressSummary.currentLevel ?? null;
 
-  const scores = (history.data ?? [])[(history.data ?? []).length - 1];
+  const scores = data?.latestLifeScore;
   const rings = [
     { label: "Health", value: num(scores?.health_score), to: "/wellness" },
     { label: "Money", value: num(scores?.finance_score), to: "/finance" },
@@ -114,9 +83,9 @@ function HomePage() {
     sleepHours,
     stress: stressNow === null ? null : Number(stressNow),
     mood: moodAvg,
-    energy: profile.data?.energy_level ?? null,
-    openTasks: open.length,
-    habitsDone: doneToday.length,
+    energy: data?.profile?.energy_level ?? null,
+    openTasks: openCount,
+    habitsDone: doneTodayCount,
     habitsTotal: habits.length,
     eventsToday,
     spent,
@@ -124,14 +93,14 @@ function HomePage() {
     recentSpendRatio: spendRatio(inMonth),
   });
 
-  const recommendation = (insights.data ?? []).find((i) => i.kind === "recommendation");
-  const aiInsight = (insights.data ?? []).find((i) => i.id !== recommendation?.id);
+  const recommendation = data?.importantInsights.find((i) => i.kind === "recommendation");
+  const aiInsight = data?.importantInsights.find((i) => i.id !== recommendation?.id);
 
-  const name = (profile.data?.display_name ?? "friend").split(" ")[0];
-  const loading = tasks.isLoading || habitsQ.isLoading;
+  const name = (data?.profile?.display_name ?? "friend").split(" ")[0];
+  const loading = dashboard.isLoading;
 
-  const doneTasks = (tasks.data ?? []).filter((t) => t.completed).length;
-  const totalTasks = (tasks.data ?? []).length;
+  const doneTasks = data?.tasks.completedCount ?? 0;
+  const totalTasks = data?.tasks.total ?? 0;
   const setupSteps = [
     {
       to: "/tasks",
@@ -157,8 +126,8 @@ function HomePage() {
     {
       to: "/account",
       label: "Personalize your account",
-      detail: profile.data?.display_name ? `Welcome, ${name}` : "Add your name so Origin feels yours",
-      done: Boolean(profile.data?.display_name),
+      detail: data?.profile?.display_name ? `Welcome, ${name}` : "Add your name so Origin feels yours",
+      done: Boolean(data?.profile?.display_name),
       icon: UserRound,
     },
   ];
@@ -173,7 +142,7 @@ function HomePage() {
           {greeting()}, {name}.
         </h1>
         <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-          {dayline(open.length, doneToday.length, habits.length)}
+          {dayline(openCount, doneTodayCount, habits.length)}
         </p>
       </header>
 
@@ -190,14 +159,14 @@ function HomePage() {
           to="/tasks"
           label="Tasks done"
           value={`${doneTasks}/${totalTasks || 0}`}
-          note={open.length ? `${open.length} still open` : "all clear"}
+          note={openCount ? `${openCount} still open` : "all clear"}
           tone="sky"
         />
         <Tile
           to="/habits"
           label="Habits"
           value={`${habitPct}%`}
-          note={`${doneToday.length} of ${habits.length || 0} today`}
+          note={`${doneTodayCount} of ${habits.length || 0} today`}
           tone="leaf"
         />
         <Tile
@@ -272,7 +241,21 @@ function HomePage() {
         </section>
       )}
 
-      {loading ? (
+      {dashboard.isError ? (
+        <section className="card-soft rise p-6">
+          <p className="label-quiet">Today is taking a breath</p>
+          <h2 className="mt-3 font-serif text-2xl leading-snug">We couldn't load your dashboard.</h2>
+          <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+            {dashboard.error instanceof Error ? dashboard.error.message : "Please try again in a moment."}
+          </p>
+          <button
+            onClick={() => dashboard.refetch()}
+            className="press mt-5 inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-accent-foreground"
+          >
+            Try again
+          </button>
+        </section>
+      ) : loading ? (
         <div className="space-y-4">
           <CardSkeleton lines={2} />
           <CardSkeleton lines={3} />
@@ -280,7 +263,6 @@ function HomePage() {
         </div>
       ) : (
         <>
-
           {/* Today's focus — the single primary action on the screen */}
           <section className="card-soft rise p-6">
             <p className="label-quiet">Today's focus</p>
@@ -375,7 +357,7 @@ function HomePage() {
                   {lifeScore ? statusLine(lifeScore) : "Log a little of your day and this begins to take shape."}
                 </p>
               </div>
-              <Ring value={habitPct} caption={`${doneToday.length}/${habits.length || 0}`} label="habits" />
+              <Ring value={habitPct} caption={`${doneTodayCount}/${habits.length || 0}`} label="habits" />
             </div>
             <div className="mt-6 grid grid-cols-4 gap-2">
               {rings.map((r) => (
@@ -418,7 +400,7 @@ function HomePage() {
               <p className="label-quiet">A thought from Origin</p>
             </div>
             <p className="mt-3 font-serif text-lg italic leading-snug">
-              {recommendation?.body ?? aiInsight?.body ?? buildInsight(open.length, profile.data?.energy_level ?? null)}
+              {recommendation?.body ?? aiInsight?.body ?? buildInsight(openCount, data?.profile?.energy_level ?? null)}
             </p>
             <button
               onClick={() => {
@@ -462,11 +444,6 @@ function HomePage() {
 function num(v: unknown) {
   const n = Number(v ?? 0);
   return Number.isFinite(n) ? Math.round(n) : 0;
-}
-
-function avg(a: number[]) {
-  const clean = a.filter((n) => Number.isFinite(n));
-  return clean.length ? clean.reduce((s, n) => s + n, 0) / clean.length : null;
 }
 
 function statusLine(score: number) {
