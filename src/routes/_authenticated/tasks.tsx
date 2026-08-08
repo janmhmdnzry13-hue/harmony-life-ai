@@ -114,8 +114,9 @@ function TasksPage() {
         <div className="card-soft">
           <EmptyState
             icon={<ListChecks className="size-5" strokeWidth={1.8} />}
-            title="Nothing waiting on you."
-            body="When something comes to mind, put it here and let your head rest."
+            title="Start with one clear next step."
+            body="Your first task should be small, visible, and easy to finish today. You can add due dates and labels later."
+            tips={["Try: Reply to Jordan", "Try: Book dentist appointment", "Try: Write first draft for 20 minutes"]}
             action={
               <button
                 onClick={() => setOpen(true)}

@@ -3,8 +3,9 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { listProjects, upsertProject, deleteProject } from "@/lib/projects.functions";
 import { useState } from "react";
-import { Plus, Trash2 } from "lucide-react";
+import { FolderKanban, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { EmptyState } from "@/components/soft";
 
 export const Route = createFileRoute("/_authenticated/projects")({
   component: ProjectsPage,
@@ -47,10 +48,25 @@ function ProjectsPage() {
         </button>
       </header>
 
+      {(q.data ?? []).length === 0 ? (
+        <div className="card-soft">
+          <EmptyState
+            icon={<FolderKanban className="size-5" strokeWidth={1.8} />}
+            title="Turn a larger goal into a board."
+            body="Use projects when a goal has multiple steps, people, or phases. For one-off work, tasks are still perfect."
+            tips={["Plan a home move", "Launch a side project", "Organize a family trip"]}
+            action={
+              <button
+                onClick={() => setOpen(true)}
+                className="press rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-accent-foreground"
+              >
+                Create a project
+              </button>
+            }
+          />
+        </div>
+      ) : (
       <div className="divide-y divide-ink/10 border-y border-ink/10">
-        {(q.data ?? []).length === 0 && (
-          <p className="py-8 text-sm text-ink/40 font-serif italic text-center">No projects yet.</p>
-        )}
         {(q.data ?? []).map((p) => (
           <div key={p.id} className="py-4 flex items-start gap-3 group">
             <Link to="/projects/$id" params={{ id: p.id }} className="flex-1">
@@ -63,6 +79,7 @@ function ProjectsPage() {
           </div>
         ))}
       </div>
+      )}
 
       {open && (
         <div className="fixed inset-0 z-50 bg-ink/40 flex items-end justify-center" onClick={() => setOpen(false)}>
