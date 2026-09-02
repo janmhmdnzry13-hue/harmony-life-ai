@@ -184,6 +184,8 @@ function HomePage() {
           { to: "/capture", label: "Capture" },
           { to: "/tasks", label: "Add task" },
           { to: "/calendar", label: "Calendar" },
+          { to: "/wellness", label: "Health" },
+          { to: "/habits", label: "Habits" },
           { to: "/finance", label: "Money" },
           { to: "/rescue", label: "Rescue" },
         ].map((a) => (
