@@ -1,9 +1,10 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport, type UIMessage } from "ai";
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Sparkles, ArrowUp, Mic, MicOff, Volume2, VolumeX, Gauge } from "lucide-react";
+import { Sparkles, ArrowUp, ArrowLeft, Mic, MicOff, Volume2, VolumeX, Gauge } from "lucide-react";
 import { useVoice } from "@/hooks/use-voice";
 
 export const Route = createFileRoute("/_authenticated/ai")({
@@ -28,6 +29,8 @@ export const Route = createFileRoute("/_authenticated/ai")({
 });
 
 const SUGGESTIONS = [
+  "Add a task: call the bank tomorrow",
+  "I did my walk today",
   "Plan my day",
   "How am I actually doing?",
   "Am I heading for burnout?",
@@ -35,6 +38,8 @@ const SUGGESTIONS = [
 ];
 
 function AiPage() {
+  const router = useRouter();
+  const qc = useQueryClient();
   const [token, setToken] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -55,6 +60,11 @@ function AiPage() {
     onFinish: ({ message }: { message: UIMessage }) => {
       const text = message.parts.map((p) => (p.type === "text" ? p.text : "")).join("");
       speak(text);
+      // Origin can create/complete tasks and log habits for real — refresh the
+      // shared views so Plan, Habits and Home show the change immediately.
+      for (const key of ["tasks", "habits", "dashboard", "insights", "understand"]) {
+        qc.invalidateQueries({ queryKey: [key] });
+      }
       inputRef.current?.focus();
     },
   });
@@ -82,12 +92,30 @@ function AiPage() {
 
   const busy = status === "streaming" || status === "submitted";
 
+  const goBack = () => {
+    if (router.history.canGoBack()) router.history.back();
+    else router.navigate({ to: "/" });
+  };
+
   return (
-    <div className="flex flex-col h-[100dvh] pb-24">
-      <header className="px-5 pt-12 pb-4 border-b border-ink/10 flex items-center justify-between">
+    <div className="flex flex-col h-[100dvh] bg-paper">
+      <header className="px-5 pt-5 pb-4 border-b border-border flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="size-9 bg-ink text-paper flex items-center justify-center">
-            <Sparkles className="size-4 text-accent" />
+          <button
+            type="button"
+            onClick={goBack}
+            aria-label="Back"
+            className="press grid size-9 shrink-0 place-items-center rounded-xl border border-border text-muted-foreground"
+          >
+            <ArrowLeft className="size-4" />
+          </button>
+          <div
+            className="grid size-9 place-items-center rounded-full p-[2px]"
+            style={{ background: "conic-gradient(from 200deg, var(--amber), var(--accent), var(--sky), var(--amber))" }}
+          >
+            <span className="grid size-full place-items-center rounded-full bg-card">
+              <Sparkles className="size-4 text-accent" />
+            </span>
           </div>
           <div>
             <h2 className="font-serif text-lg">Origin</h2>
@@ -103,8 +131,8 @@ function AiPage() {
               voice.setSpeakReplies(!voice.speakReplies);
             }}
             aria-label={voice.speakReplies ? "Mute spoken replies" : "Speak replies aloud"}
-            className={`size-9 border flex items-center justify-center ${
-              voice.speakReplies ? "bg-ink text-paper border-ink" : "border-ink/15 text-ink/60"
+            className={`press grid size-9 place-items-center rounded-xl border ${
+              voice.speakReplies ? "bg-accent text-accent-foreground border-accent" : "border-border text-muted-foreground"
             }`}
           >
             {voice.speakReplies ? <Volume2 className="size-4" /> : <VolumeX className="size-4" />}
@@ -112,28 +140,28 @@ function AiPage() {
           <Link
             to="/intel"
             aria-label="Life score"
-            className="size-9 border border-ink/15 text-ink/60 flex items-center justify-center"
+            className="press grid size-9 place-items-center rounded-xl border border-border text-muted-foreground"
           >
             <Gauge className="size-4" />
           </Link>
         </div>
       </header>
 
-      <div ref={scrollRef} className="flex-1 overflow-y-auto px-5 py-6 space-y-5">
+      <div ref={scrollRef} className="flex-1 overflow-y-auto px-5 py-6 pb-28 space-y-5">
         {messages.length === 0 && (
           <div className="pt-8 rise">
             <p className="font-serif italic text-2xl leading-snug text-ink/80 mb-2 text-balance">
               What would you like to work through today?
             </p>
-            <p className="text-sm text-ink/50 mb-6">
-              I remember what matters and read your live signals — sleep, money, focus, mood.
+            <p className="text-sm text-muted-foreground mb-6">
+              Ask me to add a task, log a habit or review your week — I change the real thing, not a copy.
             </p>
             <div className="flex flex-wrap gap-2">
               {SUGGESTIONS.map((s) => (
                 <button
                   key={s}
                   onClick={() => send(s)}
-                  className="text-xs px-3 py-2 border border-ink/15 hover:bg-surface"
+                  className="press rounded-full border border-border bg-card px-3.5 py-2 text-xs font-medium"
                 >
                   {s}
                 </button>
@@ -148,7 +176,9 @@ function AiPage() {
           return (
             <div key={m.id} className={isUser ? "flex justify-end rise" : "rise"}>
               {isUser ? (
-                <div className="max-w-[85%] bg-accent text-accent-foreground px-4 py-2.5 text-sm">{text}</div>
+                <div className="max-w-[85%] rounded-[18px] rounded-br-[5px] bg-accent px-4 py-2.5 text-sm text-accent-foreground">
+                  {text}
+                </div>
               ) : (
                 <div className="max-w-[92%] text-sm leading-relaxed whitespace-pre-wrap font-serif">{text}</div>
               )}
@@ -167,7 +197,7 @@ function AiPage() {
         {status === "submitted" && <div className="text-sm text-ink/40 font-serif italic">Thinking…</div>}
       </div>
 
-      <div className="fixed bottom-24 inset-x-0 flex justify-center pointer-events-none">
+      <div className="fixed bottom-0 inset-x-0 flex justify-center pointer-events-none pb-5">
         <form
           className="w-full max-w-[480px] px-5 pointer-events-auto"
           onSubmit={(e) => {
@@ -175,7 +205,7 @@ function AiPage() {
             send(input);
           }}
         >
-          <div className="flex items-center gap-2 glass pl-4 pr-2 py-2">
+          <div className="flex items-center gap-2 glass rounded-full pl-4 pr-2 py-2">
             <input
               ref={inputRef}
               value={input}
@@ -189,8 +219,8 @@ function AiPage() {
                 type="button"
                 onClick={() => (voice.listening ? voice.stop() : voice.start())}
                 aria-label={voice.listening ? "Stop listening" : "Speak to Origin"}
-                className={`size-8 flex items-center justify-center border ${
-                  voice.listening ? "bg-accent text-accent-foreground border-accent listening" : "border-ink/15 text-ink/60"
+                className={`grid size-8 place-items-center rounded-full border ${
+                  voice.listening ? "bg-accent text-accent-foreground border-accent listening" : "border-border text-muted-foreground"
                 }`}
               >
                 {voice.listening ? <MicOff className="size-4" /> : <Mic className="size-4" />}
@@ -199,7 +229,7 @@ function AiPage() {
             <button
               type="submit"
               disabled={busy || !input.trim()}
-              className="size-8 bg-ink text-paper flex items-center justify-center disabled:opacity-40"
+              className="grid size-8 place-items-center rounded-full bg-accent text-accent-foreground disabled:opacity-40"
               aria-label="Send"
             >
               <ArrowUp className="size-4" />
