@@ -142,7 +142,9 @@ function AuthPage() {
   }
 
   return (
-    <div className="min-h-screen bg-paper text-ink flex flex-col">
+    <div className="relative min-h-screen bg-paper text-ink flex flex-col">
+      <div className="mesh pointer-events-none absolute inset-0 opacity-55" aria-hidden />
+      <div className="grain pointer-events-none absolute inset-0 opacity-[0.025]" aria-hidden />
       <div className="flex-1 flex flex-col justify-center px-6 max-w-[440px] mx-auto w-full">
         <div className="mb-10">
           <div className="flex items-center gap-2 mb-6">
