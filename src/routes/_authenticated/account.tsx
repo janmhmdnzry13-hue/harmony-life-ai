@@ -183,7 +183,7 @@ function AccountPage() {
               <button
                 onClick={() => save.mutate({ display_name: name.trim() })}
                 disabled={save.isPending || !name.trim()}
-                className="press inline-flex items-center gap-2 rounded-full bg-amber px-5 py-2.5 text-xs font-bold tracking-wide text-white disabled:opacity-50"
+                className="press inline-flex items-center gap-2 rounded-full bg-amber px-5 py-2.5 text-xs font-bold tracking-wide text-accent-foreground disabled:opacity-50"
               >
                 <Check className="size-3.5" /> Save
               </button>
@@ -208,7 +208,7 @@ function AccountPage() {
             </p>
             <button
               onClick={() => setEditing(true)}
-              className="press mt-4 inline-flex items-center gap-2 rounded-full bg-amber px-5 py-2.5 text-xs font-bold tracking-wide text-white"
+              className="press mt-4 inline-flex items-center gap-2 rounded-full bg-amber px-5 py-2.5 text-xs font-bold tracking-wide text-accent-foreground"
             >
               <Pencil className="size-3.5" /> Edit name
             </button>
