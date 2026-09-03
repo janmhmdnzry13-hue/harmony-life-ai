@@ -29,15 +29,23 @@ export function AppShell({ children }: { children: ReactNode }) {
     <CelebrationProvider>
       <div className="min-h-screen bg-paper text-ink flex justify-center">
         <div className="w-full max-w-[520px] min-h-screen flex flex-col relative">
+          {/* Warm ambient wash + film grain, straight from the reference */}
+          <div className="mesh pointer-events-none fixed inset-0 z-0 opacity-55" aria-hidden />
+          <div className="grain pointer-events-none fixed inset-0 z-0 opacity-[0.025]" aria-hidden />
+
           {!onAi && (
-            <header className="sticky top-0 z-30 glass px-5 py-3 flex items-center justify-between border-x-0 border-t-0">
-              <Link to="/" className="flex items-center gap-2.5" onClick={() => haptic("tap")}>
-                <span className="grid size-8 place-items-center rounded-xl bg-accent-soft">
-                  <span className="size-2.5 rounded-full bg-accent" />
-                </span>
+            <header className="sticky top-0 z-30 glass px-6 py-3.5 flex items-center justify-between border-x-0 border-t-0">
+              <Link to="/" className="flex items-center gap-3" onClick={() => haptic("tap")}>
+                <span
+                  className="size-8 rounded-[9px]"
+                  style={{
+                    background:
+                      "conic-gradient(from 200deg, var(--amber), var(--clay), var(--teal), var(--amber))",
+                  }}
+                />
                 <span className="leading-none">
-                  <span className="block font-serif text-[15px] tracking-tight">Origin</span>
-                  <span className="block text-[10px] tracking-wide text-muted-foreground">
+                  <span className="block text-[14px] font-bold tracking-[0.2px]">Origin</span>
+                  <span className="block mt-[3px] text-[10.5px] text-muted-foreground">
                     Your life, unhurried.
                   </span>
                 </span>
@@ -45,6 +53,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               <NotificationsBell />
             </header>
           )}
+
 
           <main className="flex-1 pb-32">{children}</main>
 
