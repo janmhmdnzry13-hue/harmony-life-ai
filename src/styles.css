@@ -1,20 +1,21 @@
 @import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";
-@import "@fontsource/lora/400.css";
-@import "@fontsource/lora/500.css";
-@import "@fontsource/lora/600.css";
-@import "@fontsource/lora/400-italic.css";
-@import "@fontsource/nunito-sans/400.css";
-@import "@fontsource/nunito-sans/500.css";
-@import "@fontsource/nunito-sans/600.css";
-@import "@fontsource/nunito-sans/700.css";
+@import "@fontsource/fraunces/300.css";
+@import "@fontsource/fraunces/500.css";
+@import "@fontsource/fraunces/600.css";
+@import "@fontsource/fraunces/400-italic.css";
+@import "@fontsource/inter/400.css";
+@import "@fontsource/inter/500.css";
+@import "@fontsource/inter/600.css";
+@import "@fontsource/inter/700.css";
+@import "@fontsource/inter/800.css";
 
 @custom-variant dark (&:is(.dark *));
 
 /* -----------------------------------------------------------
- * Origin — Cloud White. Calm, airy, generous whitespace.
- * Lora headings · Nunito Sans body · soft shadows · round corners.
+ * Origin — Harmony. Warm charcoal night, unhurried.
+ * Fraunces headings · Inter body · amber / teal / clay / sage.
  * ----------------------------------------------------------- */
 
 @theme inline {
@@ -32,6 +33,10 @@
   --color-leaf-soft: var(--leaf-soft);
   --color-amber: var(--amber);
   --color-amber-soft: var(--amber-soft);
+  --color-clay: var(--clay);
+  --color-clay-soft: var(--clay-soft);
+  --color-teal: var(--teal);
+  --color-sage: var(--sage);
   --color-positive: var(--positive);
 
   --color-muted: var(--muted);
@@ -50,68 +55,68 @@
   --color-popover-foreground: var(--ink);
   --color-input: var(--border);
 
-  --font-serif: "Lora", ui-serif, Georgia, serif;
-  --font-sans: "Nunito Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Fraunces", ui-serif, Georgia, serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
 
-  --radius: 1rem;
-  --radius-sm: 0.625rem;
+  --radius: 1.125rem;
+  --radius-sm: 0.6875rem;
   --radius-md: 0.875rem;
   --radius-lg: 1.25rem;
-  --radius-xl: 1.75rem;
+  --radius-xl: 1.625rem;
   --radius-2xl: 2rem;
 }
 
 :root {
-  --paper: #fbfbfd;
-  --card: #ffffff;
-  --ink: #16182b;
-  --surface: #f2f1fb;
-  --accent: #6d5efc;
-  --accent-foreground: #ffffff;
-  --accent-soft: #eeeaff;
-  --sky: #3b82f6;
-  --sky-soft: #e7f0fe;
-  --leaf: #22a06b;
-  --leaf-soft: #e4f5ec;
-  --amber: #e08a1e;
-  --amber-soft: #fdf1de;
-  --muted: #eceaf6;
-  --muted-foreground: #6b6f8a;
-  --border: rgb(22 24 43 / 0.07);
-  --ring: rgb(109 94 252 / 0.35);
-  --destructive: #dc4c46;
-  --positive: #22a06b;
+  --paper: #10161a;
+  --card: #1a2226;
+  --card-hi: #202a2e;
+  --ink: #f0eee6;
+  --surface: #202a2e;
 
-  --shadow-soft: 0 1px 2px rgb(22 24 43 / 0.04), 0 10px 26px -14px rgb(22 24 43 / 0.12);
-  --shadow-lift: 0 2px 4px rgb(22 24 43 / 0.05), 0 20px 44px -20px rgb(22 24 43 / 0.18);
+  /* amber is the primary voice of the interface */
+  --accent: #e3a857;
+  --accent-foreground: #1a1408;
+  --accent-soft: rgb(227 168 87 / 0.12);
+
+  --amber: #e3a857;
+  --amber-soft: rgb(227 168 87 / 0.12);
+  --teal: #57aba0;
+  --clay: #c97f5c;
+  --sage: #93ac78;
+
+  /* legacy aliases kept so existing modules keep their colour semantics */
+  --sky: #57aba0;
+  --sky-soft: rgb(87 171 160 / 0.12);
+  --leaf: #93ac78;
+  --leaf-soft: rgb(147 172 120 / 0.12);
+  --clay-soft: rgb(201 127 92 / 0.14);
+
+  --muted: #202a2e;
+  --muted-foreground: #8d9793;
+  --faint: #707a75;
+  --border: rgb(240 238 230 / 0.07);
+  --ring: rgb(227 168 87 / 0.35);
+  --destructive: #c97f5c;
+  --positive: #93ac78;
+
+  --shadow-soft: 0 1px 2px rgb(0 0 0 / 0.32), 0 12px 30px -16px rgb(0 0 0 / 0.6);
+  --shadow-lift: 0 2px 6px rgb(0 0 0 / 0.36), 0 24px 48px -20px rgb(0 0 0 / 0.7);
+  --shadow-glow: 0 10px 26px rgb(227 168 87 / 0.32), 0 2px 8px rgb(0 0 0 / 0.4);
 
   --background: var(--paper);
   --foreground: var(--ink);
 }
 
+/* The night palette is the design; the dark class simply reaffirms it. */
 .dark {
-  --paper: #0d0e17;
-  --card: #161824;
-  --ink: #ecebf5;
-  --surface: #1e2031;
-  --accent: #9a8cff;
-  --accent-foreground: #0d0e17;
-  --accent-soft: #24234a;
-  --sky: #7db0ff;
-  --sky-soft: #16233a;
-  --leaf: #57cd97;
-  --leaf-soft: #142a20;
-  --amber: #f0b45f;
-  --amber-soft: #2c2314;
-  --muted: #232538;
-  --muted-foreground: #9b9fbb;
-  --border: rgb(236 235 245 / 0.1);
-  --ring: rgb(154 140 255 / 0.4);
-  --positive: #57cd97;
-
-  --shadow-soft: 0 1px 2px rgb(0 0 0 / 0.3), 0 10px 28px -14px rgb(0 0 0 / 0.6);
-  --shadow-lift: 0 2px 6px rgb(0 0 0 / 0.35), 0 22px 46px -20px rgb(0 0 0 / 0.7);
-
+  --paper: #10161a;
+  --card: #1a2226;
+  --card-hi: #202a2e;
+  --ink: #f0eee6;
+  --surface: #202a2e;
+  --muted: #202a2e;
+  --muted-foreground: #8d9793;
+  --border: rgb(240 238 230 / 0.07);
   --background: var(--paper);
   --foreground: var(--ink);
 }
@@ -119,7 +124,7 @@
 @layer base {
   * { border-color: var(--color-border); }
   html, body {
-    background: var(--paper);
+    background: #04060a;
     color: var(--ink);
     font-family: var(--font-sans);
     letter-spacing: -0.005em;
@@ -138,38 +143,54 @@
   scrollbar-width: none;
 }
 
-/* Elevated calm card — the primary surface of the app. */
+@utility scrollbar-none {
+  &::-webkit-scrollbar { display: none; }
+  scrollbar-width: none;
+}
+
+/* Warm ambient wash behind the whole app — the reference's mesh + grain. */
+@utility mesh {
+  background-image:
+    radial-gradient(480px 320px at 15% -8%, rgb(227 168 87 / 0.16), transparent 60%),
+    radial-gradient(420px 300px at 100% 10%, rgb(87 171 160 / 0.12), transparent 60%);
+}
+
+@utility grain {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Quiet raised card — the primary surface of the app. */
 @utility card-soft {
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
   box-shadow: var(--shadow-soft);
 }
 
 @utility card-lift {
-  background: var(--card);
+  background: linear-gradient(155deg, var(--card-hi) 0%, var(--card) 100%);
   border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
   box-shadow: var(--shadow-lift);
 }
 
 @utility glass {
-  background: color-mix(in oklab, var(--paper) 78%, transparent);
-  backdrop-filter: blur(24px) saturate(150%);
+  background: color-mix(in oklab, var(--paper) 88%, transparent);
+  backdrop-filter: blur(24px) saturate(140%);
   border: 1px solid var(--border);
 }
 
 @utility label-quiet {
-  font-size: 0.6875rem;
-  font-weight: 600;
+  font-size: 0.65625rem;
+  font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--muted-foreground);
+  color: var(--faint);
 }
 
 @utility press {
-  transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 220ms ease;
-  &:active { transform: scale(0.985); }
+  transition: transform 200ms cubic-bezier(0.32, 0.72, 0, 1), box-shadow 200ms ease;
+  &:active { transform: scale(0.96); }
 }
 
 @utility rise {
@@ -201,7 +222,7 @@
   background-image: linear-gradient(
     90deg,
     var(--muted) 0%,
-    color-mix(in oklab, var(--muted) 55%, var(--card)) 50%,
+    color-mix(in oklab, var(--muted) 55%, var(--card-hi)) 50%,
     var(--muted) 100%
   );
   background-size: 220% 100%;
@@ -232,7 +253,7 @@
   *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }
 
-/* --- Reference-inspired tiles: one card, one question ------------- */
+/* --- Reference tiles: one card, one question --------------------- */
 @utility tile {
   background: var(--card);
   border: 1px solid var(--border);
