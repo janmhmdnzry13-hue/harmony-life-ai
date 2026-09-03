@@ -55,7 +55,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           )}
 
 
-          <main className="flex-1 pb-32">{children}</main>
+          <main className="relative z-10 flex-1 pb-36">{children}</main>
 
           {/* Floating AI button → full-screen AI conversation (hidden while in it) */}
           {!onAi && (
@@ -65,15 +65,15 @@ export function AppShell({ children }: { children: ReactNode }) {
                   to="/ai"
                   aria-label="Ask Origin"
                   onClick={() => haptic("soft")}
-                  className="press orb pointer-events-auto absolute bottom-[104px] right-5 grid size-[56px] place-items-center rounded-full p-[3px]"
+                  className="press orb pointer-events-auto absolute bottom-[100px] right-5 grid size-[56px] place-items-center rounded-full p-[4px]"
                   style={{
                     background:
-                      "conic-gradient(from 200deg, var(--amber), var(--accent), var(--sky), var(--amber))",
-                    boxShadow: "var(--shadow-lift)",
+                      "conic-gradient(from 200deg, var(--amber), var(--clay), var(--teal), var(--amber))",
+                    boxShadow: "var(--shadow-glow)",
                   }}
                 >
-                  <span className="grid size-full place-items-center rounded-full bg-card">
-                    <Sparkles className="size-[22px] text-accent" strokeWidth={1.9} />
+                  <span className="grid size-full place-items-center rounded-full bg-paper">
+                    <Sparkles className="size-[22px] text-amber" strokeWidth={1.8} />
                   </span>
                 </Link>
               </div>
@@ -82,40 +82,39 @@ export function AppShell({ children }: { children: ReactNode }) {
 
           {!onAi && (
             <nav className="fixed bottom-0 inset-x-0 z-40 flex justify-center pointer-events-none">
-              <div className="w-full max-w-[520px] px-3 pb-4 pointer-events-auto">
-                <div className="card-lift rounded-2xl px-2 py-1.5 flex items-center justify-between">
-                  {tabs.map((t) => {
-                    const active =
-                      t.to === "/"
-                        ? pathname === "/"
-                        : t.match.some((m) => pathname === m || pathname.startsWith(`${m}/`));
-                    const Icon = t.icon;
+              <div className="w-full max-w-[520px] pointer-events-auto glass border-x-0 border-b-0 px-2 pt-3 pb-6 flex items-center justify-around">
+                {tabs.map((t) => {
+                  const active =
+                    t.to === "/"
+                      ? pathname === "/"
+                      : t.match.some((m) => pathname === m || pathname.startsWith(`${m}/`));
+                  const Icon = t.icon;
 
-                    return (
-                      <Link
-                        key={t.to}
-                        to={t.to as never}
-                        aria-label={t.label}
-                        aria-current={active ? "page" : undefined}
-                        onClick={() => haptic("tap")}
-                        className={`press flex flex-1 flex-col items-center gap-0.5 rounded-xl py-1.5 ${
-                          active ? "text-accent" : "text-muted-foreground"
-                        }`}
-                      >
-                        <Icon className="size-[20px]" strokeWidth={active ? 2.2 : 1.7} />
-                        <span className={`text-[9.5px] tracking-wide ${active ? "font-bold" : "font-medium"}`}>
-                          {t.label}
-                        </span>
-                        <span
-                          className={`mt-0.5 size-[3.5px] rounded-full ${active ? "bg-accent" : "bg-transparent"}`}
-                        />
-                      </Link>
-                    );
-                  })}
-                </div>
+                  return (
+                    <Link
+                      key={t.to}
+                      to={t.to as never}
+                      aria-label={t.label}
+                      aria-current={active ? "page" : undefined}
+                      onClick={() => haptic("tap")}
+                      className={`press flex flex-1 flex-col items-center gap-[5px] rounded-xl py-1 ${
+                        active ? "text-amber" : "text-muted-foreground"
+                      }`}
+                    >
+                      <Icon className="size-[20px]" strokeWidth={active ? 2.2 : 1.7} />
+                      <span className={`text-[9.5px] ${active ? "font-bold" : "font-medium"}`}>
+                        {t.label}
+                      </span>
+                      <span
+                        className={`size-[3.5px] rounded-full ${active ? "bg-amber" : "bg-transparent"}`}
+                      />
+                    </Link>
+                  );
+                })}
               </div>
             </nav>
           )}
+
         </div>
       </div>
     </CelebrationProvider>
