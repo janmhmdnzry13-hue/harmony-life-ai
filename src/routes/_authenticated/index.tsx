@@ -548,12 +548,17 @@ function Tile({
 }) {
   const t = TONES[tone];
   return (
-    <Link to={to as never} onClick={() => haptic("tap")} className="press tile rise flex flex-col gap-2">
-      <span className={`chip-icon ${t.bg}`}>
+    <Link
+      to={to as never}
+      onClick={() => haptic("tap")}
+      className="press tile rise flex flex-col gap-2.5 p-[18px]"
+      style={{ borderRadius: "var(--radius-xl)" }}
+    >
+      <span className={`chip-icon ${t.bg}`} style={{ borderRadius: "0.75rem" }}>
         <span className={`size-2 rounded-full ${t.fg} bg-current`} />
       </span>
-      <span className="text-[11px] font-semibold tracking-wide text-muted-foreground">{label}</span>
-      <span className="font-serif text-[26px] leading-none tracking-tight">{value}</span>
+      <span className="text-[10.5px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">{label}</span>
+      <span className="font-serif text-[24px] font-semibold leading-none tracking-tight">{value}</span>
       <span className="text-[11px] leading-snug text-muted-foreground">{note}</span>
     </Link>
   );
