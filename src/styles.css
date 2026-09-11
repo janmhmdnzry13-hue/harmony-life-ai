@@ -67,64 +67,66 @@
 }
 
 :root {
-  --paper: #10161a;
-  --card: #1a2226;
-  --card-hi: #202a2e;
-  --ink: #f0eee6;
-  --surface: #202a2e;
+  --paper: #faf8f2;
+  --shell: #e9e5d9;
+  --card: #ffffff;
+  --card-hi: #f2eee3;
+  --ink: #201e19;
+  --surface: #f2eee3;
 
   /* amber is the primary voice of the interface */
-  --accent: #e3a857;
+  --accent: #c98a2e;
   --accent-foreground: #1a1408;
-  --accent-soft: rgb(227 168 87 / 0.12);
+  --accent-soft: rgb(201 138 46 / 0.12);
 
-  --amber: #e3a857;
-  --amber-soft: rgb(227 168 87 / 0.12);
-  --teal: #57aba0;
-  --clay: #c97f5c;
-  --sage: #93ac78;
+  --amber: #c98a2e;
+  --amber-soft: rgb(201 138 46 / 0.12);
+  --teal: #3d9187;
+  --clay: #b5623d;
+  --sage: #708752;
 
   /* legacy aliases kept so existing modules keep their colour semantics */
-  --sky: #57aba0;
-  --sky-soft: rgb(87 171 160 / 0.12);
-  --leaf: #93ac78;
-  --leaf-soft: rgb(147 172 120 / 0.12);
-  --clay-soft: rgb(201 127 92 / 0.14);
+  --sky: #3d9187;
+  --sky-soft: rgb(61 145 135 / 0.12);
+  --leaf: #708752;
+  --leaf-soft: rgb(112 135 82 / 0.12);
+  --clay-soft: rgb(181 98 61 / 0.14);
 
-  --muted: #202a2e;
-  --muted-foreground: #8d9793;
-  --faint: #707a75;
-  --border: rgb(240 238 230 / 0.07);
-  --ring: rgb(227 168 87 / 0.35);
-  --destructive: #c97f5c;
-  --positive: #93ac78;
+  --muted: #f2eee3;
+  --muted-foreground: #6b6f68;
+  --faint: #9a9c92;
+  --border: rgb(20 20 15 / 0.09);
+  --ring: rgb(201 138 46 / 0.35);
+  --destructive: #b5623d;
+  --positive: #708752;
 
-  --shadow-soft: 0 1px 2px rgb(0 0 0 / 0.32), 0 12px 30px -16px rgb(0 0 0 / 0.6);
-  --shadow-lift: 0 2px 6px rgb(0 0 0 / 0.36), 0 24px 48px -20px rgb(0 0 0 / 0.7);
-  --shadow-glow: 0 10px 26px rgb(227 168 87 / 0.32), 0 2px 8px rgb(0 0 0 / 0.4);
+  --shadow-soft: 0 1px 2px rgb(0 0 0 / 0.04), 0 10px 26px -18px rgb(0 0 0 / 0.14);
+  --shadow-lift: 0 2px 6px rgb(0 0 0 / 0.06), 0 22px 44px -24px rgb(0 0 0 / 0.22);
+  --shadow-glow: 0 10px 26px rgb(201 138 46 / 0.28), 0 2px 8px rgb(0 0 0 / 0.08);
 
   --background: var(--paper);
   --foreground: var(--ink);
 }
 
-/* The night palette is the design; the dark class simply reaffirms it. */
+/* The light palette is the design; the dark class simply reaffirms it. */
 .dark {
-  --paper: #10161a;
-  --card: #1a2226;
-  --card-hi: #202a2e;
-  --ink: #f0eee6;
-  --surface: #202a2e;
-  --muted: #202a2e;
-  --muted-foreground: #8d9793;
-  --border: rgb(240 238 230 / 0.07);
+  --paper: #faf8f2;
+  --card: #ffffff;
+  --card-hi: #f2eee3;
+  --ink: #201e19;
+  --surface: #f2eee3;
+  --muted: #f2eee3;
+  --muted-foreground: #6b6f68;
+  --border: rgb(20 20 15 / 0.09);
   --background: var(--paper);
   --foreground: var(--ink);
 }
+
 
 @layer base {
   * { border-color: var(--color-border); }
   html, body {
-    background: #04060a;
+    background: var(--shell);
     color: var(--ink);
     font-family: var(--font-sans);
     letter-spacing: -0.005em;
@@ -175,7 +177,7 @@
 }
 
 @utility glass {
-  background: color-mix(in oklab, var(--paper) 88%, transparent);
+  background: rgb(250 248 242 / 0.88);
   backdrop-filter: blur(24px) saturate(140%);
   border: 1px solid var(--border);
 }
@@ -222,7 +224,7 @@
   background-image: linear-gradient(
     90deg,
     var(--muted) 0%,
-    color-mix(in oklab, var(--muted) 55%, var(--card-hi)) 50%,
+    color-mix(in oklab, var(--muted) 60%, #ffffff) 50%,
     var(--muted) 100%
   );
   background-size: 220% 100%;
