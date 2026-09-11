@@ -137,11 +137,14 @@ function HomePage() {
   return (
     <div className="space-y-4 px-5 pb-4 pt-7">
       <header className="rise px-1 pb-1">
-        <p className="label-quiet">{format(new Date(), "EEEE, MMMM d")}</p>
-        <h1 className="mt-2 font-serif text-[32px] leading-[1.15] tracking-tight">
-          {greeting()}, {name}.
+        <div className="flex items-center gap-3">
+          <p className="label-quiet">{format(new Date(), "EEE, MMM d")}</p>
+          <span className="h-px flex-1 bg-border" />
+        </div>
+        <h1 className="mt-3.5 font-serif text-[32px] leading-[1.18] tracking-tight">
+          {greeting()}, <span className="text-accent not-italic font-semibold">{name}</span>.
         </h1>
-        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+        <p className="mt-2.5 max-w-[88%] text-[13.5px] leading-[1.65] text-muted-foreground">
           {dayline(openCount, doneTodayCount, habits.length)}
         </p>
       </header>
@@ -266,33 +269,38 @@ function HomePage() {
       ) : (
         <>
           {/* Today's focus — the single primary action on the screen */}
-          <section className="card-soft rise p-6">
-            <p className="label-quiet">Today's focus</p>
+          <section className="card-lift rise relative overflow-hidden p-6" style={{ borderRadius: "var(--radius-xl)" }}>
+            <span
+              aria-hidden
+              className="pointer-events-none absolute -top-[70px] -right-[60px] size-[180px] rounded-full"
+              style={{ background: "radial-gradient(circle, rgb(201 138 46 / 0.14), transparent 70%)" }}
+            />
+            <p className="text-[10.5px] font-bold uppercase tracking-[0.16em] text-accent">Today's focus</p>
             {focus ? (
               <>
-                <h2 className="mt-3 font-serif text-2xl leading-snug">{focus.title}</h2>
+                <h2 className="mt-3 font-serif text-2xl leading-snug tracking-tight">{focus.title}</h2>
                 {focus.tag && <p className="mt-1.5 text-sm text-muted-foreground">{focus.tag}</p>}
                 <button
                   onClick={() => {
                     haptic("soft");
                     toggle.mutate({ id: focus.id, completed: true });
                   }}
-                  className="press mt-5 inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-accent-foreground"
+                  className="press relative z-10 mt-5 inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 text-[12.5px] font-bold text-accent-foreground"
                 >
                   <Check className="size-4" strokeWidth={2.4} /> I've done this
                 </button>
               </>
             ) : (
               <>
-                <h2 className="mt-3 font-serif text-2xl leading-snug">Nothing pressing.</h2>
-                <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
-                  A rare kind of quiet. You're allowed to enjoy it.
+                <h2 className="mt-3 font-serif text-2xl leading-snug tracking-tight">Nothing pressing.</h2>
+                <p className="mt-2 max-w-[80%] text-[13px] leading-[1.65] text-muted-foreground">
+                  A rare kind of quiet. You're allowed to enjoy it, not fill it.
                 </p>
                 <Link
                   to="/tasks"
-                  className="press mt-5 inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-accent-foreground"
+                  className="press relative z-10 mt-5 inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 text-[12.5px] font-bold text-accent-foreground"
                 >
-                  Add something <ArrowRight className="size-4" />
+                  Add something small <ArrowRight className="size-3.5" strokeWidth={2.5} />
                 </Link>
               </>
             )}
@@ -540,12 +548,17 @@ function Tile({
 }) {
   const t = TONES[tone];
   return (
-    <Link to={to as never} onClick={() => haptic("tap")} className="press tile rise flex flex-col gap-2">
-      <span className={`chip-icon ${t.bg}`}>
+    <Link
+      to={to as never}
+      onClick={() => haptic("tap")}
+      className="press tile rise flex flex-col gap-2.5 p-[18px]"
+      style={{ borderRadius: "var(--radius-xl)" }}
+    >
+      <span className={`chip-icon ${t.bg}`} style={{ borderRadius: "0.75rem" }}>
         <span className={`size-2 rounded-full ${t.fg} bg-current`} />
       </span>
-      <span className="text-[11px] font-semibold tracking-wide text-muted-foreground">{label}</span>
-      <span className="font-serif text-[26px] leading-none tracking-tight">{value}</span>
+      <span className="text-[10.5px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">{label}</span>
+      <span className="font-serif text-[24px] font-semibold leading-none tracking-tight">{value}</span>
       <span className="text-[11px] leading-snug text-muted-foreground">{note}</span>
     </Link>
   );
