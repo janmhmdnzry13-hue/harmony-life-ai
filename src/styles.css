@@ -76,7 +76,7 @@
 
   /* amber is the primary voice of the interface */
   --accent: #c98a2e;
-  --accent-foreground: #fffdf7;
+  --accent-foreground: #1a1408;
   --accent-soft: rgb(201 138 46 / 0.12);
 
   --amber: #c98a2e;
@@ -126,7 +126,7 @@
 @layer base {
   * { border-color: var(--color-border); }
   html, body {
-    background: #04060a;
+    background: var(--shell);
     color: var(--ink);
     font-family: var(--font-sans);
     letter-spacing: -0.005em;
@@ -177,7 +177,7 @@
 }
 
 @utility glass {
-  background: color-mix(in oklab, var(--paper) 88%, transparent);
+  background: rgb(250 248 242 / 0.88);
   backdrop-filter: blur(24px) saturate(140%);
   border: 1px solid var(--border);
 }
@@ -224,7 +224,7 @@
   background-image: linear-gradient(
     90deg,
     var(--muted) 0%,
-    color-mix(in oklab, var(--muted) 55%, var(--card-hi)) 50%,
+    color-mix(in oklab, var(--muted) 60%, #ffffff) 50%,
     var(--muted) 100%
   );
   background-size: 220% 100%;
