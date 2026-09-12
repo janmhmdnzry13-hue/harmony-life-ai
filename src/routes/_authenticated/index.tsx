@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { toggleTask } from "@/lib/tasks.functions";
 import { getDashboardData } from "@/lib/dashboard.functions";
 import { format, parseISO } from "date-fns";
-import { ArrowRight, Check, Clock, ListChecks, Mic, Repeat, Sparkles, UserRound } from "lucide-react";
+import { ArrowRight, Check, Clock, ListChecks, Mic, Repeat, Sparkles, UserRound, Heart, Target, Sun, Flame, PencilLine, Plus, CalendarDays, CircleDollarSign, Circle } from "lucide-react";
 import { greeting, dayline, haptic, praise } from "@/lib/feel";
 import { useCelebrate } from "@/components/celebration";
 import { CardSkeleton } from "@/components/soft";
@@ -136,72 +136,137 @@ function HomePage() {
 
   return (
     <div className="space-y-4 px-5 pb-4 pt-7">
-      <header className="rise px-1 pb-1">
-        <div className="flex items-center gap-3">
-          <p className="label-quiet">{format(new Date(), "EEE, MMM d")}</p>
-          <span className="h-px flex-1 bg-border" />
+      <h1 className="sr-only">Your day at Origin</h1>
+      <section className="flex items-center gap-6 border-b border-border pb-8 pt-2" aria-label="Life score overview">
+        <Link to="/insights" className="relative block w-[48%] shrink-0 aspect-square" aria-label={`Life score ${lifeScore}`}>
+          <svg viewBox="0 0 160 160" className="size-full -rotate-90" aria-hidden="true">
+            <circle cx="80" cy="80" r="69" fill="none" strokeWidth="14" className="stroke-surface" />
+            {rings.map((r, i) => <circle key={r.label} cx="80" cy="80" r="69" fill="none" strokeWidth="14" strokeLinecap="round" pathLength="100" strokeDasharray={`${Math.max(0, Math.min(100, r.value)) * 0.48} 100`} strokeDashoffset={-i * 25} className={['stroke-amber', 'stroke-teal', 'stroke-clay', 'stroke-sage'][i]} />)}
+          </svg>
+          <span className="absolute inset-0 flex flex-col items-center justify-center">
+            <span className="font-serif text-[44px] font-semibold leading-none">{loading ? '—' : lifeScore}</span>
+            <span className="mt-2 text-[10px] uppercase tracking-widest text-muted-foreground">Life score</span>
+          </span>
+        </Link>
+        <div className="min-w-0 flex-1 space-y-3.5">
+          {rings.map((r, i) => {
+            const Icon = [Heart, CircleDollarSign, Target, Sun][i];
+            return <Link key={r.label} to={r.to as never} className="flex items-center gap-2 text-[13px]" onClick={() => haptic('tap')}>
+              <span className={`grid size-5 shrink-0 place-items-center rounded-full text-accent-foreground ${['bg-amber', 'bg-teal', 'bg-clay', 'bg-sage'][i]}`}><Icon className="size-3" /></span>
+              <span className="text-muted-foreground">{r.label}</span><span className="ml-auto font-medium">{loading ? '—' : r.value}</span>
+            </Link>;
+          })}
         </div>
-        <h1 className="mt-3.5 font-serif text-[32px] leading-[1.18] tracking-tight">
-          {greeting()}, <span className="text-accent not-italic font-semibold">{name}</span>.
-        </h1>
-        <p className="mt-2.5 max-w-[88%] text-[13.5px] leading-[1.65] text-muted-foreground">
-          {dayline(openCount, doneTodayCount, habits.length)}
-        </p>
-      </header>
-
-      {/* At a glance — four questions, four answers */}
-      <div className="grid grid-cols-2 gap-3">
-        <Tile
-          to="/insights"
-          label="Life score"
-          value={lifeScore ? String(lifeScore) : "—"}
-          note="across every area"
-          tone="accent"
-        />
-        <Tile
-          to="/tasks"
-          label="Tasks done"
-          value={`${doneTasks}/${totalTasks || 0}`}
-          note={openCount ? `${openCount} still open` : "all clear"}
-          tone="sky"
-        />
-        <Tile
-          to="/habits"
-          label="Habits"
-          value={`${habitPct}%`}
-          note={`${doneTodayCount} of ${habits.length || 0} today`}
-          tone="leaf"
-        />
-        <Tile
-          to="/wellness"
-          label="Rest"
-          value={sleepHours ? `${sleepHours.toFixed(1)}h` : "—"}
-          note={stressNow !== null ? `stress ${Number(stressNow)}/10` : "last night"}
-          tone="amber"
-        />
+      </section>
+      <div className="grid grid-cols-2 gap-3 pt-1">
+        {[{to:'/tasks', label:'Tasks', value:`${doneTasks}/${totalTasks}`, pct:totalTasks ? doneTasks / totalTasks * 100 : 0, icon:Check, tone:'text-clay', bar:'bg-clay'}, {to:'/habits', label:'Habits', value:`${habitPct}%`, pct:habitPct, icon:Flame, tone:'text-amber', bar:'bg-amber'}].map(item => <Link key={item.label} to={item.to as never} className="card-soft press min-w-0 px-4 py-4">
+          <div className="flex flex-wrap items-center justify-between gap-1"><span className="flex items-center gap-2 text-[10px] uppercase text-muted-foreground"><item.icon className={`size-3.5 ${item.tone}`} />{item.label}</span><span className="font-serif text-[27px] font-semibold leading-tight">{item.value}</span></div>
+          <div className="mt-3 h-[3px] overflow-hidden rounded-full bg-surface"><div className={`h-full rounded-full ${item.bar}`} style={{width:`${Math.min(100, Math.max(0, item.pct))}%`}} /></div>
+        </Link>)}
       </div>
 
-      {/* Quick actions — fewer clicks to the things done most */}
-      <div className="flex gap-2 overflow-x-auto no-scrollbar px-0.5 py-0.5">
-        {[
-          { to: "/capture", label: "Capture" },
-          { to: "/tasks", label: "Add task" },
-          { to: "/calendar", label: "Calendar" },
-          { to: "/wellness", label: "Health" },
-          { to: "/habits", label: "Habits" },
-          { to: "/finance", label: "Money" },
-          { to: "/rescue", label: "Rescue" },
-        ].map((a) => (
-          <Link
-            key={a.to}
-            to={a.to as never}
-            onClick={() => haptic("tap")}
-            className="press shrink-0 rounded-full border border-border bg-card px-3.5 py-2 text-xs font-semibold"
+      {dashboard.isError ? (
+        <section className="card-soft rise p-6">
+          <p className="label-quiet">Today is taking a breath</p>
+          <h2 className="mt-3 font-serif text-2xl leading-snug">We couldn't load your dashboard.</h2>
+          <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+            {dashboard.error instanceof Error ? dashboard.error.message : "Please try again in a moment."}
+          </p>
+          <button
+            onClick={() => dashboard.refetch()}
+            className="press mt-5 inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-accent-foreground"
           >
-            {a.label}
-          </Link>
-        ))}
-      </div>
+            Try again
+          </button>
+        </section>
+      ) : loading ? (
+        <div className="space-y-4">
+          <CardSkeleton lines={2} />
+          <CardSkeleton lines={3} />
+          <CardSkeleton lines={2} />
+        </div>
+      ) : (
+        <>
+          {/* Today's focus — the single primary action on the screen */}
+          <section className="card-lift rise relative overflow-hidden px-6 py-7">
+            <p className="text-[10.5px] font-bold uppercase tracking-[0.16em] text-accent">Today's focus</p>
+            {focus ? (
+              <>
+                <h2 className="mt-3 font-serif text-2xl leading-snug tracking-tight">{focus.title}</h2>
+                {focus.tag && <p className="mt-1.5 text-sm text-muted-foreground">{focus.tag}</p>}
+                <button
+                  onClick={() => {
+                    haptic("soft");
+                    toggle.mutate({ id: focus.id, completed: true });
+                  }}
+                  className="press relative z-10 mt-5 inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 text-[12.5px] font-bold text-accent-foreground"
+                >
+                  <Check className="size-4" strokeWidth={2.4} /> I've done this
+                </button>
+              </>
+            ) : (
+              <>
+                <h2 className="mt-3 font-serif text-2xl leading-snug tracking-tight">Nothing pressing</h2>
+                <p className="mt-2 max-w-[95%] text-[14px] leading-[1.8] text-muted-foreground">
+                  A rare kind of quiet. You're allowed to enjoy it, not fill it.
+                </p>
+                <Link
+                  to="/tasks"
+                  className="press relative z-10 mt-5 inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 text-[12.5px] font-bold text-accent-foreground"
+                >
+                  Add something small <ArrowRight className="size-3.5" strokeWidth={2.5} />
+                </Link>
+              </>
+            )}
+          </section>
+
+          <div className="grid grid-cols-4 gap-3 py-2">
+            {[{to:'/capture',label:'Capture',icon:PencilLine},{to:'/tasks',label:'Add task',icon:Plus},{to:'/calendar',label:'Calendar',icon:CalendarDays},{to:'/finance',label:'Money',icon:CircleDollarSign}].map((a,i) => <Link key={a.to} to={a.to as never} onClick={() => haptic('tap')} className="press flex min-w-0 flex-col items-center gap-2 text-[11px] text-muted-foreground"><span className={`grid size-[54px] place-items-center rounded-[18px] border ${i === 0 ? 'border-accent/30 bg-accent-soft text-accent' : 'border-border bg-card'}`}><a.icon className="size-6" strokeWidth={1.7}/></span>{a.label}</Link>)}
+          </div>
+          <p className="label-quiet pt-2">Then</p>
+          {/* Next action + upcoming event — one quiet timeline */}
+          <section className="card-soft rise p-6">
+            <ul className="space-y-4">
+              {nextAction && (
+                <li className="flex items-start gap-3.5">
+                  <button
+                    onClick={() => {
+                      haptic("soft");
+                      toggle.mutate({ id: nextAction.id, completed: true });
+                    }}
+                    aria-label={`Complete ${nextAction.title}`}
+                    className="press mt-0.5 grid size-9 shrink-0 place-items-center rounded-xl border border-border bg-card text-transparent active:text-accent"
+                  >
+                    <Check className="size-4" strokeWidth={2.4} />
+                  </button>
+                  <div className="min-w-0">
+                    <p className="truncate text-[15px] font-medium">{nextAction.title}</p>
+                    <p className="mt-0.5 text-xs text-muted-foreground">next action</p>
+                  </div>
+                </li>
+              )}
+              {nextEvent && (
+                <li className="flex items-start gap-3.5">
+                  <span className="mt-0.5 grid size-9 shrink-0 place-items-center rounded-xl bg-surface">
+                    <Clock className="size-4 text-muted-foreground" strokeWidth={1.8} />
+                  </span>
+                  <div className="min-w-0">
+                    <p className="truncate text-[15px] font-medium">{nextEvent.title}</p>
+                    <p className="mt-0.5 text-xs text-muted-foreground">
+                      {format(parseISO(nextEvent.starts_at), "EEE h:mm a")}
+                      {nextEvent.location ? ` · ${nextEvent.location}` : ""}
+                    </p>
+                  </div>
+                </li>
+              )}
+              {!nextEvent && !nextAction && (
+                <li className="flex items-center gap-3 text-sm leading-relaxed text-muted-foreground">
+                  <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-surface"><Circle className="size-4" /></span>
+                  The rest of the day is open, yours to shape.
+                </li>
+              )}
+            </ul>
+          </section>
 
       {showFirstRunSetup && (
         <section className="card-soft rise p-6">
@@ -245,144 +310,6 @@ function HomePage() {
           </div>
         </section>
       )}
-
-      {dashboard.isError ? (
-        <section className="card-soft rise p-6">
-          <p className="label-quiet">Today is taking a breath</p>
-          <h2 className="mt-3 font-serif text-2xl leading-snug">We couldn't load your dashboard.</h2>
-          <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
-            {dashboard.error instanceof Error ? dashboard.error.message : "Please try again in a moment."}
-          </p>
-          <button
-            onClick={() => dashboard.refetch()}
-            className="press mt-5 inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-accent-foreground"
-          >
-            Try again
-          </button>
-        </section>
-      ) : loading ? (
-        <div className="space-y-4">
-          <CardSkeleton lines={2} />
-          <CardSkeleton lines={3} />
-          <CardSkeleton lines={2} />
-        </div>
-      ) : (
-        <>
-          {/* Today's focus — the single primary action on the screen */}
-          <section className="card-lift rise relative overflow-hidden p-6" style={{ borderRadius: "var(--radius-xl)" }}>
-            <span
-              aria-hidden
-              className="pointer-events-none absolute -top-[70px] -right-[60px] size-[180px] rounded-full"
-              style={{ background: "radial-gradient(circle, rgb(201 138 46 / 0.14), transparent 70%)" }}
-            />
-            <p className="text-[10.5px] font-bold uppercase tracking-[0.16em] text-accent">Today's focus</p>
-            {focus ? (
-              <>
-                <h2 className="mt-3 font-serif text-2xl leading-snug tracking-tight">{focus.title}</h2>
-                {focus.tag && <p className="mt-1.5 text-sm text-muted-foreground">{focus.tag}</p>}
-                <button
-                  onClick={() => {
-                    haptic("soft");
-                    toggle.mutate({ id: focus.id, completed: true });
-                  }}
-                  className="press relative z-10 mt-5 inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 text-[12.5px] font-bold text-accent-foreground"
-                >
-                  <Check className="size-4" strokeWidth={2.4} /> I've done this
-                </button>
-              </>
-            ) : (
-              <>
-                <h2 className="mt-3 font-serif text-2xl leading-snug tracking-tight">Nothing pressing.</h2>
-                <p className="mt-2 max-w-[80%] text-[13px] leading-[1.65] text-muted-foreground">
-                  A rare kind of quiet. You're allowed to enjoy it, not fill it.
-                </p>
-                <Link
-                  to="/tasks"
-                  className="press relative z-10 mt-5 inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 text-[12.5px] font-bold text-accent-foreground"
-                >
-                  Add something small <ArrowRight className="size-3.5" strokeWidth={2.5} />
-                </Link>
-              </>
-            )}
-          </section>
-
-          {/* Next action + upcoming event — one quiet timeline */}
-          <section className="card-soft rise p-6">
-            <div className="flex items-center justify-between">
-              <p className="label-quiet">Then</p>
-              <Link to="/plan" onClick={() => haptic("tap")} className="text-xs font-semibold text-accent">
-                Plan
-              </Link>
-            </div>
-            <ul className="mt-4 space-y-4">
-              {nextAction && (
-                <li className="flex items-start gap-3.5">
-                  <button
-                    onClick={() => {
-                      haptic("soft");
-                      toggle.mutate({ id: nextAction.id, completed: true });
-                    }}
-                    aria-label={`Complete ${nextAction.title}`}
-                    className="press mt-0.5 grid size-9 shrink-0 place-items-center rounded-xl border border-border bg-card text-transparent active:text-accent"
-                  >
-                    <Check className="size-4" strokeWidth={2.4} />
-                  </button>
-                  <div className="min-w-0">
-                    <p className="truncate text-[15px] font-medium">{nextAction.title}</p>
-                    <p className="mt-0.5 text-xs text-muted-foreground">next action</p>
-                  </div>
-                </li>
-              )}
-              {nextEvent && (
-                <li className="flex items-start gap-3.5">
-                  <span className="mt-0.5 grid size-9 shrink-0 place-items-center rounded-xl bg-surface">
-                    <Clock className="size-4 text-muted-foreground" strokeWidth={1.8} />
-                  </span>
-                  <div className="min-w-0">
-                    <p className="truncate text-[15px] font-medium">{nextEvent.title}</p>
-                    <p className="mt-0.5 text-xs text-muted-foreground">
-                      {format(parseISO(nextEvent.starts_at), "EEE h:mm a")}
-                      {nextEvent.location ? ` · ${nextEvent.location}` : ""}
-                    </p>
-                  </div>
-                </li>
-              )}
-              {!nextEvent && !nextAction && (
-                <li className="text-sm leading-relaxed text-muted-foreground">
-                  Nothing else scheduled. The day is yours to shape.
-                </li>
-              )}
-            </ul>
-          </section>
-
-          {/* Life status — every module, one glance */}
-          <section className="card-soft rise p-6">
-            <div className="flex items-start justify-between gap-4">
-              <div className="min-w-0">
-                <p className="label-quiet">Life status</p>
-                <p className="mt-2 font-serif text-[40px] leading-none tracking-tight">
-                  {lifeScore ? lifeScore : "—"}
-                </p>
-                <p className="mt-1.5 max-w-[24ch] text-xs leading-relaxed text-muted-foreground">
-                  {lifeScore ? statusLine(lifeScore) : "Log a little of your day and this begins to take shape."}
-                </p>
-              </div>
-              <Ring value={habitPct} caption={`${doneTodayCount}/${habits.length || 0}`} label="habits" />
-            </div>
-            <div className="mt-6 grid grid-cols-4 gap-2">
-              {rings.map((r) => (
-                <Link
-                  key={r.label}
-                  to={r.to as never}
-                  onClick={() => haptic("tap")}
-                  className="press flex flex-col items-center gap-2"
-                >
-                  <MiniRing value={r.value} />
-                  <span className="text-[10px] font-medium tracking-wide text-muted-foreground">{r.label}</span>
-                </Link>
-              ))}
-            </div>
-          </section>
 
           {/* The connection — how one part of life is touching another */}
           {link && (
